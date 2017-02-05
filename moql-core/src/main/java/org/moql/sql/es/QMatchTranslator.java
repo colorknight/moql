@@ -17,8 +17,9 @@
  */
 package org.moql.sql.es;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.moql.Operand;
 import org.moql.operand.function.Function;
 
@@ -37,29 +38,29 @@ public class QMatchTranslator extends AbstractESFunctionTranslator {
   }
 
   @Override
-  protected void innerTranslate(Function function, Object jsonObject) {
+  protected void innerTranslate(Function function, JsonElement jsonObject) {
     // TODO Auto-generated method stub
     if (function.getParameterCount() != 2) {
       throw new IllegalArgumentException(
           "Error function! The qmatch function's format should be qmatch(fields,queryString)!");
     }
-    JSONObject query = new JSONObject();
-    JSONObject match = new JSONObject();
+    JsonObject query = new JsonObject();
+    JsonObject match = new JsonObject();
 
     List<Operand> parameters = function.getParameters();
     String fieldString = getOperandName(parameters.get(0));
     String[] fields = fieldString.split(",");
     if (fields.length == 1) {
-      match.put(fields[0], getOperandName(parameters.get(1)));
-      query.put("match", match);
+      match.addProperty(fields[0], getOperandName(parameters.get(1)));
+      query.add("match", match);
     } else {
-      JSONArray array = new JSONArray();
+      JsonArray array = new JsonArray();
       for(int i = 0; i < fields.length; i++) {
         array.add(getOperandName(fields[i]));
       }
-      match.put("query", getOperandName(parameters.get(1)));
-      match.put("fields", array);
-      query.put("multi_match", match);
+      match.addProperty("query", getOperandName(parameters.get(1)));
+      match.add("fields", array);
+      query.add("multi_match", match);
     }
     putObject(jsonObject, "query", query);
   }

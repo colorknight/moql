@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,8 +17,7 @@
  */
 package org.moql.sql.es;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import com.google.gson.*;
 import org.apache.commons.lang.Validate;
 import org.moql.Filter;
 import org.moql.MoqlTranslationException;
@@ -48,9 +47,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *
  * @author Tang Tadin
- * 
+ *
  */
 public class ElasticSearchTranslator implements SqlTranslator {
 
@@ -67,12 +66,15 @@ public class ElasticSearchTranslator implements SqlTranslator {
   protected Map<String, ESFunctionTranslator> functionTranslators = new HashMap<String, ESFunctionTranslator>();
 
   {
-    functionTranslators.put(QMatchTranslator.QMATCH_FUNCTION,
-        new QMatchTranslator());
+    functionTranslators
+        .put(QMatchTranslator.QMATCH_FUNCTION, new QMatchTranslator());
     functionTranslators.put(Regex.FUNCTION_NAME, new RegExpTranslator());
     functionTranslators.put(QMoreLikeTranslator.QMORE_LIKE_FUNCTION,
         new QMoreLikeTranslator());
   }
+
+  protected static Gson gson = new GsonBuilder().serializeNulls()
+      .setPrettyPrinting().create();
 
   public String translate2Sql(Selector selector) {
     Validate.notNull(selector, "selector is null!");
@@ -85,45 +87,44 @@ public class ElasticSearchTranslator implements SqlTranslator {
 
   protected String translate2Sql(SelectorImpl selector) {
     checkGrammer(selector);
-    JSONObject jsonObject = new JSONObject();
-    JSONObject aggs = translate2Aggregations(selector);
+    JsonObject jsonObject = new JsonObject();
+    JsonObject aggs = translate2Aggregations(selector);
     if (aggs != null) {
-      jsonObject.put("size", 0);
-      JSONObject filter = translate2Filter(selector);
-      JSONObject shellAggs = new JSONObject();
-      JSONObject condition = new JSONObject();
-      condition.put("filter", filter);
-      condition.put("aggs", aggs);
-      shellAggs.put(CONDITION_ELEMENT, condition);
-      jsonObject.put("aggs", shellAggs);
+      jsonObject.addProperty("size", 0);
+      JsonObject filter = translate2Filter(selector);
+      JsonObject shellAggs = new JsonObject();
+      JsonObject condition = new JsonObject();
+      condition.add("filter", filter);
+      condition.add("aggs", aggs);
+      shellAggs.add(CONDITION_ELEMENT, condition);
+      jsonObject.add("aggs", shellAggs);
     } else {
       translateLimit(selector.getLimit(), jsonObject);
-      JSONObject filter = translate2Filter(selector);
-      jsonObject.put("filter", filter);
-      JSONArray sortArray = translate2Sort(selector);
+      JsonObject filter = translate2Filter(selector);
+      jsonObject.add("filter", filter);
+      JsonArray sortArray = translate2Sort(selector);
       if (sortArray != null) {
-        jsonObject.put("sort", sortArray);
+        jsonObject.add("sort", sortArray);
       }
     }
-    // JSONObject filter = translate2Filter(selector);
-    // jsonObject.put("filter", filter);
+    // JsonObject filter = translate2Filter(selector);
+    // JsonObject.put("filter", filter);
     // if (aggs != null) {
-    // jsonObject.put("aggs", aggs);
+    // JsonObject.put("aggs", aggs);
     // }
     // // when the sql has group clause, the order clause will be translated
     // // in the 'translate2Aggregations' function.
     // if (!(selector.getRecordSetOperator() instanceof Group)) {
     //
     // }
-    return jsonObject.toString();
+    return gson.toJson(jsonObject);
   }
 
   protected String translate2Sql(SetlectorImpl setlector) {
     throw new UnsupportedOperationException("");
   }
 
-  @Override
-  public String translate2Condition(Filter filter) {
+  @Override public String translate2Condition(Filter filter) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("");
   }
@@ -137,7 +138,7 @@ public class ElasticSearchTranslator implements SqlTranslator {
     }
   }
 
-  protected JSONObject translate2Aggregations(SelectorImpl selector) {
+  protected JsonObject translate2Aggregations(SelectorImpl selector) {
     if (selector.getRecordSetOperator() instanceof Group) {
       return translateSelectClauseWithGroup(selector);
     } else {
@@ -158,7 +159,7 @@ public class ElasticSearchTranslator implements SqlTranslator {
     return name;
   }
 
-  protected JSONObject translateSelectClause(SelectorImpl selector) {
+  protected JsonObject translateSelectClause(SelectorImpl selector) {
     Columns columns = selector.getRecordSetOperator().getColumns();
     boolean isDistinct = columns.getColumnsMetadata().isDistinct();
     if (!isDistinct)
@@ -170,18 +171,16 @@ public class ElasticSearchTranslator implements SqlTranslator {
       Operand operand = column.getOperand();
       if (column.getColumnMetadata().getName().endsWith(".*")
           || !(operand instanceof MemberVariableExpression)) {
-        throw new MoqlTranslationException(
-            StringFormater
-                .format(
-                    "Column '{}' is not a field! Column in select clause whith 'distinct' should be a field!",
-                    column.getColumnMetadata().getName()));
+        throw new MoqlTranslationException(StringFormater.format(
+            "Column '{}' is not a field! Column in select clause whith 'distinct' should be a field!",
+            column.getColumnMetadata().getName()));
       }
       aggregationColumns.add(column);
     }
     return translateGroupClause(aggregationColumns, null, selector);
   }
 
-  protected JSONObject translateSelectClauseWithGroup(SelectorImpl selector) {
+  protected JsonObject translateSelectClauseWithGroup(SelectorImpl selector) {
     Columns columns = selector.getRecordSetOperator().getColumns();
     List<Column> groupColumns = new LinkedList<Column>();
     List<Column> aggregationColumns = new LinkedList<Column>();
@@ -197,76 +196,77 @@ public class ElasticSearchTranslator implements SqlTranslator {
     return translateGroupClause(groupColumns, aggregationColumns, selector);
   }
 
-  protected JSONObject translateGroupClause(List<Column> groupColumns,
+  protected JsonObject translateGroupClause(List<Column> groupColumns,
       List<Column> aggregationColumns, SelectorImpl selector) {
-    JSONObject aggs = null;
+    JsonObject aggs = null;
     if (aggregationColumns != null) {
       aggs = translateAggregationColumns(aggregationColumns);
     }
-    JSONObject fGroup = null;
-    JSONObject lGroup = null;
-    JSONObject temp = null;
+    JsonObject fGroup = null;
+    JsonObject lGroup = null;
+    JsonObject temp = null;
     int i = 0;
     int length = groupColumns.size();
     for (Column column : groupColumns) {
       temp = translateGroup(column, selector);
       if (i + 1 == length) {
         if (aggs != null)
-          temp.put("aggs", aggs);
+          temp.add("aggs", aggs);
       }
       if (fGroup == null) {
         fGroup = temp;
       } else {
-        JSONObject subAggs = new JSONObject();
-        subAggs.put(SUB_GROUP_ELEMENT + i, temp);
-        lGroup.put("aggs", subAggs);
+        JsonObject subAggs = new JsonObject();
+        subAggs.add(SUB_GROUP_ELEMENT + i, temp);
+        lGroup.add("aggs", subAggs);
       }
       lGroup = temp;
       i++;
     }
 
-    JSONObject group = new JSONObject();
-    group.put(GROUP_ELEMENT, fGroup);
+    JsonObject group = new JsonObject();
+    group.add(GROUP_ELEMENT, fGroup);
     return group;
   }
 
-  protected JSONObject translateAggregationColumns(
+  protected JsonObject translateAggregationColumns(
       List<Column> aggregationColumns) {
-    JSONObject aggs = new JSONObject();
+    JsonObject aggs = new JsonObject();
     int i = 1;
     for (Column column : aggregationColumns) {
       AggregationFunction func = (AggregationFunction) column.getOperand();
       if (func.getName().equals("count"))
         continue;
       if (func.getParameterCount() != 1) {
-        throw new MoqlTranslationException(StringFormater.format(
-            "Function '{}' is unsupported!", func.getName()));
+        throw new MoqlTranslationException(StringFormater
+            .format("Function '{}' is unsupported!", func.getName()));
       }
-      JSONObject agg = new JSONObject();
-      agg.put("field", getOperandName(func.getParameters().get(0)));
-      JSONObject jColumn = new JSONObject();
-      jColumn.put(func.getName(), agg);
-      aggs.put(COLUMN_ELEMENT + i++, jColumn);
+      JsonObject agg = new JsonObject();
+      agg.addProperty("field", getOperandName(func.getParameters().get(0)));
+      JsonObject jColumn = new JsonObject();
+      jColumn.add(func.getName(), agg);
+      aggs.add(COLUMN_ELEMENT + i++, jColumn);
     }
     return aggs;
   }
 
-  protected JSONObject translateGroup(Column column, SelectorImpl selector) {
-    JSONObject group = new JSONObject();
-    JSONObject terms = new JSONObject();
+  protected JsonObject translateGroup(Column column, SelectorImpl selector) {
+    JsonObject group = new JsonObject();
+    JsonObject terms = new JsonObject();
     Operand operand = column.getOperand();
     if (operand instanceof MemberVariableExpression)
-      terms.put("field", getOperandName(operand));
+      terms.addProperty("field", getOperandName(operand));
     else
-      throw new MoqlTranslationException(StringFormater.format(
-          "Group column '{}' is not a field!", getOperandName(operand)));
+      throw new MoqlTranslationException(StringFormater
+          .format("Group column '{}' is not a field!",
+              getOperandName(operand)));
     translateLimit(selector.getLimit(), terms);
     translateOrder(column, selector.getOrder(), terms);
-    group.put("terms", terms);
+    group.add("terms", terms);
     return group;
   }
 
-  protected void translateLimit(Limit limit, JSONObject jsonObject) {
+  protected void translateLimit(Limit limit, JsonObject jsonObject) {
     if (limit == null) {
       return;
     }
@@ -276,37 +276,37 @@ public class ElasticSearchTranslator implements SqlTranslator {
       throw new MoqlTranslationException("Unsupported 'offset' in limit!");
     }
     size = limitMetadata.getValue();
-    jsonObject.put("size", size);
+    jsonObject.addProperty("size", size);
   }
 
   protected void translateOrder(Column column, Order order,
-      JSONObject jsonObject) {
+      JsonObject JsonObject) {
     if (order == null)
       return;
     OrderImpl orderImpl = (OrderImpl) order;
     Column[] columns = orderImpl.getOrderColumns();
     for (int i = 0; i < columns.length; i++) {
       if (column == columns[i]) {
-        JSONObject jsonOrder = new JSONObject();
-        jsonOrder.put("_term", orderImpl.getOrderTypes()[i].toString()
-            .toLowerCase());
-        jsonObject.put("order", jsonOrder);
+        JsonObject jsonOrder = new JsonObject();
+        jsonOrder.addProperty("_term",
+            orderImpl.getOrderTypes()[i].toString().toLowerCase());
+        JsonObject.add("order", jsonOrder);
       }
     }
   }
 
-  protected JSONObject translate2Filter(SelectorImpl selector) {
-    JSONObject filter = new JSONObject();
+  protected JsonObject translate2Filter(SelectorImpl selector) {
+    JsonObject filter = new JsonObject();
     Condition condition = selector.getWhere();
     if (condition == null) {
-      filter.put("match_all", new JSONObject());
+      filter.add("match_all", new JsonObject());
     } else {
       translateOperand(condition.getOperand(), filter);
     }
     return filter;
   }
 
-  protected void translateOperand(Operand operand, Object jsonObject) {
+  protected void translateOperand(Operand operand, JsonElement jsonObject) {
     if (operand instanceof AbstractOperationExpression) {
       AbstractOperationExpression expression = (AbstractOperationExpression) operand;
       if (expression.getExpressionType() == ExpressionType.LOGIC) {
@@ -314,9 +314,9 @@ public class ElasticSearchTranslator implements SqlTranslator {
       } else if (expression.getExpressionType() == ExpressionType.RELATION) {
         translateRelationExpression(expression, jsonObject);
       } else if (expression.getExpressionType() == ExpressionType.ARITHMETIC) {
-        throw new MoqlTranslationException(StringFormater.format(
-            "The expression '{}' does not support!", expression
-                .getExpressionType().toString()));
+        throw new MoqlTranslationException(StringFormater
+            .format("The expression '{}' does not support!",
+                expression.getExpressionType().toString()));
       }
     } else if (operand instanceof ParenExpression) {
       ParenExpression parenExpression = (ParenExpression) operand;
@@ -325,44 +325,45 @@ public class ElasticSearchTranslator implements SqlTranslator {
       AbstractFunction function = (AbstractFunction) operand;
       translateFunction(function, jsonObject);
     } else {
-      throw new MoqlTranslationException(StringFormater.format(
-          "The operand '{}' does not support!", operand.getOperandType()
-              .toString()));
+      throw new MoqlTranslationException(StringFormater
+          .format("The operand '{}' does not support!",
+              operand.getOperandType().toString()));
     }
   }
 
   protected void translateNotExpression(NotExpression expression,
-      Object jsonObject) {
+      JsonElement jsonObject) {
     if (expression.getRightOperand() instanceof IsExpression) {
       IsExpression isExpression = (IsExpression) expression.getRightOperand();
       translateIsExpression(isExpression.getLeftOperand(), jsonObject, true);
     } else {
-      JSONObject not = new JSONObject();
+      JsonObject not = new JsonObject();
       translateOperand(expression.getRightOperand(), not);
       putObject(jsonObject, "not", not);
     }
   }
 
-  protected void putObject(Object jsonObject, String name, Object valueJson) {
-    if (jsonObject instanceof JSONObject) {
-      ((JSONObject) jsonObject).put(name, valueJson);
+  protected void putObject(JsonElement jsonObject, String name,
+      JsonElement valueJson) {
+    if (jsonObject instanceof JsonObject) {
+      ((JsonObject) jsonObject).add(name, valueJson);
     } else {
-      JSONObject jo = new JSONObject();
-      jo.put(name, valueJson);
-      ((JSONArray) jsonObject).add(jo);
+      JsonObject jo = new JsonObject();
+      jo.add(name, valueJson);
+      ((JsonArray) jsonObject).add(jo);
     }
   }
 
   protected void translateLogicBinaryExpression(String operator,
-      Operand lOperand, Operand rOperand, Object jsonObject) {
-    JSONArray logic = new JSONArray();
+      Operand lOperand, Operand rOperand, JsonElement jsonObject) {
+    JsonArray logic = new JsonArray();
     translateOperand(lOperand, logic);
     translateOperand(rOperand, logic);
     putObject(jsonObject, operator, logic);
   }
 
   protected void translateLogicExpression(
-      AbstractOperationExpression expression, Object jsonObject) {
+      AbstractOperationExpression expression, JsonElement jsonObject) {
     if (expression.getOperator() == LogicOperator.NOT) {
       translateNotExpression((NotExpression) expression, jsonObject);
     } else {
@@ -376,7 +377,7 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translateRelationExpression(
-      AbstractOperationExpression expression, Object jsonObject) {
+      AbstractOperationExpression expression, JsonElement jsonObject) {
     if (expression.getOperator() == RelationOperator.EQ) {
       translateEQExpression(expression.getLeftOperand(),
           expression.getRightOperand(), jsonObject);
@@ -414,115 +415,116 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translateParenExpression(ParenExpression expression,
-      Object jsonObject) {
+      JsonElement jsonObject) {
     translateOperand(expression.getOperand(), jsonObject);
   }
 
   protected void translateEQExpression(Operand lOperand, Operand rOperand,
-      Object jsonObject) {
-    JSONObject eq = new JSONObject();
-    eq.put(getOperandName(lOperand), getOperandName(rOperand));
+      JsonElement jsonObject) {
+    JsonObject eq = new JsonObject();
+    eq.addProperty(getOperandName(lOperand), getOperandName(rOperand));
     putObject(jsonObject, "term", eq);
   }
 
   protected void translateLGExpression(String operator, Operand lOperand,
-      Operand rOperand, Object jsonObject) {
-    JSONObject range = new JSONObject();
-    JSONObject cmp = new JSONObject();
-    cmp.put(operator, getOperandName(rOperand));
-    range.put(getOperandName(lOperand), cmp);
+      Operand rOperand, JsonElement jsonObject) {
+    JsonObject range = new JsonObject();
+    JsonObject cmp = new JsonObject();
+    cmp.addProperty(operator, getOperandName(rOperand));
+    range.add(getOperandName(lOperand), cmp);
     putObject(jsonObject, "range", range);
   }
 
   protected void translateNEExpression(Operand lOperand, Operand rOperand,
-      Object jsonObject) {
-    JSONObject not = new JSONObject();
-    JSONObject term = new JSONObject();
-    term.put(getOperandName(lOperand), getOperandName(rOperand));
-    not.put("term", term);
+      JsonElement jsonObject) {
+    JsonObject not = new JsonObject();
+    JsonObject term = new JsonObject();
+    term.addProperty(getOperandName(lOperand), getOperandName(rOperand));
+    not.add("term", term);
     putObject(jsonObject, "not", not);
   }
 
   protected void translateBetweenExpression(BetweenExpression expression,
-      Object jsonObject) {
-    JSONObject range = new JSONObject();
-    JSONObject cmp = new JSONObject();
+      JsonElement jsonObject) {
+    JsonObject range = new JsonObject();
+    JsonObject cmp = new JsonObject();
     int i = 0;
     for (Operand rOperand : expression.getrOperands()) {
       if (i == 0) {
-        cmp.put("gte", getOperandName(rOperand));
+        cmp.addProperty("gte", getOperandName(rOperand));
         i++;
       } else {
-        cmp.put("lt", getOperandName(rOperand));
+        cmp.addProperty("lt", getOperandName(rOperand));
       }
     }
-    range.put(getOperandName(expression.getLeftOperand()), cmp);
+    range.add(getOperandName(expression.getLeftOperand()), cmp);
     putObject(jsonObject, "range", range);
   }
 
   protected void translateLikeExpression(Operand lOperand, Operand rOperand,
-      Object jsonObject) {
-    JSONObject regex = new JSONObject();
-    regex.put(getOperandName(lOperand),
+      JsonElement jsonObject) {
+    JsonObject regex = new JsonObject();
+    regex.addProperty(getOperandName(lOperand),
         LikeExpression.translatePattern2Regex(getOperandName(rOperand)));
     putObject(jsonObject, "regexp", regex);
   }
 
   protected void translateInExpression(InExpression expression,
-      Object jsonObject) {
-    JSONObject terms = new JSONObject();
-    JSONArray array = new JSONArray();
+      JsonElement jsonObject) {
+    JsonObject terms = new JsonObject();
+    JsonArray array = new JsonArray();
     for (Operand rOperand : expression.getrOperands()) {
       array.add(getOperandName(rOperand));
     }
-    terms.put(getOperandName(expression.getLeftOperand()), array);
+    terms.add(getOperandName(expression.getLeftOperand()), array);
     putObject(jsonObject, "terms", terms);
   }
 
   protected void translateExistsExpression(ExistsExpression expression,
-      Object jsonObject) {
-    JSONObject exists = new JSONObject();
-    exists.put("field", getOperandName(expression.getRightOperand()));
+      JsonElement jsonObject) {
+    JsonObject exists = new JsonObject();
+    exists.addProperty("field", getOperandName(expression.getRightOperand()));
     putObject(jsonObject, "exists", exists);
   }
 
-  protected void translateIsExpression(Operand lOperand, Object jsonObject,
+  protected void translateIsExpression(Operand lOperand, JsonElement jsonObject,
       boolean not) {
-    JSONObject exists = new JSONObject();
+    JsonObject exists = new JsonObject();
     if (not) {
-      exists.put("field", getOperandName(lOperand));
+      exists.addProperty("field", getOperandName(lOperand));
       putObject(jsonObject, "exists", exists);
     } else {
-      JSONObject notJo = new JSONObject();
-      exists.put("field", getOperandName(lOperand));
+      JsonObject notJo = new JsonObject();
+      exists.addProperty("field", getOperandName(lOperand));
       putObject(notJo, "exists", exists);
       putObject(jsonObject, "not", notJo);
     }
   }
 
-  protected void translateFunction(AbstractFunction function, Object jsonObject) {
-    ESFunctionTranslator functionTranslator = functionTranslators.get(function
-        .getName());
+  protected void translateFunction(AbstractFunction function,
+      JsonElement jsonObject) {
+    ESFunctionTranslator functionTranslator = functionTranslators
+        .get(function.getName());
     if (functionTranslator == null) {
-      throw new MoqlTranslationException(StringFormater.format(
-          "The function '{}' does not support!", function.getName()));
+      throw new MoqlTranslationException(StringFormater
+          .format("The function '{}' does not support!", function.getName()));
     } else {
       functionTranslator.translate(function, jsonObject);
     }
   }
 
-  protected JSONArray translate2Sort(SelectorImpl selector) {
+  protected JsonArray translate2Sort(SelectorImpl selector) {
     if (selector.getOrder() == null)
       return null;
-    JSONArray sort = new JSONArray();
+    JsonArray sort = new JsonArray();
     OrderImpl order = (OrderImpl) selector.getOrder();
     Column[] columns = order.getOrderColumns();
     OrderType[] orderTypes = order.getOrderTypes();
     for (int i = 0; i < columns.length; i++) {
-      JSONObject sortColumn = new JSONObject();
-      JSONObject props = new JSONObject();
-      props.put("order", orderTypes[i].toString().toLowerCase());
-      sortColumn.put(getOperandName(columns[i].getOperand()), props);
+      JsonObject sortColumn = new JsonObject();
+      JsonObject props = new JsonObject();
+      props.addProperty("order", orderTypes[i].toString().toLowerCase());
+      sortColumn.add(getOperandName(columns[i].getOperand()), props);
       sort.add(sortColumn);
     }
     return sort;
@@ -557,8 +559,7 @@ public class ElasticSearchTranslator implements SqlTranslator {
     return functionTranslators.remove(functionName);
   }
 
-  @Override
-  public List<FunctionTranslator> getFunctionTranslators() {
+  @Override public List<FunctionTranslator> getFunctionTranslators() {
     // TODO Auto-generated method stub
     return new LinkedList<FunctionTranslator>(functionTranslators.values());
   }

@@ -17,9 +17,9 @@
  */
 package org.moql.sql.es;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.apache.commons.lang.Validate;
 import org.moql.Operand;
 import org.moql.operand.constant.StringConstant;
@@ -51,7 +51,7 @@ public abstract class AbstractESFunctionTranslator implements
   }
 
   @Override
-  public void translate(Function function, Object jsonObject) {
+  public void translate(Function function, JsonElement jsonObject) {
     // TODO Auto-generated method stub
     Validate.notNull(function, "Parameter 'function' is null!");
     Validate.notNull(jsonObject, "Parameter 'jsonObject' is null!");
@@ -63,15 +63,23 @@ public abstract class AbstractESFunctionTranslator implements
     innerTranslate(function, jsonObject);
   }
   
-  protected abstract void innerTranslate(Function function, Object jsonObject);
+  protected abstract void innerTranslate(Function function, JsonElement jsonObject);
   
-  protected void putObject(Object jsonObject, String name, Object valueJson) {
-    if (jsonObject instanceof JSONObject) {
-      ((JSONObject) jsonObject).put(name, valueJson);
+  protected void putObject(JsonElement jsonObject, String name, Object valueJson) {
+    if (jsonObject instanceof JsonObject) {
+      if (valueJson instanceof JsonElement) {
+        ((JsonObject) jsonObject).add(name, (JsonElement)valueJson);
+      } else {
+        ((JsonObject) jsonObject).addProperty(name, valueJson.toString());
+      }
     } else {
-      JSONObject jo = new JSONObject();
-      jo.put(name, valueJson);
-      ((JSONArray) jsonObject).add(jo);
+      JsonObject jo = new JsonObject();
+      if (valueJson instanceof JsonElement) {
+        ((JsonObject) jo).add(name, (JsonElement)valueJson);
+      } else {
+        ((JsonObject) jo).addProperty(name, valueJson.toString());
+      }
+      ((JsonArray) jsonObject).add(jo);
     }
   }
   

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,8 +17,9 @@
  */
 package org.moql.sql.es;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.moql.Operand;
 import org.moql.operand.function.Function;
 
@@ -37,27 +38,29 @@ public class QMoreLikeTranslator extends AbstractESFunctionTranslator {
   }
 
   @Override
-  protected void innerTranslate(Function function, Object jsonObject) {
+  protected void innerTranslate(Function function, JsonElement jsonObject) {
     // TODO Auto-generated method stub
     if (function.getParameterCount() != 4) {
       throw new IllegalArgumentException(
           "Error function! The qmoreLike function's format should be qmoreLike(fields,likeText,minTermFreq,maxQueryTerms)!");
     }
-    JSONObject query = new JSONObject();
-    JSONObject moreLike = new JSONObject();
+    JsonObject query = new JsonObject();
+    JsonObject moreLike = new JsonObject();
 
     List<Operand> parameters = function.getParameters();
     String fieldString = getOperandName(parameters.get(0));
     String[] fields = fieldString.split(",");
-    JSONArray array = new JSONArray();
+    JsonArray array = new JsonArray();
     for (int i = 0; i < fields.length; i++) {
       array.add(getOperandName(fields[i]));
     }
-    moreLike.put("fields", array);
-    moreLike.put("like_text", getOperandName(parameters.get(1)));
-    moreLike.put("min_term_freq", parameters.get(2).getValue());
-    moreLike.put("max_query_terms", parameters.get(3).getValue());
-    query.put("more_like_this", moreLike);
+    moreLike.add("fields", array);
+    moreLike.addProperty("like_text", getOperandName(parameters.get(1)));
+    moreLike
+        .addProperty("min_term_freq", (Long)parameters.get(2).getValue());
+    moreLike
+        .addProperty("max_query_terms", (Long)parameters.get(3).getValue());
+    query.add("more_like_this", moreLike);
 
     putObject(jsonObject, "query", query);
   }

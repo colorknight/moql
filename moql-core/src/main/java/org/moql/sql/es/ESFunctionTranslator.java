@@ -17,6 +17,7 @@
  */
 package org.moql.sql.es;
 
+import com.google.gson.JsonElement;
 import org.moql.operand.function.Function;
 import org.moql.sql.FunctionTranslator;
 
@@ -25,5 +26,5 @@ import org.moql.sql.FunctionTranslator;
  */
 public interface ESFunctionTranslator extends FunctionTranslator{
 
-  void translate(Function function, Object jsonObject);
+  void translate(Function function, JsonElement jsonObject);
 }

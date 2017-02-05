@@ -17,6 +17,8 @@
  */
 package org.moql.operand.expression.member;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.apache.commons.lang.Validate;
 import org.moql.EntityMap;
 import org.moql.Operand;
@@ -111,6 +113,8 @@ public class MemberVariableExpression extends AbstractExpression implements Memb
 		if(!(o instanceof OperandContextList)) {
 			if (o instanceof Map) {
 				return operate((Map)o);
+			} if (o instanceof JsonObject) {	// modified 2017/02/05
+				return operate((JsonObject)o);
 			}
 			return operate(o);
 		} else {
@@ -127,6 +131,11 @@ public class MemberVariableExpression extends AbstractExpression implements Memb
 	protected Object operate(Map map) {
 		String name = variable.getName();
 		return map.get(name);
+	}
+	// added 2017/02/05
+	protected Object operate(JsonObject jsonObject) {
+		String name = variable.getName();
+		return jsonObject.get(name);
 	}
 	
 	protected Object operate(Object o) {
