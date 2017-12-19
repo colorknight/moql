@@ -7,8 +7,7 @@ import org.moql.EntityMapImpl;
 import org.moql.MoqlException;
 import org.moql.Operand;
 import org.moql.cep.metadata.CeperMetadata;
-import org.moql.core.MoqlFactory;
-import org.moql.service.MoqlUtils;
+import org.moql.engine.MoqlEngine;
 
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class MatcherWindow<T> extends AbstractWindow<T> {
     String expression = metadata.getParameters().get(PARAM_MATCHER_EXPRESSION);
     Validate.notEmpty(expression, "matcher expression is empty!");
     try {
-      operand = MoqlUtils.createOperand(expression);
+      operand = MoqlEngine.createOperand(expression);
     } catch (MoqlException e) {
       throw new IllegalArgumentException("matcher expression is invalid!");
     }

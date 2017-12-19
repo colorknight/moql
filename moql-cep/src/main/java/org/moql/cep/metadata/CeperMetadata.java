@@ -17,7 +17,7 @@ public class CeperMetadata implements Serializable {
 
   private String winType;
 
-  private int capacity;   // entity count or second
+  private int bucketCount;   // count
 
   private int bucketSize; // entity count or second
 
@@ -51,12 +51,16 @@ public class CeperMetadata implements Serializable {
   }
 
   public int getCapacity() {
-    return capacity;
+    return bucketCount*bucketSize;
   }
 
-  public void setCapacity(int capacity) {
-    Validate.isTrue(capacity > 0, "capacity is less than 0!");
-    this.capacity = capacity;
+  public int getBucketCount() {
+    return bucketCount;
+  }
+
+  public void setBucketCount(int bucketCount) {
+    Validate.isTrue(bucketCount > 0, "bucketSize is less than 1!");
+    this.bucketCount = bucketCount;
   }
 
   public int getBucketSize() {
@@ -65,7 +69,6 @@ public class CeperMetadata implements Serializable {
 
   public void setBucketSize(int bucketSize) {
     Validate.isTrue(bucketSize >= 0, "bucketSize is less than 0!");
-    Validate.isTrue(bucketSize < capacity, "bucketSize is bigger than capacity!");
     this.bucketSize = bucketSize;
   }
 

@@ -5,7 +5,7 @@ import org.moql.*;
 import org.moql.cep.CepListener;
 import org.moql.cep.SlideWindow;
 import org.moql.cep.metadata.CeperMetadata;
-import org.moql.service.MoqlUtils;
+import org.moql.engine.MoqlEngine;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +40,7 @@ public abstract class AbstractWindow<T> implements SlideWindow<T> {
     curBucket = new LinkedList<T>();
     buckets.add(curBucket);
     try {
-      selector = MoqlUtils.createSelector(metadata.getMoql());
+      selector = MoqlEngine.createSelector(metadata.getMoql());
     } catch (MoqlException e) {
       throw new IllegalArgumentException("moql is invalid!", e);
     }

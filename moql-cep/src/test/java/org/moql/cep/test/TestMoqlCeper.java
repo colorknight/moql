@@ -22,7 +22,7 @@ public class TestMoqlCeper extends TestCase {
     metadata.setName("cep1");
     metadata.setWinType(SlideWindowEnum.SW_BATCH.name());
     metadata.setMoql("select evt[0] name, sum(evt[2]) sum from evt evt group by name having sum > 100");
-    metadata.setCapacity(50);
+    metadata.setBucketCount(5);
     metadata.setBucketSize(10);
     Ceper<Object[]> ceper = new MoqlCeper<Object[]>("evt", metadata);
     ceper.addCepListener(new CepPrintListener());
@@ -38,7 +38,7 @@ public class TestMoqlCeper extends TestCase {
     metadata.setName("cep1");
     metadata.setWinType(SlideWindowEnum.SW_MATCHER.name());
     metadata.setMoql("select evt[0] name, sum(evt[2]) sum from evt evt group by name having sum > 100");
-    metadata.setCapacity(3);
+    metadata.setBucketCount(3);
     metadata.setBucketSize(0);
     metadata.getParameters().put(MatcherWindow.PARAM_MATCHER_EXPRESSION, "evt[0]");
     Ceper<Object[]> ceper = new MoqlCeper<Object[]>("evt", metadata);
@@ -54,9 +54,8 @@ public class TestMoqlCeper extends TestCase {
     metadata.setName("cep1");
     metadata.setWinType(SlideWindowEnum.SW_TIME.name());
     metadata.setMoql("select evt[0] name, sum(evt[2]) sum from evt evt group by name having sum > 100");
-    metadata.setCapacity(6);
+    metadata.setBucketCount(3);
     metadata.setBucketSize(2);
-    metadata.getParameters().put(MatcherWindow.PARAM_MATCHER_EXPRESSION, "evt[0]");
     Ceper<Object[]> ceper = new MoqlCeper<Object[]>("evt", metadata);
     ceper.addCepListener(new CepPrintListener());
     int i = 0;

@@ -9,11 +9,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.moql</groupId>
-  <artifactId>cep</artifactId>
+  <artifactId>moql-cep</artifactId>
   <version>1.0.7</version>
   <packaging>jar</packaging>
 
-  <name>cep</name>
+  <name>moql-cep</name>
   <url>http://maven.apache.org</url>
 
   <properties>
@@ -39,7 +39,7 @@
     </dependency>
     <dependency>
       <groupId>org.moql</groupId>
-      <artifactId>moql</artifactId>
+      <artifactId>moql-engine</artifactId>
       <version>1.0.7</version>
     </dependency>
   </dependencies>
