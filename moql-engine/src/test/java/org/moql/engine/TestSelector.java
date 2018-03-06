@@ -750,6 +750,42 @@ public class TestSelector extends TestCase {
     }
   }
 
+  public void testMultiDimTranslationDecorator() {
+    List<BeanA> beanAList = BeanFactory.createBeanAList(0, 100);
+    DataSetMap dataSetMap = new DataSetMapImpl();
+    dataSetMap.putDataSet("BeanA", beanAList);
+    String sql = "Select a.num%10 grp1, a.num%50 grp2, count(a.id) cnt, Sum(a.num) sum FROM BeanA a group by grp1,grp2 decorate by multiDimTranslation('grp1', 'grp2', 'cnt, sum')";
+    try {
+      Selector selector = MoqlEngine.createSelector(sql);
+      selector.select(dataSetMap);
+      RecordSet recordSet = selector.getRecordSet();
+      outputRecordSet(recordSet);
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    sql = "Select a.num%10 grp1, a.num%50 grp2, count(a.id) cnt, Sum(a.num) sum FROM BeanA a group by grp1,grp2 decorate by multiDimTranslation(null, 'grp1, grp2', 'cnt, sum')";
+    try {
+      Selector selector = MoqlEngine.createSelector(sql);
+      selector.select(dataSetMap);
+      RecordSet recordSet = selector.getRecordSet();
+      outputRecordSet(recordSet);
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    sql = "Select a.num%10 grp1, a.num%50 grp2, count(a.id) cnt, Sum(a.num) sum FROM BeanA a group by grp1,grp2 decorate by multiDimTranslation('grp1, grp2',null, 'cnt, sum')";
+    try {
+      Selector selector = MoqlEngine.createSelector(sql);
+      selector.select(dataSetMap);
+      RecordSet recordSet = selector.getRecordSet();
+      outputRecordSet(recordSet);
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   public void testMergeColumns() {
     List<Map<String, String>> mapList = new LinkedList<Map<String, String>>();
     Map<String, String> record = new HashMap<String, String>();
