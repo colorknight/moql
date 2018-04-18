@@ -17,21 +17,22 @@
  */
 package org.moql.sql.es;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.moql.Operand;
 import org.moql.operand.function.Function;
-import org.moql.operand.function.Regex;
 
 import java.util.List;
 
 /**
  * @author Tang Tadin
  */
-public class RegExpTranslator extends AbstractESFunctionTranslator {
+public class IdsTranslator extends AbstractESFunctionTranslator {
+  public static final String FUNCTION_NAME = "ids";
 
-  public RegExpTranslator() {
-    super(Regex.FUNCTION_NAME);
+  public IdsTranslator() {
+    super(FUNCTION_NAME);
     // TODO Auto-generated constructor stub
   }
 
@@ -40,14 +41,20 @@ public class RegExpTranslator extends AbstractESFunctionTranslator {
     // TODO Auto-generated method stub
     if (function.getParameterCount() != 2) {
       throw new IllegalArgumentException(
-          "Error function! The regex function's format should be regex(field,pattern)!");
+          "Error function! The ids function's format should be ids(type, values)!");
     }
-    JsonObject regexp = new JsonObject();
+    JsonObject type = new JsonObject();
     List<Operand> parameters = function.getParameters();
-    String fieldString = getOperandName(parameters.get(0));
-    String field = getOperandName(fieldString);
-    regexp.addProperty(field, getOperandName(parameters.get(1)));
-    putObject(jsonObject, "regexp", regexp);
+    type.addProperty("type",
+        getOperandName(parameters.get(0)));
+    JsonArray array = new JsonArray();
+    String valueString = getOperandName(parameters.get(1));
+    String[] values = valueString.split(",");
+    for(int i = 0; i < values.length; i++) {
+      array.add(values[i]);
+    }
+    putObject(type, "values", array);
+    putObject(jsonObject, "ids", type);
   }
 
 }

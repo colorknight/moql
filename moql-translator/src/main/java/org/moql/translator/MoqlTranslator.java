@@ -1,18 +1,13 @@
 package org.moql.translator;
 
-import org.apache.commons.lang.Validate;
 import org.moql.Filter;
 import org.moql.MoqlException;
 import org.moql.Selector;
 import org.moql.SelectorDefinition;
 import org.moql.engine.MoqlEngine;
 import org.moql.metadata.ConditionMetadata;
-import org.moql.metadata.xml.FilterFormater;
 import org.moql.parser.MoqlParser;
 import org.moql.sql.SqlDialectType;
-import org.moql.sql.SqlTranslatorHelper;
-import org.moql.xml.DefaultDocumentFormater;
-import org.moql.xml.XmlAccessException;
 
 /**
  * Created by tangtadin on 17/10/16.

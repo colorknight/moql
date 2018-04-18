@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,62 +24,68 @@ import org.moql.SelectorDefinition;
 import java.io.Serializable;
 
 /**
- * 
+ *
  * @author Tang Tadin
  *
  */
 public class ColumnMetadata implements ColumnDefinition, Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	protected String name;
-	
-	protected String value;
-	
-	protected SelectorDefinition nestedSelector;
-	
-	public ColumnMetadata(String name, String value) {
-		Validate.notEmpty(name, "Parameter 'name' is empty!");
-		Validate.notEmpty(value, "Parameter 'value' is empty!");
-		this.name = name;
-		this.value = value;
-	}
-	
-	public ColumnMetadata(String name, SelectorDefinition nestedSelector) {
-		Validate.notEmpty(name, "Parameter 'name' is empty!");
-		Validate.notNull(nestedSelector, "Parameter 'nestedSelector' is empty!");
-		SelectorValidator.isValidateNestedColumnSelector(nestedSelector);
-		this.name = name;
-		this.nestedSelector = nestedSelector;
-		this.value = "";	//pending... nestedColumnSelector.toString();
-	}
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
-	public boolean isHasAlias() {
-		return !name.equals(value);
-	}
+  protected String name;
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
+  protected String value;
 
-	/**
-	 * @return the value
-	 */
-	public String getValue() {
-		return value;
-	}
+  protected SelectorDefinition nestedSelector;
 
-	/**
-	 * @return the selectorMetadata
-	 */
-	public SelectorDefinition getNestedSelector() {
-		return nestedSelector;
-	}
-	
+  public ColumnMetadata(String name, String value) {
+    Validate.notEmpty(name, "Parameter 'name' is empty!");
+    Validate.notEmpty(value, "Parameter 'value' is empty!");
+    if (name.indexOf('(') != -1) {
+      name = name.replace('(', '$');
+      name = name.replace(')', '$');
+      name = name.replace(',', '$');
+      name = name.replace('.', '_');
+    }
+    this.name = name;
+    this.value = value;
+  }
+
+  public ColumnMetadata(String name, SelectorDefinition nestedSelector) {
+    Validate.notEmpty(name, "Parameter 'name' is empty!");
+    Validate.notNull(nestedSelector, "Parameter 'nestedSelector' is empty!");
+    SelectorValidator.isValidateNestedColumnSelector(nestedSelector);
+    this.name = name;
+    this.nestedSelector = nestedSelector;
+    this.value = "";  //pending... nestedColumnSelector.toString();
+  }
+
+  public boolean isHasAlias() {
+    return !name.equals(value);
+  }
+
+  /**
+   * @return the name
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * @return the value
+   */
+  public String getValue() {
+    return value;
+  }
+
+  /**
+   * @return the selectorMetadata
+   */
+  public SelectorDefinition getNestedSelector() {
+    return nestedSelector;
+  }
+
 }

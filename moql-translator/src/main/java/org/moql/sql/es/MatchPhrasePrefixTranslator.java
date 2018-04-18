@@ -21,33 +21,49 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.moql.Operand;
 import org.moql.operand.function.Function;
-import org.moql.operand.function.Regex;
 
 import java.util.List;
 
 /**
  * @author Tang Tadin
  */
-public class RegExpTranslator extends AbstractESFunctionTranslator {
+public class MatchPhrasePrefixTranslator extends AbstractESFunctionTranslator {
 
-  public RegExpTranslator() {
-    super(Regex.FUNCTION_NAME);
+  public static final String FUNCTION_NAME = "matchPhrasePrefix";
+
+  public MatchPhrasePrefixTranslator() {
+    super(FUNCTION_NAME);
     // TODO Auto-generated constructor stub
   }
 
   @Override
   protected void innerTranslate(Function function, JsonElement jsonObject) {
     // TODO Auto-generated method stub
-    if (function.getParameterCount() != 2) {
+    if (function.getParameterCount() != 2
+        && function.getParameterCount() != 3) {
       throw new IllegalArgumentException(
-          "Error function! The regex function's format should be regex(field,pattern)!");
+          "Error function! The matchPhrasePrefix function's format should be "
+              + "matchPhrasePrefix(field, queryString) or "
+              + "matchPhrasePrefix(field, queryString, analyzer)!");
     }
-    JsonObject regexp = new JsonObject();
+
     List<Operand> parameters = function.getParameters();
     String fieldString = getOperandName(parameters.get(0));
     String field = getOperandName(fieldString);
-    regexp.addProperty(field, getOperandName(parameters.get(1)));
-    putObject(jsonObject, "regexp", regexp);
-  }
+    if (parameters.size() == 2) {
+      JsonObject matchPhrasePrefix = new JsonObject();
+      matchPhrasePrefix
+          .addProperty(field, getOperandName(parameters.get(1)));
+      putObject(jsonObject, "match_phrase_prefix", matchPhrasePrefix);
+    } else {
+      JsonObject matchPhrasePrefix = new JsonObject();
+      JsonObject inPhrasePrefix = new JsonObject();
 
+      inPhrasePrefix.addProperty("query", getOperandName(parameters.get(1)));
+      inPhrasePrefix.addProperty("analyzer", getOperandName(parameters.get(2)));
+      matchPhrasePrefix.add(field, inPhrasePrefix);
+      putObject(jsonObject, "match_phrase_prefix", matchPhrasePrefix);
+    }
+
+  }
 }

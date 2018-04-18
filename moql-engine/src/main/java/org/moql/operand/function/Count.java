@@ -77,7 +77,11 @@ public class Count extends AggregationFunction {
 		return new Long(count);
 	}
 
-	@Override
+  public boolean isDistinct() {
+    return distinct;
+  }
+
+  @Override
 	public void clear() {
 		// TODO Auto-generated method stub
 		count = 0;

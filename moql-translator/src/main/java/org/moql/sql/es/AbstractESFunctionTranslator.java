@@ -75,9 +75,9 @@ public abstract class AbstractESFunctionTranslator implements
     } else {
       JsonObject jo = new JsonObject();
       if (valueJson instanceof JsonElement) {
-        ((JsonObject) jo).add(name, (JsonElement)valueJson);
+        jo.add(name, (JsonElement)valueJson);
       } else {
-        ((JsonObject) jo).addProperty(name, valueJson.toString());
+        jo.addProperty(name, valueJson.toString());
       }
       ((JsonArray) jsonObject).add(jo);
     }

@@ -28,12 +28,12 @@ import java.util.List;
 /**
  * @author Tang Tadin
  */
-public class QMatchTranslator extends AbstractESFunctionTranslator {
+public class MatchTranslator extends AbstractESFunctionTranslator {
 
-  public static final String QMATCH_FUNCTION = "qmatch";
+  public static final String FUNCTION_NAME = "match";
 
-  public QMatchTranslator() {
-    super(QMATCH_FUNCTION);
+  public MatchTranslator() {
+    super(FUNCTION_NAME);
     // TODO Auto-generated constructor stub
   }
 
@@ -42,17 +42,16 @@ public class QMatchTranslator extends AbstractESFunctionTranslator {
     // TODO Auto-generated method stub
     if (function.getParameterCount() != 2) {
       throw new IllegalArgumentException(
-          "Error function! The qmatch function's format should be qmatch(fields,queryString)!");
+          "Error function! The match function's format should be match(fields,queryString)!");
     }
-    JsonObject query = new JsonObject();
     JsonObject match = new JsonObject();
 
     List<Operand> parameters = function.getParameters();
     String fieldString = getOperandName(parameters.get(0));
     String[] fields = fieldString.split(",");
     if (fields.length == 1) {
-      match.addProperty(fields[0], getOperandName(parameters.get(1)));
-      query.add("match", match);
+      match.addProperty(getOperandName(fields[0]), getOperandName(parameters.get(1)));
+      putObject(jsonObject, "match", match);
     } else {
       JsonArray array = new JsonArray();
       for(int i = 0; i < fields.length; i++) {
@@ -60,9 +59,8 @@ public class QMatchTranslator extends AbstractESFunctionTranslator {
       }
       match.addProperty("query", getOperandName(parameters.get(1)));
       match.add("fields", array);
-      query.add("multi_match", match);
+      putObject(jsonObject, "multi_match", match);
     }
-    putObject(jsonObject, "query", query);
   }
 
 

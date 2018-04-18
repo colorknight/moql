@@ -17,37 +17,48 @@
  */
 package org.moql.sql.es;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.moql.Operand;
 import org.moql.operand.function.Function;
-import org.moql.operand.function.Regex;
 
 import java.util.List;
 
 /**
  * @author Tang Tadin
  */
-public class RegExpTranslator extends AbstractESFunctionTranslator {
+public class MoreLikeTranslator extends AbstractESFunctionTranslator {
 
-  public RegExpTranslator() {
-    super(Regex.FUNCTION_NAME);
+  public static final String FUNCTION_NAME = "moreLike";
+
+  public MoreLikeTranslator() {
+    super(FUNCTION_NAME);
     // TODO Auto-generated constructor stub
   }
 
   @Override
   protected void innerTranslate(Function function, JsonElement jsonObject) {
     // TODO Auto-generated method stub
-    if (function.getParameterCount() != 2) {
+    if (function.getParameterCount() != 4) {
       throw new IllegalArgumentException(
-          "Error function! The regex function's format should be regex(field,pattern)!");
+          "Error function! The moreLike function's format should be moreLike(fields,likeText,minTermFreq,maxQueryTerms)!");
     }
-    JsonObject regexp = new JsonObject();
+    JsonObject moreLike = new JsonObject();
+
     List<Operand> parameters = function.getParameters();
     String fieldString = getOperandName(parameters.get(0));
-    String field = getOperandName(fieldString);
-    regexp.addProperty(field, getOperandName(parameters.get(1)));
-    putObject(jsonObject, "regexp", regexp);
+    String[] fields = fieldString.split(",");
+    JsonArray array = new JsonArray();
+    for (int i = 0; i < fields.length; i++) {
+      array.add(getOperandName(fields[i]));
+    }
+    moreLike.add("fields", array);
+    moreLike.addProperty("like_text", getOperandName(parameters.get(1)));
+    moreLike.addProperty("min_term_freq", (Long) parameters.get(2).getValue());
+    moreLike
+        .addProperty("max_query_terms", (Long) parameters.get(3).getValue());
+    putObject(jsonObject, "more_like_this", moreLike);
   }
 
 }

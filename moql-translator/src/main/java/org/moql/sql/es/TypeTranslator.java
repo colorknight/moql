@@ -28,26 +28,26 @@ import java.util.List;
 /**
  * @author Tang Tadin
  */
-public class RegExpTranslator extends AbstractESFunctionTranslator {
+public class TypeTranslator extends AbstractESFunctionTranslator {
+  public static final String FUNCTION_NAME = "type";
 
-  public RegExpTranslator() {
-    super(Regex.FUNCTION_NAME);
+  public TypeTranslator() {
+    super(FUNCTION_NAME);
     // TODO Auto-generated constructor stub
   }
 
   @Override
   protected void innerTranslate(Function function, JsonElement jsonObject) {
     // TODO Auto-generated method stub
-    if (function.getParameterCount() != 2) {
+    if (function.getParameterCount() != 1) {
       throw new IllegalArgumentException(
-          "Error function! The regex function's format should be regex(field,pattern)!");
+          "Error function! The type function's format should be type(value)!");
     }
-    JsonObject regexp = new JsonObject();
+    JsonObject type = new JsonObject();
     List<Operand> parameters = function.getParameters();
-    String fieldString = getOperandName(parameters.get(0));
-    String field = getOperandName(fieldString);
-    regexp.addProperty(field, getOperandName(parameters.get(1)));
-    putObject(jsonObject, "regexp", regexp);
+    type.addProperty("value",
+        getOperandName(parameters.get(0)));
+    putObject(jsonObject, "type", type);
   }
 
 }

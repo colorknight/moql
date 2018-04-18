@@ -2,4 +2,4 @@
 
 *.tokens
 *.iml
-**/antlr
+**/java/**/antlr

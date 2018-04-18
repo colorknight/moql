@@ -28,41 +28,42 @@ import java.util.List;
 /**
  * @author Tang Tadin
  */
-public class QMoreLikeTranslator extends AbstractESFunctionTranslator {
+public class MatchPhraseTranslator extends AbstractESFunctionTranslator {
 
-  public static final String QMORE_LIKE_FUNCTION = "qmoreLike";
+  public static final String FUNCTION_NAME = "matchPhrase";
 
-  public QMoreLikeTranslator() {
-    super(QMORE_LIKE_FUNCTION);
+  public MatchPhraseTranslator() {
+    super(FUNCTION_NAME);
     // TODO Auto-generated constructor stub
   }
 
   @Override
   protected void innerTranslate(Function function, JsonElement jsonObject) {
     // TODO Auto-generated method stub
-    if (function.getParameterCount() != 4) {
+    if (function.getParameterCount() != 2
+        && function.getParameterCount() != 3) {
       throw new IllegalArgumentException(
-          "Error function! The qmoreLike function's format should be qmoreLike(fields,likeText,minTermFreq,maxQueryTerms)!");
+          "Error function! The matchPhrase function's format should be "
+              + "matchPhrase(field, queryString) or "
+              + "matchPhrase(field, queryString, analyzer)!");
     }
-    JsonObject query = new JsonObject();
-    JsonObject moreLike = new JsonObject();
 
     List<Operand> parameters = function.getParameters();
     String fieldString = getOperandName(parameters.get(0));
-    String[] fields = fieldString.split(",");
-    JsonArray array = new JsonArray();
-    for (int i = 0; i < fields.length; i++) {
-      array.add(getOperandName(fields[i]));
+    String field = getOperandName(fieldString);
+    if (parameters.size() == 2) {
+      JsonObject matchPhrase = new JsonObject();
+      matchPhrase.addProperty(field, getOperandName(parameters.get(1)));
+      putObject(jsonObject, "match_phrase", matchPhrase);
+    } else {
+      JsonObject matchPhrase = new JsonObject();
+      JsonObject inPhrase = new JsonObject();
+
+      inPhrase.addProperty("query", getOperandName(parameters.get(1)));
+      inPhrase.addProperty("analyzer", getOperandName(parameters.get(2)));
+      matchPhrase.add(field, inPhrase);
+      putObject(jsonObject, "match_phrase", matchPhrase);
     }
-    moreLike.add("fields", array);
-    moreLike.addProperty("like_text", getOperandName(parameters.get(1)));
-    moreLike
-        .addProperty("min_term_freq", (Long)parameters.get(2).getValue());
-    moreLike
-        .addProperty("max_query_terms", (Long)parameters.get(3).getValue());
-    query.add("more_like_this", moreLike);
 
-    putObject(jsonObject, "query", query);
   }
-
 }

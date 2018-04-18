@@ -17,37 +17,48 @@
  */
 package org.moql.sql.es;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.moql.Operand;
 import org.moql.operand.function.Function;
-import org.moql.operand.function.Regex;
 
 import java.util.List;
 
 /**
  * @author Tang Tadin
  */
-public class RegExpTranslator extends AbstractESFunctionTranslator {
+public class TermsSetTranslator extends AbstractESFunctionTranslator {
 
-  public RegExpTranslator() {
-    super(Regex.FUNCTION_NAME);
+  public static final String FUNCTION_NAME = "termsSet";
+
+  public TermsSetTranslator() {
+    super(FUNCTION_NAME);
     // TODO Auto-generated constructor stub
   }
 
   @Override
   protected void innerTranslate(Function function, JsonElement jsonObject) {
     // TODO Auto-generated method stub
-    if (function.getParameterCount() != 2) {
+    if (function.getParameterCount() != 3) {
       throw new IllegalArgumentException(
-          "Error function! The regex function's format should be regex(field,pattern)!");
+          "Error function! The termsSet function's format should be termsSet(fieldName, valueSet, minMatchField)!");
     }
-    JsonObject regexp = new JsonObject();
+
     List<Operand> parameters = function.getParameters();
-    String fieldString = getOperandName(parameters.get(0));
-    String field = getOperandName(fieldString);
-    regexp.addProperty(field, getOperandName(parameters.get(1)));
-    putObject(jsonObject, "regexp", regexp);
+    JsonObject termsSet = new JsonObject();
+    JsonObject inTermsSet = new JsonObject();
+    String valueSet = getOperandName(parameters.get(1));
+    String[] fields = valueSet.split(",");
+    JsonArray array = new JsonArray();
+    for (int i = 0; i < fields.length; i++) {
+      array.add(getOperandName(fields[i]));
+    }
+    inTermsSet.add("terms", array);
+    inTermsSet.addProperty("minimum_should_match_field",
+        getOperandName(parameters.get(2)));
+    termsSet.add(getOperandName(parameters.get(0)), inTermsSet);
+    putObject(jsonObject, "terms_set", termsSet);
   }
 
 }
