@@ -166,7 +166,7 @@ public class TestOracleTranslator extends TestCase {
   }
 
   public void testTopSelector() {
-    String sql = "select top 20 a.name from BeanA a where a.time > to_date('2013-01-01 13:14:20','yyyy-MM-dd HH24:mm:ss')";
+    String sql = "select a.name from BeanA a where a.time > to_date('2013-01-01 13:14:20','yyyy-MM-dd HH24:mm:ss') limit 20";
     testSqlDialect(sql, false);
   }
 

@@ -5,7 +5,7 @@
 
     <groupId>org.moql</groupId>
     <artifactId>moql-parent</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <modules>
         <module>moql-cep</module>
         <module>moql-meta</module>
