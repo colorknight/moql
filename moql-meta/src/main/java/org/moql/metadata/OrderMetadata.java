@@ -38,12 +38,17 @@ public class OrderMetadata implements Serializable {
 	protected OrderType orderType = OrderType.ASC;
 	
 	public OrderMetadata(String column) {
-		Validate.notEmpty(column, "Parameter 'column' is empty!");
-		this.column = column;
+		this(column, OrderType.ASC);
 	}
 	
 	public OrderMetadata(String column, OrderType orderType) {
 		Validate.notEmpty(column, "Parameter 'column' is empty!");
+		if (column.indexOf('(') != -1) {
+			column = column.replace('(', '$');
+			column = column.replace(')', '$');
+			column = column.replace(',', '$');
+			column = column.replace('.', '_');
+		}
 		this.column = column;
 		if (orderType != null)
 			this.orderType = orderType;

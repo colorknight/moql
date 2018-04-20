@@ -68,15 +68,11 @@ public class ElasticSearchTranslator implements SqlTranslator {
   protected String translate2Sql(SelectorImpl selector) {
     checkGrammer(selector);
     JsonObject jsonObject = new JsonObject();
-    if (selector.getLimit() != null) {
-      translateLimitClause(selector.getLimit(), jsonObject);
-    }
-    if (selector.getOrder() != null) {
-      translateOrderClause(selector.getOrder(), jsonObject);
-    }
-    translate2CommonQuery(selector, jsonObject);
+
     if (isAggregations(selector)) {
-      translate2Aggregations(selector, jsonObject);
+      translate2Aggs(selector, jsonObject);
+    } else {
+      translate2Query(selector, jsonObject);
     }
     return gson.toJson(jsonObject);
   }
@@ -85,6 +81,22 @@ public class ElasticSearchTranslator implements SqlTranslator {
     if (selector.getTables().getTablesMetadata().getTables().size() > 1) {
       throw new MoqlTranslationException("The sql querys more than 1 table!");
     }
+  }
+
+  protected void translate2Query(SelectorImpl selector, JsonObject jsonObject) {
+    if (selector.getLimit() != null) {
+      translateLimitClause(selector.getLimit(), jsonObject);
+    }
+    if (selector.getOrder() != null) {
+      translateOrderClause(selector.getOrder(), jsonObject);
+    }
+    translate2CommonQuery(selector, jsonObject);
+  }
+
+  protected void translate2Aggs(SelectorImpl selector, JsonObject jsonObject) {
+    jsonObject.addProperty("size", 0);
+    translate2CommonQuery(selector, jsonObject);
+    translate2Aggregations(selector, jsonObject);
   }
 
   protected void translateLimitClause(Limit limit, JsonObject jsonObject) {
@@ -136,11 +148,12 @@ public class ElasticSearchTranslator implements SqlTranslator {
     RecordSetOperator recordSetOperator = selector.getRecordSetOperator();
     if (recordSetOperator instanceof Group) {
       translate2GroupAggregations((GroupRecordSetOperator) recordSetOperator,
-          jsonObject);
+          jsonObject, selector.getLimit(), selector.getOrder());
     } else if (recordSetOperator.getColumns().getColumnsMetadata()
         .isDistinct()) {
       translate2DistinctAggregations(
-          (ColumnsRecordSetOperator) recordSetOperator, jsonObject);
+          (ColumnsRecordSetOperator) recordSetOperator, jsonObject,
+          selector.getLimit(), selector.getOrder());
     } else {
       translateColumnAggregations((ColumnsRecordSetOperator) recordSetOperator,
           jsonObject);
@@ -148,16 +161,23 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translate2GroupAggregations(
-      GroupRecordSetOperator groupRecordSetOperator, JsonObject jsonObject) {
+      GroupRecordSetOperator groupRecordSetOperator, JsonObject jsonObject,
+      Limit limit, Order order) {
     Column[] columns = groupRecordSetOperator.getGroupColumns();
     JsonObject baseObject = jsonObject;
     jsonObject.add("aggs", baseObject);
+    int size = getLimitSize(limit);
     for (int i = 0; i < columns.length; i++) {
-      baseObject = translate2TermsAggs(columns[i], baseObject);
+      baseObject = translate2TermsAggs(columns[i], baseObject, size, order);
+      size = 0;
     }
     columns = groupRecordSetOperator.getNonGroupColumns();
     JsonObject aggsObject = new JsonObject();
     baseObject.add("aggs", aggsObject);
+    JsonArray orderArray = null;
+    if (order != null) {
+      orderArray = getOrderArray(baseObject);
+    }
     for (int i = 0; i < columns.length; i++) {
       if (columns[i] == null)
         continue;
@@ -165,15 +185,35 @@ public class ElasticSearchTranslator implements SqlTranslator {
       translateFunctionAggregation(
           (AggregationFunction) columns[i].getOperand(), aggregation);
       aggsObject.add(columns[i].getColumnMetadata().getName(), aggregation);
+      if (order != null) {
+        OrderType orderType = getOrderType(columns[i], order);
+        if (orderType != null) {
+          JsonObject orderObject = new JsonObject();
+          orderObject.addProperty(columns[i].getColumnMetadata().getName(),
+              orderType.name().toLowerCase());
+          orderArray.add(orderObject);
+        }
+      }
+    }
+    if (order != null && orderArray.size() == 0) {
+      removeOrderArray(baseObject);
     }
   }
 
-  protected JsonObject translate2TermsAggs(Column column,
-      JsonObject jsonObject) {
+  protected int getLimitSize(Limit limit) {
+    if (limit == null)
+      return 0;
+    LimitMetadata metadata = limit.getLimitMetadata();
+    return metadata.getValue();
+  }
+
+  protected JsonObject translate2TermsAggs(Column column, JsonObject jsonObject,
+      int size, Order order) {
     JsonObject aggsObject = new JsonObject();
     jsonObject.add("aggs", aggsObject);
     JsonObject aggregation = new JsonObject();
-    translateTermsAggregation(getOperandName(column.getOperand()), aggregation);
+    translateTermsAggregation(getOperandName(column.getOperand()), aggregation,
+        size, order);
     aggsObject.add(getOperandName(column.getOperand()), aggregation);
     return aggregation;
   }
@@ -182,6 +222,8 @@ public class ElasticSearchTranslator implements SqlTranslator {
       AggregationFunction aggregationFunction, JsonObject jsonObject) {
     JsonObject functionObject = new JsonObject();
     String functionName = getFunctionName(aggregationFunction);
+    if (functionName == null)
+      return;
     Operand operand = aggregationFunction.getParameters().get(0);
     functionObject.addProperty("field", getOperandName(operand));
     jsonObject.add(functionName, functionObject);
@@ -191,27 +233,97 @@ public class ElasticSearchTranslator implements SqlTranslator {
     String functionName = aggregationFunction.getName();
     if (functionName.equals(Count.FUNCTION_NAME)) {
       Count count = (Count) aggregationFunction;
-      if (!count.isDistinct())
-        functionName = "value_count";
-      else
-        functionName = "cardinality";
+      if (count.isDistinct())
+        return "cardinality";
+      return null;
     }
     return functionName;
   }
 
   protected void translateTermsAggregation(String fieldName,
-      JsonObject jsonObject) {
+      JsonObject jsonObject, int size, Order order) {
     JsonObject termsObject = new JsonObject();
     termsObject.addProperty("field", fieldName);
+    if (size != 0)
+      termsObject.addProperty("size", size);
+    JsonArray orderArray = translateTermsOrder(fieldName, order);
+    if (orderArray != null)
+      termsObject.add("order", orderArray);
     jsonObject.add("terms", termsObject);
   }
 
+  protected JsonArray translateTermsOrder(String fieldName, Order order) {
+    if (order == null)
+      return null;
+    OrderImpl orderImpl = (OrderImpl) order;
+    Column[] columns = orderImpl.getOrderColumns();
+    OrderType[] orderTypes = orderImpl.getOrderTypes();
+    JsonArray jsonArray = new JsonArray();
+    for (int i = 0; i < columns.length; i++) {
+      if (columns[i].getOperand() instanceof Count) {
+        Count count = (Count) columns[i].getOperand();
+        String name = getOperandName(count.getParameters().get(0));
+        if (name.equals(fieldName)) {
+          add2OrderArray("_count", orderTypes[i], jsonArray);
+          break;
+        }
+      } else {
+        String tmp = getOperandName(columns[i].getOperand());
+        if (tmp.equals(fieldName)) {
+          add2OrderArray("_term", orderTypes[i], jsonArray);
+          break;
+        }
+      }
+    }
+    if (jsonArray.size() == 0)
+      return null;
+    return jsonArray;
+  }
+
+  protected void add2OrderArray(String field, OrderType orderType,
+      JsonArray jsonArray) {
+    JsonObject jsonObject = new JsonObject();
+    jsonObject.addProperty(field, orderType.name().toLowerCase());
+    jsonArray.add(jsonObject);
+  }
+
+  protected JsonArray getOrderArray(JsonObject aggregation) {
+    JsonObject termsObject = (JsonObject) aggregation.get("terms");
+    JsonArray orderArray = (JsonArray) termsObject.get("order");
+    if (orderArray == null) {
+      orderArray = new JsonArray();
+      termsObject.add("order", orderArray);
+    }
+    return orderArray;
+  }
+
+  protected void removeOrderArray(JsonObject aggregation) {
+    JsonObject termsObject = (JsonObject) aggregation.get("terms");
+    termsObject.remove("order");
+  }
+
+  protected OrderType getOrderType(Column column, Order order) {
+    OrderImpl orderImpl = (OrderImpl) order;
+    Column[] columns = orderImpl.getOrderColumns();
+    OrderType[] orderTypes = orderImpl.getOrderTypes();
+    String columnName = column.getColumnMetadata().getName();
+    for (int i = 0; i < columns.length; i++) {
+      String tmp = columns[i].getColumnMetadata().getName();
+      if (tmp.equals(columnName)) {
+        return orderTypes[i];
+      }
+    }
+    return null;
+  }
+
   protected void translate2DistinctAggregations(
-      ColumnsRecordSetOperator columnsRecordSetOperator,
-      JsonObject jsonObject) {
+      ColumnsRecordSetOperator columnsRecordSetOperator, JsonObject jsonObject,
+      Limit limit, Order order) {
     JsonObject baseObject = jsonObject;
+    int size = getLimitSize(limit);
     for (Column column : columnsRecordSetOperator.getColumns().getColumns()) {
-      baseObject = translate2TermsAggs(column, baseObject);
+      baseObject = translate2TermsAggs(column, baseObject, size, order);
+      size = 0;
     }
   }
 
