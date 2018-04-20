@@ -42,7 +42,7 @@ public class TermsSetTranslator extends AbstractESFunctionTranslator {
     // TODO Auto-generated method stub
     if (function.getParameterCount() != 3) {
       throw new IllegalArgumentException(
-          "Error function! The termsSet function's format should be termsSet(fieldName, valueSet, minMatchField)!");
+          "Error function! The termsSet function's format should be termsSet(field, valueSet, minMatchField)!");
     }
 
     List<Operand> parameters = function.getParameters();
