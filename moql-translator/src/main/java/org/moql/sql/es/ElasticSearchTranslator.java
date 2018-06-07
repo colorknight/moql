@@ -184,7 +184,9 @@ public class ElasticSearchTranslator implements SqlTranslator {
       JsonObject aggregation = new JsonObject();
       translateFunctionAggregation(
           (AggregationFunction) columns[i].getOperand(), aggregation);
-      aggsObject.add(columns[i].getColumnMetadata().getName(), aggregation);
+      //  当聚集函数是0时，aggregation为空
+      if (aggregation.entrySet().size() > 0)
+        aggsObject.add(columns[i].getColumnMetadata().getName(), aggregation);
       if (order != null) {
         OrderType orderType = getOrderType(columns[i], order);
         if (orderType != null) {

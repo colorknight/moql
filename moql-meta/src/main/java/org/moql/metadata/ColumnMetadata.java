@@ -45,11 +45,17 @@ public class ColumnMetadata implements ColumnDefinition, Serializable {
     Validate.notEmpty(name, "Parameter 'name' is empty!");
     Validate.notEmpty(value, "Parameter 'value' is empty!");
     if (name.indexOf('(') != -1) {
+      int index = name.indexOf(',');
+      if ( index != -1) {
+          name = name.substring(0, index);
+          name+=')';
+      }
+      name = name.replace(" ", "");
       name = name.replace('(', '$');
       name = name.replace(')', '$');
-      name = name.replace(',', '$');
       name = name.replace('.', '_');
     }
+
     this.name = name;
     this.value = value;
   }

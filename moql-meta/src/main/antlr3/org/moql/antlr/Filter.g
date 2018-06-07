@@ -206,8 +206,8 @@ fragment
 HexLiteral : '0' ('x'|'X') HexDigit+ ;
 
 fragment
-//DecimalLiteral : ('+'|'-')? ('0' | '1'..'9' '0'..'9'*) ;
-DecimalLiteral : ('0' | '1'..'9' '0'..'9'*) ;
+DecimalLiteral : ('+'|'-')? ('0' | '1'..'9' '0'..'9'*) ;
+//DecimalLiteral : ('0' | '1'..'9' '0'..'9'*) ;
 
 fragment
 OctalLiteral : '0' ('0'..'7')+ ;
@@ -217,10 +217,9 @@ HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
 
 
 FloatingPointLiteral
-    	:   ('0'..'9')+ '.' ('0'..'9')* Exponent?
+    	:   ('+'|'-')? ('0'..'9')+ '.' ('0'..'9')* Exponent?
     	|   '.' ('0'..'9')+ Exponent? 
-    	|   ('0'..'9')+ Exponent 
-    	|   ('0'..'9')+
+    	|   ('+'|'-')? ('0'..'9')+ Exponent
     	;
 
 fragment
