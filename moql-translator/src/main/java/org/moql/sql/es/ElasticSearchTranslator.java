@@ -2,15 +2,10 @@ package org.moql.sql.es;
 
 import com.google.gson.*;
 import org.apache.commons.lang.Validate;
-import org.moql.Filter;
-import org.moql.MoqlTranslationException;
-import org.moql.Operand;
-import org.moql.Selector;
+import org.moql.*;
 import org.moql.core.*;
 import org.moql.core.group.GroupRecordSetOperator;
-import org.moql.metadata.LimitMetadata;
-import org.moql.metadata.OrderMetadata;
-import org.moql.metadata.OrderType;
+import org.moql.metadata.*;
 import org.moql.operand.constant.StringConstant;
 import org.moql.operand.expression.AbstractOperationExpression;
 import org.moql.operand.expression.ExpressionType;
@@ -84,6 +79,7 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translate2Query(SelectorImpl selector, JsonObject jsonObject) {
+    translateSelectClause(selector.getSelectorDefinition(), jsonObject);
     if (selector.getLimit() != null) {
       translateLimitClause(selector.getLimit(), jsonObject);
     }
@@ -97,6 +93,35 @@ public class ElasticSearchTranslator implements SqlTranslator {
     jsonObject.addProperty("size", 0);
     translate2CommonQuery(selector, jsonObject);
     translate2Aggregations(selector, jsonObject);
+  }
+
+  protected void translateSelectClause(SelectorDefinition selectorDefinition,
+      JsonObject jsonObject) {
+    ColumnsMetadata columnsMetadata = ((SelectorMetadata) selectorDefinition)
+        .getColumns();
+    List<ColumnMetadata> columnMetadatas = columnsMetadata.getColumns();
+    if (columnMetadatas.size() == 1) {
+      ColumnMetadata columnMetadata = columnMetadatas.get(0);
+      String value = columnMetadata.getValue();
+      if (value.endsWith(".*"))
+        return;
+    }
+    JsonObject source = new JsonObject();
+    JsonArray includes = new JsonArray();
+    for (ColumnMetadata columnMetadata : columnMetadatas) {
+      if (columnMetadata.getNestedSelector() != null)
+        throw new UnsupportedOperationException(
+            "Unsupported nested selector in select clause!");
+      String value = columnMetadata.getValue();
+      int index = value.indexOf('(');
+      if (index == -1) {
+        index = value.indexOf('.');
+        value = value.substring(index + 1);
+      }
+      includes.add(value);
+    }
+    source.add("includes", includes);
+    jsonObject.add("_source", source);
   }
 
   protected void translateLimitClause(Limit limit, JsonObject jsonObject) {
