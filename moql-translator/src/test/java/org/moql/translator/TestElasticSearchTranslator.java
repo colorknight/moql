@@ -158,6 +158,11 @@ public class TestElasticSearchTranslator extends TestCase {
     testESDialect(sql);
   }
 
+  public void testQuery2() {
+    String sql = "SELECT sim.EVENT_ID AS EVENT_ID, sim.NAME AS NAME, sim.CUSTOMER AS CUSTOMER  FROM SIM_EVENT sim WHERE 1=1 AND (END_TIME >= STR_TO_DATE( '2018-06-01 09:58:16', GET_FORMAT( DATETIME, 'ISO' ) ) AND END_TIME <= STR_TO_DATE( '2018-07-06 09:58:19', GET_FORMAT( DATETIME, 'ISO' ) ) ) ORDER BY EVENT_ID,NAME,CUSTOMER";
+    testESDialect(sql);
+  }
+
   protected void testESDialect(String sql) {
     try {
       String es = MoqlTranslator

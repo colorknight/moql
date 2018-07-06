@@ -16,6 +16,7 @@ public class EsDataQuerierTest extends TestCase {
     String[] serverIps = new String[] {"172.21.5.221"};
 //    String[] serverIps = new String[] {"127.0.0.1"};
     Properties properties = new Properties();
+    //properties.put(EsDataQuerier.HTTP_PORT, 9200);
 //    properties.put(EsDataQuerierOld.CLUSTER_NAME, "bdp-test");
 //    properties.put(EsDataQuerierOld.CLIENT_TRANSPORT_SNIFF, true);
     dataQuerier.connect(serverIps, properties);

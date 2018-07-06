@@ -62,12 +62,21 @@ public class EsDataQuerier implements DataQuerier {
 
   @Override public RecordSet query(String sql) throws IOException {
     Validate.notEmpty(sql, "sql is empty!");
+    return query(sql, (Properties) null);
+  }
+
+  @Override public RecordSet query(String sql, Properties queryProps)
+      throws IOException {
+    Validate.notEmpty(sql, "sql is empty!");
+    if (queryProps == null) {
+      queryProps = new Properties();
+    }
     try {
       SelectorDefinition selectorDefinition = MoqlParser.parseMoql(sql);
       List<String> indexAndTables = getIndexAndTables(selectorDefinition);
       String query = MoqlTranslator.translateMetadata2Sql(selectorDefinition,
           SqlDialectType.ELASTICSEARCH);
-      String queryUrl = makeQueryUrl(indexAndTables);
+      String queryUrl = makeQueryUrl(indexAndTables, queryProps);
       HttpResponse response = query(queryUrl, query);
       String data = EntityUtils.toString(response.getEntity());
       return toRecordSet(data, selectorDefinition);
@@ -107,7 +116,8 @@ public class EsDataQuerier implements DataQuerier {
     return indexAndTables;
   }
 
-  protected String makeQueryUrl(List<String> indexAndTables) {
+  protected String makeQueryUrl(List<String> indexAndTables,
+      Properties queryProps) {
     StringBuffer sbuf = new StringBuffer();
     sbuf.append(esServiceUrl);
     sbuf.append("/");
@@ -123,7 +133,18 @@ public class EsDataQuerier implements DataQuerier {
       sbuf.append("/");
     }
     sbuf.append("_search?pretty");
+    assembleUrlProperties(sbuf, queryProps);
     return sbuf.toString();
+  }
+
+  protected void assembleUrlProperties(StringBuffer sbuf,
+      Properties queryProps) {
+    for(Map.Entry<Object, Object> entry : queryProps.entrySet()) {
+      sbuf.append("&");
+      sbuf.append(entry.getKey());
+      sbuf.append("=");
+      sbuf.append(entry.getValue());
+    }
   }
 
   protected HttpResponse query(String queryUrl, String query)

@@ -14,10 +14,7 @@ import org.moql.operand.expression.logic.LogicOperator;
 import org.moql.operand.expression.logic.NotExpression;
 import org.moql.operand.expression.member.MemberVariableExpression;
 import org.moql.operand.expression.relation.*;
-import org.moql.operand.function.AbstractFunction;
-import org.moql.operand.function.AggregationFunction;
-import org.moql.operand.function.Count;
-import org.moql.operand.function.Regex;
+import org.moql.operand.function.*;
 import org.moql.sql.FunctionTranslator;
 import org.moql.sql.SqlTranslator;
 import org.moql.util.StringFormater;
@@ -578,6 +575,8 @@ public class ElasticSearchTranslator implements SqlTranslator {
       }
     } else if (operand instanceof StringConstant) {
       return name.substring(1, name.length() - 1);
+    } else if (operand instanceof Function) {
+      return operand.toString();
     }
     return name;
   }

@@ -13,4 +13,6 @@ public interface DataQuerier {
 
   RecordSet query(String sql) throws IOException;
 
+  RecordSet query(String sql, Properties queryProps) throws IOException;
+
 }
