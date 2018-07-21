@@ -7,7 +7,6 @@
     <artifactId>moql-parent</artifactId>
     <version>1.0.8</version>
     <modules>
-        <module>moql-cep</module>
         <module>moql-meta</module>
         <module>moql-engine</module>
         <module>moql-translator</module>
