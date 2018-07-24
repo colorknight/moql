@@ -30,10 +30,13 @@ import java.util.List;
 public class Floor extends AbstractFunction {
 	
 	public static final String FUNCTION_NAME = "floor";
+
+	protected Operand operand;
 	
 	public Floor(List<Operand> parameters) {
 		super(FUNCTION_NAME, 1, parameters);
 		// TODO Auto-generated constructor stub
+		operand = parameters.get(0);
 	}
 
 	/* (non-Javadoc)
@@ -42,7 +45,7 @@ public class Floor extends AbstractFunction {
 	@Override
 	protected Object innerOperate(EntityMap entityMap) {
 		// TODO Auto-generated method stub
-		Object obj = parameters.get(0).operate(entityMap);
+		Object obj = operand.operate(entityMap);
 		if (obj == null)
 		  return null;
 		double val = 0;
