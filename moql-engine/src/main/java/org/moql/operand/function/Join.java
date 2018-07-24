@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class Join extends AggregationFunction {
 
-	public static final String FUNCTION_NAME = "concat";
+	public static final String FUNCTION_NAME = "join";
 
 	protected Operand operand;
 
