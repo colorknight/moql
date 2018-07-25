@@ -18,9 +18,9 @@ public class JsonArrayAccessor implements ArrayAccessor {
     if (index instanceof Number) {
       return jsonArray.get(((Number)index).intValue());
     }
-    if (index.getClass().equals(String.class)) {
-      return jsonArray.get(Integer.valueOf((String)index));
-    }
+//    if (index.getClass().equals(String.class)) {
+//      return jsonArray.get(Integer.valueOf((String)index));
+//    }
     if (index instanceof NumberConvertable) {
       Number inx = ((NumberConvertable)index).toNumber();
       return jsonArray.get(inx.intValue());

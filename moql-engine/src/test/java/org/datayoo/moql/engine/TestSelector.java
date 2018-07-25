@@ -2,6 +2,7 @@ package org.datayoo.moql.engine;
 
 import junit.framework.TestCase;
 import org.datayoo.moql.*;
+import org.datayoo.moql.operand.factory.OperandFactoryImpl;
 import org.datayoo.moql.simulation.*;
 
 import java.util.HashMap;
@@ -21,6 +22,11 @@ public class TestSelector extends TestCase {
       selector.select(dataSetMap);
       RecordSet recordSet = selector.getRecordSet();
       outputRecordSet(recordSet);
+      Operand arrayOperand = MoqlEngine.createOperand("rs['a.name']");
+      EntityMap entityMap = new EntityMapImpl();
+      entityMap.putEntity("rs", recordSet);
+      List data = (List)arrayOperand.operate(entityMap);
+      System.out.println(data.size());
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

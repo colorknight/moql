@@ -39,9 +39,9 @@ public class IteratorAccessor implements ArrayAccessor {
 		if (index instanceof Number) {
 			return getObject(it, ((Number)index).intValue());
 		}
-		if (index.getClass().equals(String.class)) {
-			return getObject(it, Integer.valueOf((String)index));
-		}
+//		if (index.getClass().equals(String.class)) {
+//			return getObject(it, Integer.valueOf((String)index));
+//		}
 		if (index instanceof NumberConvertable) {
 			Number inx = ((NumberConvertable)index).toNumber();
 			return getObject(it, inx.intValue());

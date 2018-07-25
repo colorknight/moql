@@ -38,7 +38,8 @@ public class RecordSetAccessor implements ArrayAccessor {
 			return rs.getRecordAsMap(((Number)index).intValue());
 		}
 		if (index.getClass().equals(String.class)) {
-			return rs.getRecordAsMap(Integer.valueOf((String)index));
+			return rs.getColumn((String)index);
+//			return rs.getRecordAsMap(Integer.valueOf((String)index));
 		}
 		if (index instanceof NumberConvertable) {
 			Number inx = ((NumberConvertable)index).toNumber();

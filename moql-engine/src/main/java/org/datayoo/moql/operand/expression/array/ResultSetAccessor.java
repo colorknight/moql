@@ -27,6 +27,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,7 +46,8 @@ public class ResultSetAccessor implements ArrayAccessor {
 			return getObject(rs, ((Number)index).intValue());
 		}
 		if (index.getClass().equals(String.class)) {
-			return getObject(rs, Integer.valueOf((String)index));
+			return getColumn(rs, (String)index);
+//			return getObject(rs, Integer.valueOf((String)index));
 		}
 		if (index instanceof NumberConvertable) {
 			Number inx = ((NumberConvertable)index).toNumber();
@@ -77,6 +80,21 @@ public class ResultSetAccessor implements ArrayAccessor {
 			record.put(metadata.getCatalogName(i), rs.getObject(i));
 		}
 		return record;
+	}
+
+	protected List<Object> getColumn(ResultSet rs, String columnName) {
+		List<Object> data = new LinkedList<Object>();
+		try {
+			int index = rs.findColumn(columnName);
+			while(rs.next()) {
+				data.add(rs.getObject(index));
+			}
+			rs.first();
+		} catch(SQLException e) {
+			throw new OperateException(e);
+		}
+
+		return data;
 	}
 
 	@Override

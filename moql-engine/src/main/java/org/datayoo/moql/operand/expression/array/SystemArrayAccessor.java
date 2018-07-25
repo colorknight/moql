@@ -37,9 +37,9 @@ public class SystemArrayAccessor implements ArrayAccessor {
 		if (index instanceof Number) {
 			return Array.get(array, ((Number)index).intValue());
 		}
-		if (index.getClass().equals(String.class)) {
-			return Array.get(array, Integer.valueOf((String)index));
-		}
+//		if (index.getClass().equals(String.class)) {
+//			return Array.get(array, Integer.valueOf((String)index));
+//		}
 		if (index instanceof NumberConvertable) {
 			Number inx = ((NumberConvertable)index).toNumber();
 			return Array.get(array, inx.intValue());

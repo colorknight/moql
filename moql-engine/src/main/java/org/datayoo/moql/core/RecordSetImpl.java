@@ -177,6 +177,17 @@ public class RecordSetImpl implements RecordSet {
 		return records.get(index);
 	}
 
+	@Override public List<Object> getColumn(String columnName) {
+		int index = recordSetDefinition.getColumnIndex(columnName);
+		if (index == -1)
+			throw new IllegalArgumentException("Invalid column name!");
+		List<Object> data = new LinkedList<Object>();
+		for(Object[] record : records) {
+			data.add(record[index]);
+		}
+		return data;
+	}
+
 	@Override
 	public RecordSetDefinition getRecordSetDefinition() {
 		// TODO Auto-generated method stub

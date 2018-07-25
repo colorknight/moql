@@ -43,6 +43,8 @@ public interface RecordSet {
 	List<RecordNode> getRecordNodesByColumns(String[] columns);
 	
 	Object[] getRecord(int index);
+
+	List<Object> getColumn(String columnName);
 	
 	Map<String, Object> getRecordAsMap(int index);
 	/**
