@@ -3,9 +3,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.moql</groupId>
+    <groupId>org.datayoo.moql</groupId>
     <artifactId>moql-parent</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <modules>
         <module>moql-meta</module>
         <module>moql-engine</module>

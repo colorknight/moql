@@ -5,11 +5,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>moql-parent</artifactId>
-        <groupId>org.moql</groupId>
-        <version>1.0.8</version>
+        <groupId>org.datayoo.moql</groupId>
+        <version>1.0.9</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>org.datayoo.moql</groupId>
+    <version>1.0.9</version>
+    <packaging>jar</packaging>
     <artifactId>moql-querier</artifactId>
 
     <name>moql-querier</name>
@@ -23,9 +26,9 @@
             <version>6.2.4</version>
         </dependency>
         <dependency>
-            <groupId>org.moql</groupId>
+            <groupId>org.datayoo.moql</groupId>
             <artifactId>moql-engine</artifactId>
-            <version>1.0.8</version>
+            <version>1.0.9</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -34,9 +37,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.moql</groupId>
+            <groupId>org.datayoo.moql</groupId>
             <artifactId>moql-translator</artifactId>
-            <version>1.0.8</version>
+            <version>1.0.9</version>
         </dependency>
     </dependencies>
 
