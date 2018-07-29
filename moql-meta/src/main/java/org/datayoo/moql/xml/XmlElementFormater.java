@@ -31,13 +31,11 @@ public interface XmlElementFormater<T> {
      * import an object from a xml element
      * @param element the xml format of the object
      * @return an object
-     * @throws XmlAccessException
      */
     T importObjectFromElement(Element element) throws XmlAccessException;
     /**
      * export an object to a xml element
      * @param element 
-     * @throws XmlAccessException
      */
     Element exportObjectToElement(Element element, T object) throws XmlAccessException;
 }

@@ -95,6 +95,7 @@ public class ClassPathResource extends AbstractResource {
 
 	/**
 	 * Return the path for this resource (as resource path within the class path).
+	 * @return the path of this resource
 	 */
 	public final String getPath() {
 		return this.path;
@@ -102,6 +103,7 @@ public class ClassPathResource extends AbstractResource {
 
 	/**
 	 * Return the ClassLoader that this resource will be obtained from.
+	 * @return the ClassLoader
 	 */
 	public final ClassLoader getClassLoader() {
 		return (this.classLoader != null ? this.classLoader : this.clazz.getClassLoader());
@@ -110,6 +112,7 @@ public class ClassPathResource extends AbstractResource {
 
 	/**
 	 * This implementation opens an InputStream for the given class path resource.
+	 * @return the inputstram of the resource
 	 */
 	public InputStream getInputStream() throws IOException {
 		InputStream is = null;
@@ -127,6 +130,7 @@ public class ClassPathResource extends AbstractResource {
 
 	/**
 	 * This implementation returns a URL for the underlying class path resource.
+	 * @return the URL of the resource
 	 */
 	public URL getURL() throws IOException {
 		URL url = null;
@@ -146,6 +150,7 @@ public class ClassPathResource extends AbstractResource {
 	/**
 	 * This implementation returns a File reference for the underlying class path
 	 * resource, provided that it refers to a file in the file system.
+	 * @return the file reference of the resource
 	 */
 	public File getFile() throws IOException {
 		return ResourceUtils.getFile(getURL());
@@ -154,6 +159,7 @@ public class ClassPathResource extends AbstractResource {
 	/**
 	 * This implementation determines the underlying File
 	 * (or jar file, in case of a resource in a jar/zip).
+	 * @return the file reference
 	 */
 	protected File getFile2Check() throws IOException {
 		URL url = getURL();
@@ -169,6 +175,7 @@ public class ClassPathResource extends AbstractResource {
 	/**
 	 * returns the name of the file that this class path
 	 * resource refers to.
+	 * @return the name of resource
 	 */
 	public String getResourceName() {
 		return PathUtils.getFileName(this.path);
@@ -181,6 +188,7 @@ public class ClassPathResource extends AbstractResource {
 
 	/**
 	 * compares the underlying class path locations.
+	 * @return equals or not, true is equal
 	 */
 	public boolean equals(Object obj) {
 		if (obj == this) {

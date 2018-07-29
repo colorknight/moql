@@ -46,7 +46,7 @@ public abstract class PathUtils {
 	}
 
 	/**
-	 * Extract the filename from the given path, e.g. "mypath/myfile.txt" ->
+	 * Extract the filename from the given path, e.g. "mypath/myfile.txt" -&gt;
 	 * "myfile.txt".
 	 * 
 	 * @param path	the file path
@@ -62,7 +62,7 @@ public abstract class PathUtils {
 	}
 
 	/**
-	 * Extract the path from the given path, e.g. "mypath/myfile.txt" ->
+	 * Extract the path from the given path, e.g. "mypath/myfile.txt" -&gt;
 	 * "mypath/".
 	 * 
 	 * @param path	the file path
@@ -79,7 +79,7 @@ public abstract class PathUtils {
 
 	/**
 	 * Extract the filename extension from the given path, e.g.
-	 * "mypath/myfile.txt" -> "txt".
+	 * "mypath/myfile.txt" -&gt; "txt".
 	 * 
 	 * @param path	the file path
 	 * @return the extracted filename extension, or <code>null</code> if none
@@ -186,7 +186,7 @@ public abstract class PathUtils {
 	 * Return whether the path is a relative path which start 
 	 * with "." or "..".
 	 * @param path	the given path
-	 * @return 
+	 * @return the relative path
 	 */
 	public static boolean isRelativePath(String path) {
 		if (path.charAt(0) == DOT_CHAR)

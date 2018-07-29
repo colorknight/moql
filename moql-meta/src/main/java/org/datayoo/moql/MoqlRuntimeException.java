@@ -27,8 +27,8 @@ public class MoqlRuntimeException extends RuntimeException {
 	private long exceptionCode;
 
 	/**
-	 * @param message
-	 * @param cause
+	 * @param message exception description
+	 * @param cause the original exception
 	 */
 	public MoqlRuntimeException(String message, Throwable cause) {
 		super(message, cause);
@@ -36,7 +36,7 @@ public class MoqlRuntimeException extends RuntimeException {
 	}
 
 	/**
-	 * @param message
+	 * @param message exception description
 	 */
 	public MoqlRuntimeException(String message) {
 		super(message);
@@ -44,7 +44,7 @@ public class MoqlRuntimeException extends RuntimeException {
 	}
 
 	/**
-	 * @param cause
+	 * @param cause the original exception
 	 */
 	public MoqlRuntimeException(Throwable cause) {
 		super(cause);

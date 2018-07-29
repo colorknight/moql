@@ -70,6 +70,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 	 * <p>
 	 * Will get passed to ClassPathResource's constructor for all
 	 * ClassPathResource objects created by this resource loader.
+	 * @return the ClassLoader
 	 */
 	public ClassLoader getClassLoader() {
 		return this.classLoader;

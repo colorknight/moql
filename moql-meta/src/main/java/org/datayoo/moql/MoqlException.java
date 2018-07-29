@@ -27,8 +27,8 @@ public class MoqlException extends Exception {
 	private String exceptionCode;
 
 	/**
-	 * @param message
-	 * @param cause
+	 * @param message exception description
+	 * @param cause the original exception
 	 */
 	public MoqlException(String message, Throwable cause) {
 		super(message, cause);
@@ -39,7 +39,7 @@ public class MoqlException extends Exception {
 	}
 
 	/**
-	 * @param message
+	 * @param message exception description
 	 */
 	public MoqlException(String message) {
 		super(message);
@@ -47,7 +47,7 @@ public class MoqlException extends Exception {
 	}
 
 	/**
-	 * @param cause
+	 * @param cause the original exception
 	 */
 	public MoqlException(Throwable cause) {
 		super(cause);

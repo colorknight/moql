@@ -26,7 +26,6 @@ public abstract class MoqlParser {
    *
    * @param moql
    * @return SelectorMetadata or SetlectorMetadata
-   * @throws MoqlException
    */
   public static SelectorDefinition parseMoql(String moql) throws MoqlException {
     Validate.notEmpty(moql, "Parameter 'moql' is empty!");
