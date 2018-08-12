@@ -627,11 +627,11 @@ class XmlMetadataHelper {
       elRoot = element.addElement(rootName);
     } else {
       Document doc = DocumentHelper.createDocument();
-      elRoot = doc.addElement(rootName, "http://www.moql.org/schema/moql");
+      elRoot = doc.addElement(rootName, "http://www.datayoo.org/schema/moql");
       elRoot.add(new Namespace("xsi",
           "http://www.w3.org/2001/XMLSchema-instance"));
       elRoot.addAttribute("xsi:schemaLocation",
-          "http://www.moql.org/schema/moql selector-base.xsd");
+          "http://www.datayoo.org/schema/moql selector-base.xsd");
 
     }
     return elRoot;
