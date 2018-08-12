@@ -28,9 +28,9 @@ import java.util.List;
  * @author Tang Tadin
  *
  */
-public class Join extends AggregationFunction {
+public class Joint extends AggregationFunction {
 
-	public static final String FUNCTION_NAME = "join";
+	public static final String FUNCTION_NAME = "joint";
 
 	protected Operand operand;
 
@@ -38,7 +38,7 @@ public class Join extends AggregationFunction {
 
 	protected StringBuffer sbuf;
 
-	public Join(List<Operand> parameters) {
+	public Joint(List<Operand> parameters) {
 		super(FUNCTION_NAME, VARIANT_PARAMETERS, parameters);
 		// TODO Auto-generated constructor stub
 		if (this.parameters.size() > 2)

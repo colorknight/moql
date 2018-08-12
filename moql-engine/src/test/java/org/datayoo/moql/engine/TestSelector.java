@@ -91,7 +91,7 @@ public class TestSelector extends TestCase {
     List<BeanA> beanAList = BeanFactory.createBeanAList(0, 100);
     DataSetMap dataSetMap = new DataSetMapImpl();
     dataSetMap.putDataSet("BeanA", beanAList);
-    String sql = "Select Count(a.id) cnt, Sum(a.num) sum FROM BeanA a";
+    String sql = "Select Joint(a.name,','), Count(a.id) cnt, Sum(a.num) sum FROM BeanA a";
     try {
       Selector selector = MoqlEngine.createSelector(sql);
       selector.select(dataSetMap);

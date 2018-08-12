@@ -20,6 +20,7 @@ package org.datayoo.moql.operand.function.factory;
 import org.apache.commons.lang.Validate;
 import org.datayoo.moql.MoqlRuntimeException;
 import org.datayoo.moql.Operand;
+import org.datayoo.moql.core.JoinTables;
 import org.datayoo.moql.operand.function.*;
 import org.datayoo.moql.operand.function.decorator.*;
 import org.datayoo.moql.util.StringFormater;
@@ -50,6 +51,8 @@ public class FunctionFactoryImpl implements FunctionFactory {
         new FunctionBean(Max.FUNCTION_NAME, Max.class.getName(), true));
     functionMap.put(Sum.FUNCTION_NAME.toLowerCase(),
         new FunctionBean(Sum.FUNCTION_NAME, Sum.class.getName(), true));
+    functionMap.put(Joint.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Joint.FUNCTION_NAME, Joint.class.getName(), true));
     functionMap.put(NotNull.FUNCTION_NAME.toLowerCase(),
         new FunctionBean(NotNull.FUNCTION_NAME, NotNull.class.getName(), true));
     functionMap.put(Percentile.FUNCTION_NAME.toLowerCase(),
