@@ -27,24 +27,26 @@ import org.datayoo.moql.operand.selector.ColumnSelectorOperand;
 import org.datayoo.moql.util.CompareHelper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
- *
  * @author Tang Tadin
- *
  */
 public class InExpression extends AbstractRelationExpression {
 
   protected List<Operand> rOperands;
 
+  protected Set<Object> rValues;
+
   public InExpression(Operand lOperand, Operand rOperand) {
     super(OperatorType.BINARY, RelationOperator.IN, lOperand, rOperand);
     // TODO Auto-generated constructor stub
     /*
-		 * The rOperand will be parsed as a parenExpression when the expression list in
-		 * parenthese like "in ('a')" has only one expression.  
-		 */
+     * The rOperand will be parsed as a parenExpression when the expression list in
+     * parenthese like "in ('a')" has only one expression.
+     */
     if (rOperand instanceof ParenExpression) {
       rOperands = new ArrayList<Operand>();
       rOperands.add(((ParenExpression) rOperand).getOperand());
@@ -53,6 +55,16 @@ public class InExpression extends AbstractRelationExpression {
       if (rOperands.size() == 0) {
         throw new IllegalArgumentException(
             "Parameter 'rOperand' has no operand!");
+      }
+      // prepare the right operand when they are all constant
+      rValues = new HashSet<Object>();
+      for (Operand operand : rOperands) {
+        if (operand.isConstantReturn()) {
+          rValues.add(operand.getValue());
+        } else {
+          rValues = null;
+          return;
+        }
       }
     } else if (rOperand instanceof ColumnSelectorOperand) {
       rOperands = new ArrayList<Operand>();
@@ -68,21 +80,25 @@ public class InExpression extends AbstractRelationExpression {
     Object lValue = lOperand.operate(entityMap);
     if (lValue == null)
       return false;
-    for (Operand rOperand : rOperands) {
-      int ret = 0;
-      Object rValue = rOperand.operate(entityMap);
-      if (rValue == null)
-        continue;
-      if (ArrayExpressionUtils.isArray(rValue)) {
-        for (Object obj : ArrayExpressionUtils.toOperandContextList(rValue)) {
-          ret = CompareHelper.compare(lValue, obj);
+    if (rValues != null) {
+      return rValues.contains(lValue);
+    } else {
+      for (Operand rOperand : rOperands) {
+        int ret = 0;
+        Object rValue = rOperand.operate(entityMap);
+        if (rValue == null)
+          continue;
+        if (ArrayExpressionUtils.isArray(rValue)) {
+          for (Object obj : ArrayExpressionUtils.toOperandContextList(rValue)) {
+            ret = CompareHelper.compare(lValue, obj);
+            if (ret == 0)
+              return true;
+          }
+        } else {
+          ret = CompareHelper.compare(lValue, rValue);
           if (ret == 0)
             return true;
         }
-      } else {
-        ret = CompareHelper.compare(lValue, rValue);
-        if (ret == 0)
-          return true;
       }
     }
     return false;
