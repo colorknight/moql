@@ -85,7 +85,7 @@ comparisonPredicate returns[OperationMetadata operationMetadata]
 @after {
 operationMetadata = new RelationOperationMetadata(op.getText(), lExpr.expressionText, rExpr.expressionText);
 }
-	: lExpr = expression op = ('=' | '<' | '<=' | '>' | '>=' | '<>') rExpr = expression
+	: lExpr = expression op = ('=' | '<' | '<=' | '>' | '>=' | '<>' | '!=') rExpr = expression
 	;
 
 betweenPredicate returns[OperationMetadata operationMetadata]
