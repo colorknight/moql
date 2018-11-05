@@ -99,8 +99,12 @@ public class TestOperand extends TestCase {
           .createOperand("(num*num1) / num2 * 2.2 + 2 - 1");
       Operand arithmetic2 = MoqlEngine
           .createOperand("(经济|文化) + (十八大|中国) + 美国 - 病闹");
+      Operand arithmetic3 = MoqlEngine
+          .createOperand("6+ 5*2");
+      System.out.println(arithmetic3.toString() + " "
+          + arithmetic3.operate(entityMap));
       System.out.println(arithmetic2.toString() + " "
-          + arithmetic.getOperandType());
+          + arithmetic2.getOperandType());
       System.out.println(arithmetic.toString() + " "
           + arithmetic.getOperandType());
       System.out.println(arithmetic.operate(entityMap));
@@ -108,6 +112,25 @@ public class TestOperand extends TestCase {
       System.out.println(arithmetic.toString() + " "
           + arithmetic.getOperandType());
       System.out.println(arithmetic.operate(entityMap));
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  public void testBitwiseExpression() {
+    EntityMap entityMap = new EntityMapImpl();
+    entityMap.putEntity("num", 2);
+    entityMap.putEntity("num1", 3);
+    entityMap.putEntity("num2", 4);
+    try {
+      Operand arithmetic = MoqlEngine
+          .createOperand(" num << num1 + 1");
+      System.out.println(arithmetic.toString() + " " + arithmetic.operate(entityMap));
+      arithmetic = MoqlEngine.createOperand("num2 | num1 & num");
+      System.out.println(arithmetic.toString() + " " + arithmetic.operate(entityMap));
+      arithmetic = MoqlEngine.createOperand("~num2 ^ num2");
+      System.out.println(arithmetic.toString() + " " + arithmetic.operate(entityMap));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

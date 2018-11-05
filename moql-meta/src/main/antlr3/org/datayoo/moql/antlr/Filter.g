@@ -153,16 +153,21 @@ exclusiveOrExpression
     	;
 
 andExpression
-    	: additiveExpression ('&' additiveExpression)*
+    	: shiftExpression ('&' shiftExpression)*
     	;
-    
+shiftExpression
+    	: additiveExpression (('<<'|'>>') additiveExpression)*
+    	;
 additiveExpression
     	: multiplicativeExpression (('+' | '-')  multiplicativeExpression)*
     	;
 
 multiplicativeExpression
-    	: primary (( '*' | '/' | '%' ) primary)*
+    	: notExpression (( '*' | '/' | '%' ) notExpression)*
     	;
+
+notExpression
+    	: '~'? exp = primary;
 
 primary
     	: parExpression

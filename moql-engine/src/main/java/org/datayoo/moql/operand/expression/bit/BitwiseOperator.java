@@ -15,28 +15,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datayoo.moql.operand.expression.arithmetic;
+package org.datayoo.moql.operand.expression.bit;
 
-import org.datayoo.moql.Operand;
-import org.datayoo.moql.operand.constant.ConstantType;
+import org.datayoo.moql.SelectorConstants;
+import org.datayoo.moql.operand.expression.OperatorGetter;
 
 /**
  * 
  * @author Tang Tadin
  *
  */
-public class BitwiseXorExpression extends AbstractArithmeticExpression {
+public enum BitwiseOperator implements OperatorGetter {
+	LSHIFT,			//	<<
+	RSHIFT,			//	>>
+	BITWISENOT,	//	~
+	BITWISEAND,	//	'&'
+	BITWISEOR,	//	'|'
+	BITWISEXOR;	//	'^'
 
-	public BitwiseXorExpression(Operand operand, Operand operand2) {
-		super(ArithmeticOperator.BITWISEXOR, operand, operand2);
-		// TODO Auto-generated constructor stub
+
+	public String getOperator() {
+		if(this == LSHIFT)
+			return SelectorConstants.LSHIFT;
+		if(this == RSHIFT)
+			return SelectorConstants.RSHIFT;
+		if(this == BITWISENOT)
+			return SelectorConstants.SWANGDASH;
+		if(this == BITWISEAND)
+			return SelectorConstants.AMPERSAND;
+		if(this == BITWISEOR)
+			return SelectorConstants.VERTICAL;
+		return SelectorConstants.CIRCUMFLEX;
 	}
-
-	@Override
-	protected Object calc(Number number, Number number2, ConstantType returnType) {
-		// TODO Auto-generated method stub
-		long ret = number.longValue() ^ number2.longValue();
-		return new Long(ret);
-	}
-
 }

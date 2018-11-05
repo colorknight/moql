@@ -15,28 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datayoo.moql.operand.expression.arithmetic;
+package org.datayoo.moql.operand.expression.bit;
 
-import org.datayoo.moql.SelectorConstants;
-import org.datayoo.moql.operand.expression.OperatorGetter;
+import org.datayoo.moql.Operand;
+import org.datayoo.moql.operand.constant.ConstantType;
+import org.datayoo.moql.operand.expression.arithmetic.AbstractArithmeticExpression;
+import org.datayoo.moql.operand.expression.arithmetic.ArithmeticOperator;
 
 /**
  *
  * @author Tang Tadin
  *
  */
-public enum ArithmeticOperator implements OperatorGetter {
-  ADD, SUBTRACT, MULTIPLY, DIVIDE, MODULAR;  //	'^'
+public class BitwiseAndExpression extends AbstractBitwiseExpression {
 
-  public String getOperator() {
-    if (this == ADD)
-      return SelectorConstants.PLUS;
-    if (this == SUBTRACT)
-      return SelectorConstants.MINUS;
-    if (this == MULTIPLY)
-      return SelectorConstants.ASTERRISK;
-    if (this == DIVIDE)
-      return SelectorConstants.SLASH;
-    return SelectorConstants.PERCENT;
+  public BitwiseAndExpression(Operand lOperand, Operand rOperand) {
+    super(BitwiseOperator.BITWISEAND, lOperand, rOperand);
+    // TODO Auto-generated constructor stub
   }
+
+  @Override protected Long calc(Long lNumber, Long rNumber) {
+    // TODO Auto-generated method stub
+    long ret = lNumber.longValue() & rNumber.longValue();
+    return new Long(ret);
+  }
+
 }

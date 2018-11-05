@@ -31,6 +31,7 @@ import org.datayoo.moql.operand.function.*;
 import org.datayoo.moql.operand.function.factory.*;
 import org.datayoo.moql.operand.expression.*;
 import org.datayoo.moql.operand.expression.arithmetic.*;
+import org.datayoo.moql.operand.expression.bit.*;
 import org.datayoo.moql.operand.expression.member.*;
 import org.datayoo.moql.operand.expression.array.*;
 }
@@ -86,23 +87,37 @@ parExpression returns[Operand operand]
     	;
 
 expression returns[Operand operand] 
-    	: exp = exclusiveOrExpression {operand = exp;} ( t = '|' exp = exclusiveOrExpression {operand = ArithmeticExpressionFactory.createArithmeticExpression(t.getText(), operand, exp);})*
+    	: exp = exclusiveOrExpression {operand = exp;} ( t = '|' exp = exclusiveOrExpression {operand = BitwiseExpressionFactory.createBitwiseExpression(t.getText(), operand, exp);})*
     	;
 
 exclusiveOrExpression returns[Operand operand]
-    	: exp = andExpression {operand = exp;} ( t = '^' rOperand = andExpression {operand = ArithmeticExpressionFactory.createArithmeticExpression(t.getText(), operand, exp);})*
+    	: exp = andExpression {operand = exp;} ( t = '^' exp = andExpression {operand = BitwiseExpressionFactory.createBitwiseExpression(t.getText(), operand, exp);})*
     	;
 
 andExpression returns[Operand operand]
-    	: exp = additiveExpression {operand = exp;} ( t = '&' exp = additiveExpression {operand = ArithmeticExpressionFactory.createArithmeticExpression(t.getText(), operand, exp);})*
+    	: exp = shiftExpression {operand = exp;} ( t = '&'  exp = shiftExpression {operand = BitwiseExpressionFactory.createBitwiseExpression(t.getText(), operand, exp);})*
     	;
-    
+
+shiftExpression returns[Operand operand]
+    	: exp = additiveExpression {operand = exp;} ( t = ('<<'|'>>') exp = additiveExpression {operand = BitwiseExpressionFactory.createBitwiseExpression(t.getText(), operand, exp);})*
+    	;
+
 additiveExpression returns[Operand operand]
-    	: exp = multiplicativeExpression {operand = exp;} ( t = ('+' | '-')  exp = multiplicativeExpression {operand = ArithmeticExpressionFactory.createArithmeticExpression(t.getText(), operand, exp);})*
+    	: exp = multiplicativeExpression {operand = exp;} ( t = ('+'|'-')  exp = multiplicativeExpression {operand = ArithmeticExpressionFactory.createArithmeticExpression(t.getText(), operand, exp);})*
     	;
 
 multiplicativeExpression returns[Operand operand]
-    	: exp = primary {operand = exp;} ( t = ( '*' | '/' | '%' ) exp = primary {operand = ArithmeticExpressionFactory.createArithmeticExpression(t.getText(), operand, exp);})*
+    	: exp = notExpression {operand = exp;} ( t = ('*'|'/'|'%' ) exp = notExpression {operand = ArithmeticExpressionFactory.createArithmeticExpression(t.getText(), operand, exp);})*
+    	;
+
+notExpression returns[Operand operand]
+    	: t = '~'? exp = primary
+    	{
+    	    if (t != null)
+    	        operand = BitwiseExpressionFactory.createBitwiseExpression(t.getText(), null, exp);
+    	    else
+    	        operand = exp;
+    	}
     	;
 
 primary returns[Operand operand]

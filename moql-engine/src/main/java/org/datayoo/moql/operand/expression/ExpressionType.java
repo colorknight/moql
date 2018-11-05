@@ -27,6 +27,7 @@ public enum ExpressionType {
 	LOGIC,
 	RELATION,
 	ARITHMETIC,
+	BITWISE,
 	ARRAY,
 	MEMBER,
 }

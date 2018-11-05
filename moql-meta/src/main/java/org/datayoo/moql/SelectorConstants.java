@@ -60,9 +60,15 @@ public abstract class SelectorConstants {
 	public static final String SLASH= "/";
 	
 	public static final String PERCENT= "%";
-	
+
+	public static final String LSHIFT= "<<";
+
+	public static final String RSHIFT= ">>";
+
+	public static final String SWANGDASH = "~";	//	'~'
+
 	public static final String AMPERSAND = "&";	//	'&'
-	
+
 	public static final String VERTICAL = "|";	//	'|'
 	
 	public static final String CIRCUMFLEX = "^";	//	'^'
@@ -84,7 +90,9 @@ public abstract class SelectorConstants {
 	public static final String GE = ">=";
 	
 	public static final String NE = "<>";
-	
+
+	public static final String NE2 = "!=";
+
 	public static final String PAREN = "(";
 	
 	public static final String BETWEEN = "between";

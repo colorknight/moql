@@ -15,15 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datayoo.moql.operand.expression.arithmetic;
+package org.datayoo.moql.operand.expression.bit;
 
 import org.apache.commons.lang.Validate;
 import org.datayoo.moql.Operand;
 import org.datayoo.moql.SelectorConstants;
 import org.datayoo.moql.operand.expression.OperationExpression;
-import org.datayoo.moql.operand.expression.bit.BitwiseAndExpression;
-import org.datayoo.moql.operand.expression.bit.BitwiseOrExpression;
-import org.datayoo.moql.operand.expression.bit.BitwiseXorExpression;
+import org.datayoo.moql.operand.expression.arithmetic.*;
 import org.datayoo.moql.util.StringFormater;
 
 /**
@@ -31,35 +29,29 @@ import org.datayoo.moql.util.StringFormater;
  * @author Tang Tadin
  *
  */
-public class ArithmeticExpressionFactory {
+public class BitwiseExpressionFactory {
 	
-	public static OperationExpression createArithmeticExpression(
+	public static OperationExpression createBitwiseExpression(
 			String operator, Operand lOperand, Operand rOperand) {
 		Validate.notEmpty(operator, "Parameter 'operator' is empty!");
-		Validate.notNull(lOperand, "Parameter 'lOperand' is null!");
-		Validate.notNull(rOperand, "Parameter 'rOperand' is null!");
-		if (operator.length() > 1) {
+		if (operator.length() > 2) {
 			throw new IllegalArgumentException(
-					StringFormater.format("Operator '' is invalid!", operator));
+					StringFormater.format("Operator '{}' is invalid!", operator));
 		}
-		char op = operator.charAt(0);
-		
-		if (op == SelectorConstants.PLUS.charAt(0))
-			return new AddExpression(lOperand, rOperand);
-		else if (op == SelectorConstants.MINUS.charAt(0))
-			return new SubtractExpression(lOperand, rOperand);
-		else if (op == SelectorConstants.ASTERRISK.charAt(0))
-			return new MultiplyExpression(lOperand, rOperand);
-		else if (op == SelectorConstants.SLASH.charAt(0))
-			return new DivideExpression(lOperand, rOperand);
-		else if (op == SelectorConstants.PERCENT.charAt(0))
-			return new ModularExpression(lOperand, rOperand);
-		else if (op == SelectorConstants.AMPERSAND.charAt(0))
+		Validate.notNull(rOperand, "Parameter 'rOperand' is null!");
+
+		if (operator.equals(SelectorConstants.SWANGDASH))
+			return new BitwiseNotExpression(rOperand);
+		if (operator.equals(SelectorConstants.AMPERSAND))
 			return new BitwiseAndExpression(lOperand, rOperand);
-		else if (op == SelectorConstants.VERTICAL.charAt(0))
+		else if (operator.equals(SelectorConstants.VERTICAL))
 			return new BitwiseOrExpression(lOperand, rOperand);
-		else if (op == SelectorConstants.CIRCUMFLEX.charAt(0))
+		else if (operator.equals(SelectorConstants.CIRCUMFLEX))
 			return new BitwiseXorExpression(lOperand, rOperand);
+		else if (operator.equals(SelectorConstants.LSHIFT))
+			return new LeftShiftExpression(lOperand, rOperand);
+		else if (operator.equals(SelectorConstants.RSHIFT))
+			return new RightShiftExpression(lOperand, rOperand);
 		throw new IllegalArgumentException(StringFormater.format("Unsuppored operator '{}'!", operator));
 	}
 	
