@@ -33,6 +33,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -52,7 +53,8 @@
         <tag>master</tag>
         <url>git@github.com:colorknight/moql.git</url>
         <connection>scm:git:git@github.com:colorknight/moql.git</connection>
-        <developerConnection>scm:git:git@github.com:colorknight/moql.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:colorknight/moql.git
+        </developerConnection>
     </scm>
     <developers>
         <developer>
