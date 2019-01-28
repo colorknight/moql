@@ -145,8 +145,31 @@ public class MemberFunctionExpression extends AbstractExpression implements Memb
 		Class<?>[] parameterTypes = new Class[parameterObjects.length];
 		for(int i = 0; i < parameterObjects.length; i++) {
 			parameterTypes[i] = parameterObjects[i].getClass();
+			parameterTypes[i] = adjustPrimitiveType(parameterTypes[i]);
 		}
 		return parameterTypes;
+	}
+
+	protected Class<?> adjustPrimitiveType(Class<?> clazz) {
+		String name = clazz.getName();
+		if (name.equals(Integer.class.getName())) {
+			return Integer.TYPE;
+		} else if (name.equals(Long.class.getName())) {
+			return Long.TYPE;
+		} else if (name.equals(Short.class.getName())) {
+			return Short.TYPE;
+		} else if (name.equals(Byte.class.getName())) {
+			return Byte.TYPE;
+		} else if (name.equals(Character.class.getName())) {
+			return Character.TYPE;
+		} else if (name.equals(Double.class.getName())) {
+			return Double.TYPE;
+		} else if (name.equals(Float.class.getName())) {
+			return Float.TYPE;
+		} else if (name.equals(Boolean.class.getName())) {
+			return Boolean.TYPE;
+		}
+		return clazz;
 	}
 
 	@Override

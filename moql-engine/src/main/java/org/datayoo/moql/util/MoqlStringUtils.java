@@ -60,6 +60,8 @@ public abstract class MoqlStringUtils {
 			if (moqlString.charAt(i) == SelectorConstants.QUOTE
 					&& moqlString.charAt(i+1) == SelectorConstants.QUOTE) {
 				i++;
+				if (i == moqlString.length() - 1)
+					break;
 			}
 			sbuf.append(moqlString.charAt(i));
 		}
