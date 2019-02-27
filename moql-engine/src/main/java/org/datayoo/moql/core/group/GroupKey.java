@@ -17,7 +17,9 @@
  */
 package org.datayoo.moql.core.group;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Objects;
 
 /**
  * @author Tang Tadin
@@ -58,7 +60,7 @@ public class GroupKey {
     if (!(obj instanceof GroupKey))
       return false;
     Object[] target = ((GroupKey)obj).groups;
-    return ArrayUtils.isEquals(groups, target);
+    return Objects.deepEquals(groups, target);
   }
 
   @Override

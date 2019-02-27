@@ -2,7 +2,7 @@ package org.datayoo.moql.parser;
 
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.MoqlException;
 import org.datayoo.moql.SelectorDefinition;
 import org.datayoo.moql.antlr.FilterLexer;

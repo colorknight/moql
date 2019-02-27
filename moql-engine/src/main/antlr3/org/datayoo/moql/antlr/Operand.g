@@ -21,7 +21,7 @@ CIRCUMFLEX = '^';
 @header {
 package org.datayoo.moql.antlr;
 import java.util.LinkedList;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import org.datayoo.moql.*;
 import org.datayoo.moql.operand.*;

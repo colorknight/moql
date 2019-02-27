@@ -17,7 +17,7 @@
  */
 package org.datayoo.moql.sql;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.Filter;
 import org.datayoo.moql.Operand;
 import org.datayoo.moql.Selector;

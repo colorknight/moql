@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/moql-engine/moql-engine.iml" filepath="$PROJECT_DIR$/moql-engine/moql-engine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/moql-meta/moql-meta.iml" filepath="$PROJECT_DIR$/moql-meta/moql-meta.iml" />
+      <module fileurl="file://$PROJECT_DIR$/moql-parent.iml" filepath="$PROJECT_DIR$/moql-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/moql-querier/moql-querier.iml" filepath="$PROJECT_DIR$/moql-querier/moql-querier.iml" />
+      <module fileurl="file://$PROJECT_DIR$/moql-translator/moql-translator.iml" filepath="$PROJECT_DIR$/moql-translator/moql-translator.iml" />
+    </modules>
+  </component>
+</project>

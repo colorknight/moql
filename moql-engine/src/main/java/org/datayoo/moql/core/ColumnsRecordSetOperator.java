@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,8 +17,7 @@
  */
 package org.datayoo.moql.core;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.*;
 import org.datayoo.moql.core.cache.CacheImpl;
 import org.datayoo.moql.metadata.CacheMetadata;
@@ -27,11 +26,12 @@ import org.datayoo.moql.operand.function.AggregationFunction;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * 
+ *
  * @author Tang Tadin
- * 
+ *
  */
 public class ColumnsRecordSetOperator implements RecordSetOperator {
 
@@ -72,23 +72,18 @@ public class ColumnsRecordSetOperator implements RecordSetOperator {
       this.aggregation = true;
   }
 
-  @Override
-  @SuppressWarnings({
-    "rawtypes"
-  })
-  public Cache getCache() {
+  @Override @SuppressWarnings({ "rawtypes"
+  }) public Cache getCache() {
     // TODO Auto-generated method stub
     return cache;
   }
 
-  @Override
-  public Columns getColumns() {
+  @Override public Columns getColumns() {
     // TODO Auto-generated method stub
     return columns;
   }
 
-  @Override
-  public RecordSet getValue() {
+  @Override public RecordSet getValue() {
     // TODO Auto-generated method stub
     RecordSetDefinition recordSetDefinition = createRecordSetDefinition();
     if (!aggregation) {
@@ -110,8 +105,7 @@ public class ColumnsRecordSetOperator implements RecordSetOperator {
     return new RecordSetMetadata(columnDefinitions, null);
   }
 
-  @Override
-  public void operate(EntityMap entityMap) {
+  @Override public void operate(EntityMap entityMap) {
     // TODO Auto-generated method stub
     columns.operate(entityMap);
     if (!aggregation) {
@@ -125,8 +119,7 @@ public class ColumnsRecordSetOperator implements RecordSetOperator {
     }
   }
 
-  @Override
-  public void clear() {
+  @Override public void clear() {
     // TODO Auto-generated method stub
     cache.clear();
     columns.clear();
@@ -146,16 +139,14 @@ public class ColumnsRecordSetOperator implements RecordSetOperator {
       }
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    @Override public boolean equals(Object obj) {
       // TODO Auto-generated method stub
       if (!(obj instanceof ColumnRecord))
         return false;
-      return ArrayUtils.isEquals(record, ((ColumnRecord) obj).record);
+      return Objects.deepEquals(record, ((ColumnRecord) obj).record);
     }
 
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
       // TODO Auto-generated method stub
       return hashCode;
     }

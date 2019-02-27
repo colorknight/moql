@@ -17,13 +17,13 @@
  */
 package org.datayoo.moql.core;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.RecordNode;
 
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class RecordNodeImpl implements RecordNode, Serializable {
 	private static final long serialVersionUID = 1L;
@@ -93,7 +93,7 @@ public class RecordNodeImpl implements RecordNode, Serializable {
 		if (!(obj instanceof RecordNode))
 			return false;
 		RecordNode rn = (RecordNode)obj;
-		return ArrayUtils.isEquals(rn.getColumns(), columns);
+		return Objects.deepEquals(rn.getColumns(), columns);
 	}
 
 	

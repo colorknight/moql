@@ -17,7 +17,7 @@
  */
 package org.datayoo.moql.operand.constant;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 public class BooleanConstant extends AbstractConstant {
 	{

@@ -17,16 +17,14 @@
  */
 package org.datayoo.moql.metadata;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.ColumnDefinition;
 import org.datayoo.moql.SelectorDefinition;
 
 import java.io.Serializable;
 
 /**
- *
  * @author Tang Tadin
- *
  */
 public class ColumnMetadata implements ColumnDefinition, Serializable {
 
@@ -46,9 +44,9 @@ public class ColumnMetadata implements ColumnDefinition, Serializable {
     Validate.notEmpty(value, "Parameter 'value' is empty!");
     if (name.indexOf('(') != -1) {
       int index = name.indexOf(',');
-      if ( index != -1) {
-          name = name.substring(0, index);
-          name+=')';
+      if (index != -1) {
+        name = name.substring(0, index);
+        name += ')';
       }
       name = name.replace(" ", "");
       name = name.replace('(', '$');

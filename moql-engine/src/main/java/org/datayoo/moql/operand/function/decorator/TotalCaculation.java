@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,6 @@
  */
 package org.datayoo.moql.operand.function.decorator;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.datayoo.moql.*;
 import org.datayoo.moql.core.Column;
 import org.datayoo.moql.core.Columns;
@@ -31,6 +30,7 @@ import org.datayoo.moql.operand.variable.SingleVariable;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Tang Tadin
@@ -82,8 +82,7 @@ public class TotalCaculation extends DecorateFunction {
 
   }
 
-  @Override
-  public RecordSet decorate(RecordSet recordSet, Columns columns) {
+  @Override public RecordSet decorate(RecordSet recordSet, Columns columns) {
     // TODO Auto-generated method stub
     if (recordSet == null)
       return null;
@@ -98,7 +97,8 @@ public class TotalCaculation extends DecorateFunction {
     initializeTotalRecords(recordSetDefinition, columns);
   }
 
-  protected void initializeGroupIndexes(RecordSetDefinition recordSetDefinition) {
+  protected void initializeGroupIndexes(
+      RecordSetDefinition recordSetDefinition) {
     List<ColumnDefinition> columnDefinitions = recordSetDefinition
         .getGroupColumns();
     if (columnDefinitions.size() == 0 && totalAliases.length != 1) {
@@ -113,8 +113,8 @@ public class TotalCaculation extends DecorateFunction {
     }
   }
 
-  protected void initializeTotalRecords(
-      RecordSetDefinition recordSetDefinition, Columns columns) {
+  protected void initializeTotalRecords(RecordSetDefinition recordSetDefinition,
+      Columns columns) {
     for (int i = 0; i < totalRecords.length; i++) {
       if (totalAliases[i] != null) {
         totalRecords[i] = new TotalRecord(i, columns.getColumns().size());
@@ -205,7 +205,7 @@ public class TotalCaculation extends DecorateFunction {
     public boolean isGroupChanged(Object[] record) {
       if (groups != null) {
         for (int i = 0; i < groups.length; i++) {
-          if (!ObjectUtils.equals(groups[i], record[groupIndexes[i]]))
+          if (!Objects.deepEquals(groups[i], record[groupIndexes[i]]))
             return true;
         }
       }

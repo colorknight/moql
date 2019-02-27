@@ -17,7 +17,7 @@
  */
 package org.datayoo.moql.core.table;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import java.util.Iterator;
 import java.util.Map;

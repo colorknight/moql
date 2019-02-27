@@ -1,7 +1,7 @@
 package org.datayoo.moql.querier.es;
 
 import com.google.gson.*;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;

@@ -17,7 +17,7 @@
  */
 package org.datayoo.moql.core.cache;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.core.Cache;
 import org.datayoo.moql.core.CacheElement;
 import org.datayoo.moql.core.WashoutExecutor;

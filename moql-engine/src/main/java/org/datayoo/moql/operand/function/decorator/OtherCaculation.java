@@ -17,7 +17,7 @@
  */
 package org.datayoo.moql.operand.function.decorator;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.datayoo.moql.*;
 import org.datayoo.moql.core.Column;
 import org.datayoo.moql.core.Columns;

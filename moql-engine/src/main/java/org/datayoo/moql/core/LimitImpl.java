@@ -17,7 +17,7 @@
  */
 package org.datayoo.moql.core;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.RecordSet;
 import org.datayoo.moql.metadata.LimitMetadata;
 

@@ -17,7 +17,7 @@
  */
 package org.datayoo.moql.core.combination;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import java.util.Comparator;
 

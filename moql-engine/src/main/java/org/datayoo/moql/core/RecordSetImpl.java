@@ -17,8 +17,7 @@
  */
 package org.datayoo.moql.core;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.ColumnDefinition;
 import org.datayoo.moql.RecordNode;
 import org.datayoo.moql.RecordSet;
@@ -129,7 +128,7 @@ public class RecordSetImpl implements RecordSet {
 	
 	protected RecordNode findRecordNode(List<RecordNode> nodes, Object[] columns) {
 		for(RecordNode node : nodes) {
-			if (ArrayUtils.isEquals(node.getColumns(), columns))
+			if (Objects.deepEquals(node.getColumns(), columns))
 				return node;
 		}
 		return null;

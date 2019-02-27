@@ -17,7 +17,7 @@
  */
 package org.datayoo.moql;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import java.sql.ResultSet;
 import java.util.HashMap;

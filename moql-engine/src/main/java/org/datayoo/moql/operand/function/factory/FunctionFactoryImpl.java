@@ -17,10 +17,9 @@
  */
 package org.datayoo.moql.operand.function.factory;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.MoqlRuntimeException;
 import org.datayoo.moql.Operand;
-import org.datayoo.moql.core.JoinTables;
 import org.datayoo.moql.operand.function.*;
 import org.datayoo.moql.operand.function.decorator.*;
 import org.datayoo.moql.util.StringFormater;

@@ -112,6 +112,8 @@ public class TestOperand extends TestCase {
       System.out.println(arithmetic.toString() + " "
           + arithmetic.getOperandType());
       System.out.println(arithmetic.operate(entityMap));
+      arithmetic = MoqlEngine.createOperand("num + num1 + num2");
+      System.out.println(arithmetic.toString() + " " + arithmetic.operate(entityMap));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -147,6 +149,8 @@ public class TestOperand extends TestCase {
       member = MoqlEngine.createOperand("bean.getNum()");
       System.out.println(member.toString() + " " + member.getOperandType());
       System.out.println(member.operate(entityMap));
+      member = MoqlEngine.createOperand("bean.getNum().getX()");
+      System.out.println(member.toString() + " " + member.getOperandType());
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

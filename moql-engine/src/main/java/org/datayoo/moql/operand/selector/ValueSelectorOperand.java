@@ -17,7 +17,7 @@
  */
 package org.datayoo.moql.operand.selector;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.EntityMap;
 import org.datayoo.moql.OperandType;
 import org.datayoo.moql.RecordSet;

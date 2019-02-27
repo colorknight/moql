@@ -17,7 +17,7 @@
  */
 package org.datayoo.moql.engine;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.*;
 import org.datayoo.moql.core.MoqlFactory;
 import org.datayoo.moql.core.factory.MoqlFactoryImpl;
