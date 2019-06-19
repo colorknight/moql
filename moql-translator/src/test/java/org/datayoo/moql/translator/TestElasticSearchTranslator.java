@@ -163,6 +163,11 @@ public class TestElasticSearchTranslator extends TestCase {
     testESDialect(sql);
   }
 
+  public void testQuery3() {
+    String sql = "select distinct l.name AS name from lyl l";
+    testESDialect(sql);
+  }
+
   protected void testESDialect(String sql) {
     try {
       String es = MoqlTranslator

@@ -2,7 +2,6 @@ package org.datayoo.moql.engine;
 
 import junit.framework.TestCase;
 import org.datayoo.moql.*;
-import org.datayoo.moql.operand.factory.OperandFactoryImpl;
 import org.datayoo.moql.simulation.*;
 
 import java.util.HashMap;
@@ -25,7 +24,7 @@ public class TestSelector extends TestCase {
       Operand arrayOperand = MoqlEngine.createOperand("rs['a.name']");
       EntityMap entityMap = new EntityMapImpl();
       entityMap.putEntity("rs", recordSet);
-      List data = (List)arrayOperand.operate(entityMap);
+      List data = (List) arrayOperand.operate(entityMap);
       System.out.println(data.size());
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
@@ -86,7 +85,23 @@ public class TestSelector extends TestCase {
       e.printStackTrace();
     }
   }
-  
+
+  public void testOneSingleTableWithUnderlineSelector() {
+    List<BeanA> beanAList = BeanFactory.createBeanAList(0, 100);
+    DataSetMap dataSetMap = new DataSetMapImpl();
+    dataSetMap.putDataSet("BeanA_05_09", beanAList);
+    String sql = "select a.id, a.name, a.num%50 from BeanA_05_09 a where a.num%500 > 10 order by 3";
+    try {
+      Selector selector = MoqlEngine.createSelector(sql);
+      selector.select(dataSetMap);
+      RecordSet recordSet = selector.getRecordSet();
+      outputRecordSet(recordSet);
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   public void testAggregationOneTableSelector() {
     List<BeanA> beanAList = BeanFactory.createBeanAList(0, 100);
     DataSetMap dataSetMap = new DataSetMapImpl();
@@ -356,7 +371,8 @@ public class TestSelector extends TestCase {
     System.out.println("------------------------------------------------");
   }
 
-  protected void outputRecordNode(List<RecordNode> recordNodes, int indentation) {
+  protected void outputRecordNode(List<RecordNode> recordNodes,
+      int indentation) {
     StringBuffer prefix = new StringBuffer();
     for (int i = 0; i < indentation; i++) {
       prefix.append('\t');
@@ -384,8 +400,9 @@ public class TestSelector extends TestCase {
     dataSetMap.putDataSet("BeanA", beanAList);
     dataSetMap.putDataSet("BeanB", beanBList);
     dataSetMap.putDataSet("BeanC", beanCList);
-    String sql = "select a.id, a.name, a.num, b.id, b.name, b.num, c.id, c.name, c.num "
-        + "from BeanA a, BeanB b, BeanC c where a.num%50 > 100 and b.num%500 < 400 order by 3 desc, 6 desc";
+    String sql =
+        "select a.id, a.name, a.num, b.id, b.name, b.num, c.id, c.name, c.num "
+            + "from BeanA a, BeanB b, BeanC c where a.num%50 > 100 and b.num%500 < 400 order by 3 desc, 6 desc";
     try {
       Selector selector = MoqlEngine.createSelector(sql);
       selector.select(dataSetMap);
@@ -405,8 +422,9 @@ public class TestSelector extends TestCase {
     dataSetMap.putDataSet("BeanA", beanAList);
     dataSetMap.putDataSet("BeanB", beanBList);
     dataSetMap.putDataSet("BeanC", beanCList);
-    String sql = "select a.id, a.name, a.num, b.id, b.name, b.num, c.id, c.name, c.num "
-        + "from BeanA a left join BeanB b on a.id = b.id left join BeanC c on c.id = b.id where a.num%500 > 100 or b.num < 400 order by 3 desc";
+    String sql =
+        "select a.id, a.name, a.num, b.id, b.name, b.num, c.id, c.name, c.num "
+            + "from BeanA a left join BeanB b on a.id = b.id left join BeanC c on c.id = b.id where a.num%500 > 100 or b.num < 400 order by 3 desc";
     try {
       Selector selector = MoqlEngine.createSelector(sql);
       selector.select(dataSetMap);
@@ -426,8 +444,9 @@ public class TestSelector extends TestCase {
     dataSetMap.putDataSet("BeanA", beanAList);
     dataSetMap.putDataSet("BeanB", beanBList);
     dataSetMap.putDataSet("BeanC", beanCList);
-    String sql = "select a.id, a.name, a.num, b.id, b.name, b.num, c.id, c.name, c.num "
-        + "from BeanA a right join BeanB b on a.id = b.id right join BeanC c on c.id = b.id order by 3 desc";
+    String sql =
+        "select a.id, a.name, a.num, b.id, b.name, b.num, c.id, c.name, c.num "
+            + "from BeanA a right join BeanB b on a.id = b.id right join BeanC c on c.id = b.id order by 3 desc";
     try {
       Selector selector = MoqlEngine.createSelector(sql);
       selector.select(dataSetMap);
@@ -447,8 +466,9 @@ public class TestSelector extends TestCase {
     dataSetMap.putDataSet("BeanA", beanAList);
     dataSetMap.putDataSet("BeanB", beanBList);
     dataSetMap.putDataSet("BeanC", beanCList);
-    String sql = "select a.id, a.name, a.num, b.id, b.name, b.num, c.id, c.name, c.num "
-        + "from BeanA a full join BeanB b on a.id = b.id full join BeanC c on c.id = b.id order by 3 desc";
+    String sql =
+        "select a.id, a.name, a.num, b.id, b.name, b.num, c.id, c.name, c.num "
+            + "from BeanA a full join BeanB b on a.id = b.id full join BeanC c on c.id = b.id order by 3 desc";
     try {
       Selector selector = MoqlEngine.createSelector(sql);
       selector.select(dataSetMap);
@@ -468,8 +488,9 @@ public class TestSelector extends TestCase {
     dataSetMap.putDataSet("BeanA", beanAList);
     dataSetMap.putDataSet("BeanB", beanBList);
     dataSetMap.putDataSet("BeanC", beanCList);
-    String sql = "select a.id, a.name, a.num, b.id, b.name, b.num, c.id, c.name, c.num "
-        + "from BeanA a inner join BeanB b on a.id = b.id inner join BeanC c on c.id = b.id order by 3 desc";
+    String sql =
+        "select a.id, a.name, a.num, b.id, b.name, b.num, c.id, c.name, c.num "
+            + "from BeanA a inner join BeanB b on a.id = b.id inner join BeanC c on c.id = b.id order by 3 desc";
     try {
       Selector selector = MoqlEngine.createSelector(sql);
       selector.select(dataSetMap);
@@ -489,8 +510,9 @@ public class TestSelector extends TestCase {
     dataSetMap.putDataSet("BeanA", beanAList);
     dataSetMap.putDataSet("BeanB", beanBList);
     dataSetMap.putDataSet("BeanC", beanCList);
-    String sql = "select a.id 标示, a.name 名称, a.num, b.id, b.name, b.num, c.id, c.name, c.num "
-        + "from BeanA a left join BeanB b on a.id = b.id right join BeanC c on c.id = b.id order by 3 desc";
+    String sql =
+        "select a.id 标示, a.name 名称, a.num, b.id, b.name, b.num, c.id, c.name, c.num "
+            + "from BeanA a left join BeanB b on a.id = b.id right join BeanC c on c.id = b.id order by 3 desc";
     try {
       Selector selector = MoqlEngine.createSelector(sql);
       selector.select(dataSetMap);
@@ -642,13 +664,11 @@ public class TestSelector extends TestCase {
       System.out.println("-----------------------------------");
       List<RecordNode> recordNodes = recordSet.getRecordsAsNodes();
       outputRecordNode(recordNodes, 0);
-      String[] columns = new String[] {
-          "cnt", "mod"
+      String[] columns = new String[] { "cnt", "mod"
       };
       recordNodes = recordSet.getRecordNodesByColumns(columns);
       outputRecordNode(recordNodes, 0);
-      columns = new String[] {
-        "cnt,mod"
+      columns = new String[] { "cnt,mod"
       };
       recordNodes = recordSet.getRecordNodesByColumns(columns);
       outputRecordNode(recordNodes, 0);
