@@ -21,6 +21,8 @@ public class TestOperand extends TestCase {
       System.out.println(constant.toString() + " " + constant.getOperandType());
       constant = MoqlEngine.createOperand("'中国''china'");
       System.out.println(constant.toString() + " " + constant.getOperandType());
+      constant = MoqlEngine.createOperand("'中国\t''ch\r\n'");
+      System.out.println(constant.toString() + " " + constant.getOperandType());
       constant = MoqlEngine.createOperand("0-4");
       System.out.println(constant.toString() + " " + constant.getOperandType());
       constant = MoqlEngine.createOperand("null");
