@@ -15,4 +15,10 @@ public interface DataQuerier {
 
   RecordSet query(String sql, Properties queryProps) throws IOException;
 
+  RecordSet query(String sql, SupplementReader supplementReader)
+      throws IOException;
+
+  RecordSet query(String sql, Properties queryProps,
+      SupplementReader supplementReader) throws IOException;
+
 }

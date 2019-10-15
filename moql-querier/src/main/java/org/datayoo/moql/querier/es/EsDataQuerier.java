@@ -17,6 +17,7 @@ import org.datayoo.moql.operand.OperandFactory;
 import org.datayoo.moql.operand.factory.OperandFactoryImpl;
 import org.datayoo.moql.parser.MoqlParser;
 import org.datayoo.moql.querier.DataQuerier;
+import org.datayoo.moql.querier.SupplementReader;
 import org.datayoo.moql.sql.SqlDialectType;
 import org.datayoo.moql.translator.MoqlTranslator;
 import org.datayoo.moql.util.StringFormater;
@@ -31,6 +32,8 @@ public class EsDataQuerier implements DataQuerier {
   public static String DOC_COUNT = "doc_count";
 
   protected String esServiceUrl;
+
+  protected int maxResultWindow = 10000;
 
   protected CloseableHttpClient httpClient;
 
@@ -53,20 +56,34 @@ public class EsDataQuerier implements DataQuerier {
     httpClient = HttpClients.createDefault();
   }
 
-  @Override public synchronized void disconnect() throws IOException {
+  @Override
+  public synchronized void disconnect() throws IOException {
     if (httpClient != null) {
       httpClient.close();
       httpClient = null;
     }
   }
 
-  @Override public RecordSet query(String sql) throws IOException {
+  @Override
+  public RecordSet query(String sql) throws IOException {
     Validate.notEmpty(sql, "sql is empty!");
-    return query(sql, (Properties) null);
+    return query(sql, (Properties) null, null);
   }
 
-  @Override public RecordSet query(String sql, Properties queryProps)
+  @Override
+  public RecordSet query(String sql, Properties queryProps) throws IOException {
+    return query(sql, queryProps, null);
+  }
+
+  @Override
+  public RecordSet query(String sql, SupplementReader supplementReader)
       throws IOException {
+    return query(sql, null, supplementReader);
+  }
+
+  @Override
+  public RecordSet query(String sql, Properties queryProps,
+      SupplementReader supplementReader) throws IOException {
     Validate.notEmpty(sql, "sql is empty!");
     if (queryProps == null) {
       queryProps = new Properties();
@@ -79,7 +96,7 @@ public class EsDataQuerier implements DataQuerier {
       String queryUrl = makeQueryUrl(indexAndTables, queryProps);
       HttpResponse response = query(queryUrl, query);
       String data = EntityUtils.toString(response.getEntity());
-      return toRecordSet(data, selectorDefinition);
+      return toRecordSet(data, selectorDefinition, supplementReader);
     } catch (MoqlException e) {
       throw new IOException("Parse failed!", e);
     }
@@ -139,7 +156,7 @@ public class EsDataQuerier implements DataQuerier {
 
   protected void assembleUrlProperties(StringBuffer sbuf,
       Properties queryProps) {
-    for(Map.Entry<Object, Object> entry : queryProps.entrySet()) {
+    for (Map.Entry<Object, Object> entry : queryProps.entrySet()) {
       sbuf.append("&");
       sbuf.append(entry.getKey());
       sbuf.append("=");
@@ -165,9 +182,12 @@ public class EsDataQuerier implements DataQuerier {
   }
 
   protected RecordSet toRecordSet(String data,
-      SelectorDefinition selectorDefinition) {
+      SelectorDefinition selectorDefinition,
+      SupplementReader supplementReader) {
     JsonParser jsonParser = new JsonParser();
     JsonObject root = (JsonObject) jsonParser.parse(data);
+    if (supplementReader != null)
+      supplementReader.read(root);
     JsonObject aggHits = (JsonObject) root.get("aggregations");
     if (aggHits != null) {
       return toAggregationRecordSet(aggHits, selectorDefinition);
@@ -359,8 +379,12 @@ public class EsDataQuerier implements DataQuerier {
         map.put(DOC_COUNT, entry.getValue().getAsInt());
         continue;
       }
-      JsonPrimitive value = ((JsonObject) entry.getValue())
-          .getAsJsonPrimitive("value");
+      JsonPrimitive value;
+      if (entry.getValue() instanceof JsonObject) {
+        value = ((JsonObject) entry.getValue()).getAsJsonPrimitive("value");
+      } else {
+        value = (JsonPrimitive) entry.getValue();
+      }
       map.put(entry.getKey(), getValue(value));
     }
     return map;
@@ -388,5 +412,13 @@ public class EsDataQuerier implements DataQuerier {
       record[i] = operands[i].operate(entityMap);
     }
     return record;
+  }
+
+  public int getMaxResultWindow() {
+    return maxResultWindow;
+  }
+
+  public void setMaxResultWindow(int maxResultWindow) {
+    this.maxResultWindow = maxResultWindow;
   }
 }

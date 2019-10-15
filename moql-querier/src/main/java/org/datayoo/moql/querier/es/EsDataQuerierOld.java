@@ -10,6 +10,7 @@ import org.datayoo.moql.metadata.TableMetadata;
 import org.datayoo.moql.metadata.TablesMetadata;
 import org.datayoo.moql.parser.MoqlParser;
 import org.datayoo.moql.querier.DataQuerier;
+import org.datayoo.moql.querier.SupplementReader;
 import org.datayoo.moql.sql.SqlDialectType;
 import org.datayoo.moql.translator.MoqlTranslator;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -90,6 +91,18 @@ public class EsDataQuerierOld implements DataQuerier {
 
   @Override public RecordSet query(String sql, Properties queryProps)
       throws IOException {
+    return null;
+  }
+
+  @Override
+  public RecordSet query(String sql, SupplementReader supplementReader)
+      throws IOException {
+    return null;
+  }
+
+  @Override
+  public RecordSet query(String sql, Properties queryProps,
+      SupplementReader supplementReader) throws IOException {
     return null;
   }
 
