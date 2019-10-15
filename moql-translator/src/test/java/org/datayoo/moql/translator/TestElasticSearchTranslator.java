@@ -3,6 +3,10 @@ package org.datayoo.moql.translator;
 import junit.framework.TestCase;
 import org.datayoo.moql.MoqlException;
 import org.datayoo.moql.sql.SqlDialectType;
+import org.datayoo.moql.sql.es.EsTranslationContextConstants;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class TestElasticSearchTranslator extends TestCase {
 
@@ -55,7 +59,7 @@ public class TestElasticSearchTranslator extends TestCase {
   }
 
   public void testGroupLimit() {
-    String sql = "select w.country, max(w.port), min(w.port) from web w where w.port=443 group by w.country limit 10";
+    String sql = "select w.country, max(w.port), min(w.port) from web w where w.port=443 group by w.country limit 20, 10";
     testESDialect(sql);
   }
 
@@ -168,10 +172,33 @@ public class TestElasticSearchTranslator extends TestCase {
     testESDialect(sql);
   }
 
+  public void testSearchAfter() {
+    String sql = "select w.* from web w where w.port=443 limit 20,10";
+    Map<String, Object> translationContext = new HashMap<String, Object>();
+    Object[] features = new Object[] { 133, "test" };
+    translationContext
+        .put(EsTranslationContextConstants.RESULT_SORT_FEATURES, features);
+    testESDialect(sql, translationContext);
+  }
+
   protected void testESDialect(String sql) {
     try {
       String es = MoqlTranslator
           .translateMoql2Dialect(sql, SqlDialectType.ELASTICSEARCH);
+      es = es.trim();
+      System.out.println(es);
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  protected void testESDialect(String sql,
+      Map<String, Object> translationContext) {
+    try {
+      String es = MoqlTranslator
+          .translateMoql2Dialect(sql, SqlDialectType.ELASTICSEARCH,
+              translationContext);
       es = es.trim();
       System.out.println(es);
     } catch (MoqlException e) {

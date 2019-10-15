@@ -22,6 +22,9 @@ import org.datayoo.moql.Selector;
 import org.datayoo.moql.sql.*;
 import org.datayoo.moql.sql.es.ElasticSearchTranslator;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Tang Tadin
  */
@@ -43,6 +46,11 @@ public abstract class SqlTranslatorHelper {
 
   public static String translate2Sql(Selector selector,
       SqlDialectType dialectType) {
+    return translate2Sql(selector, dialectType, new HashMap<String, Object>());
+  }
+
+  public static String translate2Sql(Selector selector,
+      SqlDialectType dialectType, Map<String, Object> translationContext) {
     SqlTranslator sqlTranslator;
     if (dialectType.equals(SqlDialectType.MOQL)) {
       sqlTranslator = getMoqlTranslator();
@@ -61,11 +69,17 @@ public abstract class SqlTranslatorHelper {
     } else {
       throw new UnsupportedOperationException();
     }
-    return sqlTranslator.translate2Sql(selector);
+    return sqlTranslator.translate2Sql(selector, translationContext);
   }
 
   public static String translate2Condition(Filter filter,
       SqlDialectType dialectType) {
+    return translate2Condition(filter, dialectType,
+        new HashMap<String, Object>());
+  }
+
+  public static String translate2Condition(Filter filter,
+      SqlDialectType dialectType, Map<String, Object> translationContext) {
     SqlTranslator sqlTranslator;
     if (dialectType.equals(SqlDialectType.MOQL)) {
       sqlTranslator = getMoqlTranslator();
@@ -82,7 +96,7 @@ public abstract class SqlTranslatorHelper {
     } else {
       throw new UnsupportedOperationException();
     }
-    return sqlTranslator.translate2Condition(filter);
+    return sqlTranslator.translate2Condition(filter, translationContext);
   }
 
   protected static synchronized MoqlGrammarTranslator getMoqlTranslator() {

@@ -48,23 +48,31 @@ public class ElasticSearchTranslator implements SqlTranslator {
   protected static Gson gson = new GsonBuilder().serializeNulls()
       .setPrettyPrinting().create();
 
-  @Override public String translate2Sql(Selector selector) {
+  @Override
+  public String translate2Sql(Selector selector) {
+    return translate2Sql(selector, new HashMap<String, Object>());
+  }
+
+  @Override
+  public String translate2Sql(Selector selector,
+      Map<String, Object> translationContext) {
     Validate.notNull(selector, "selector is null!");
     if (selector instanceof SelectorImpl) {
-      return translate2Sql((SelectorImpl) selector);
+      return translate2Sql((SelectorImpl) selector, translationContext);
     } else {
-      return translate2Sql((SetlectorImpl) selector);
+      return translate2Sql((SetlectorImpl) selector, translationContext);
     }
   }
 
-  protected String translate2Sql(SelectorImpl selector) {
+  protected String translate2Sql(SelectorImpl selector,
+      Map<String, Object> translationContext) {
     checkGrammer(selector);
     JsonObject jsonObject = new JsonObject();
 
     if (isAggregations(selector)) {
-      translate2Aggs(selector, jsonObject);
+      translate2Aggs(selector, jsonObject, translationContext);
     } else {
-      translate2Query(selector, jsonObject);
+      translate2Query(selector, jsonObject, translationContext);
     }
     return gson.toJson(jsonObject);
   }
@@ -75,25 +83,28 @@ public class ElasticSearchTranslator implements SqlTranslator {
     }
   }
 
-  protected void translate2Query(SelectorImpl selector, JsonObject jsonObject) {
-    translateSelectClause(selector.getSelectorDefinition(), jsonObject);
+  protected void translate2Query(SelectorImpl selector, JsonObject jsonObject,
+      Map<String, Object> translationContext) {
+    translateSelectClause(selector.getSelectorDefinition(), jsonObject,
+        translationContext);
     if (selector.getLimit() != null) {
-      translateLimitClause(selector.getLimit(), jsonObject);
+      translateLimitClause(selector.getLimit(), jsonObject, translationContext);
     }
     if (selector.getOrder() != null) {
-      translateOrderClause(selector.getOrder(), jsonObject);
+      translateOrderClause(selector.getOrder(), jsonObject, translationContext);
     }
-    translate2CommonQuery(selector, jsonObject);
+    translate2CommonQuery(selector, jsonObject, translationContext);
   }
 
-  protected void translate2Aggs(SelectorImpl selector, JsonObject jsonObject) {
+  protected void translate2Aggs(SelectorImpl selector, JsonObject jsonObject,
+      Map<String, Object> translationContext) {
     jsonObject.addProperty("size", 0);
-    translate2CommonQuery(selector, jsonObject);
-    translate2Aggregations(selector, jsonObject);
+    translate2CommonQuery(selector, jsonObject, translationContext);
+    translate2Aggregations(selector, jsonObject, translationContext);
   }
 
   protected void translateSelectClause(SelectorDefinition selectorDefinition,
-      JsonObject jsonObject) {
+      JsonObject jsonObject, Map<String, Object> translationContext) {
     ColumnsMetadata columnsMetadata = ((SelectorMetadata) selectorDefinition)
         .getColumns();
     List<ColumnMetadata> columnMetadatas = columnsMetadata.getColumns();
@@ -121,18 +132,40 @@ public class ElasticSearchTranslator implements SqlTranslator {
     jsonObject.add("_source", source);
   }
 
-  protected void translateLimitClause(Limit limit, JsonObject jsonObject) {
+  protected void translateLimitClause(Limit limit, JsonObject jsonObject,
+      Map<String, Object> translationContext) {
     if (limit == null) {
       return;
     }
     LimitMetadata limitMetadata = limit.getLimitMetadata();
-    if (limit.getLimitMetadata().getOffset() != 0) {
-      jsonObject.addProperty("from", limitMetadata.getOffset());
+    Object[] searchAfter = (Object[]) translationContext
+        .get(EsTranslationContextConstants.RESULT_SORT_FEATURES);
+    if (searchAfter != null && searchAfter.length > 0) {
+      jsonObject.add("search_after", createSearchAfter(searchAfter));
+    } else {
+      if (limit.getLimitMetadata().getOffset() != 0) {
+        jsonObject.addProperty("from", limitMetadata.getOffset());
+      }
     }
     jsonObject.addProperty("size", limitMetadata.getValue());
   }
 
-  protected void translateOrderClause(Order order, JsonElement jsonElement) {
+  protected JsonArray createSearchAfter(Object[] searchAfter) {
+    JsonArray jsonSearchAfter = new JsonArray();
+    for (int i = 0; i < searchAfter.length; i++) {
+      if (searchAfter[i] instanceof Number) {
+        jsonSearchAfter.add((Number) searchAfter[i]);
+      } else if (searchAfter[i] instanceof Boolean) {
+        jsonSearchAfter.add((Boolean) searchAfter[i]);
+      } else {
+        jsonSearchAfter.add((String) searchAfter[i]);
+      }
+    }
+    return jsonSearchAfter;
+  }
+
+  protected void translateOrderClause(Order order, JsonElement jsonElement,
+      Map<String, Object> translationContext) {
     if (order == null)
       return;
     JsonArray sortObject = new JsonArray();
@@ -165,32 +198,34 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translate2Aggregations(SelectorImpl selector,
-      JsonObject jsonObject) {
+      JsonObject jsonObject, Map<String, Object> translationContext) {
 
     RecordSetOperator recordSetOperator = selector.getRecordSetOperator();
     if (recordSetOperator instanceof Group) {
       translate2GroupAggregations((GroupRecordSetOperator) recordSetOperator,
-          jsonObject, selector.getLimit(), selector.getOrder());
+          jsonObject, selector.getLimit(), selector.getOrder(),
+          translationContext);
     } else if (recordSetOperator.getColumns().getColumnsMetadata()
         .isDistinct()) {
       translate2DistinctAggregations(
           (ColumnsRecordSetOperator) recordSetOperator, jsonObject,
-          selector.getLimit(), selector.getOrder());
+          selector.getLimit(), selector.getOrder(), translationContext);
     } else {
       translateColumnAggregations((ColumnsRecordSetOperator) recordSetOperator,
-          jsonObject);
+          jsonObject, translationContext);
     }
   }
 
   protected void translate2GroupAggregations(
       GroupRecordSetOperator groupRecordSetOperator, JsonObject jsonObject,
-      Limit limit, Order order) {
+      Limit limit, Order order, Map<String, Object> translationContext) {
     Column[] columns = groupRecordSetOperator.getGroupColumns();
     JsonObject baseObject = jsonObject;
     jsonObject.add("aggs", baseObject);
     int size = getLimitSize(limit);
     for (int i = 0; i < columns.length; i++) {
-      baseObject = translate2TermsAggs(columns[i], baseObject, size, order);
+      baseObject = translate2TermsAggs(columns[i], baseObject, size, order,
+          translationContext);
       size = 0;
     }
     columns = groupRecordSetOperator.getNonGroupColumns();
@@ -205,7 +240,8 @@ public class ElasticSearchTranslator implements SqlTranslator {
         continue;
       JsonObject aggregation = new JsonObject();
       translateFunctionAggregation(
-          (AggregationFunction) columns[i].getOperand(), aggregation);
+          (AggregationFunction) columns[i].getOperand(), aggregation,
+          translationContext);
       //  当聚集函数是0时，aggregation为空
       if (aggregation.entrySet().size() > 0)
         aggsObject.add(columns[i].getColumnMetadata().getName(), aggregation);
@@ -232,18 +268,19 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected JsonObject translate2TermsAggs(Column column, JsonObject jsonObject,
-      int size, Order order) {
+      int size, Order order, Map<String, Object> translationContext) {
     JsonObject aggsObject = new JsonObject();
     jsonObject.add("aggs", aggsObject);
     JsonObject aggregation = new JsonObject();
     translateTermsAggregation(getOperandName(column.getOperand()), aggregation,
-        size, order);
+        size, order, translationContext);
     aggsObject.add(getOperandName(column.getOperand()), aggregation);
     return aggregation;
   }
 
   protected void translateFunctionAggregation(
-      AggregationFunction aggregationFunction, JsonObject jsonObject) {
+      AggregationFunction aggregationFunction, JsonObject jsonObject,
+      Map<String, Object> translationContext) {
     JsonObject functionObject = new JsonObject();
     String functionName = getFunctionName(aggregationFunction);
     if (functionName == null)
@@ -265,18 +302,21 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translateTermsAggregation(String fieldName,
-      JsonObject jsonObject, int size, Order order) {
+      JsonObject jsonObject, int size, Order order,
+      Map<String, Object> translationContext) {
     JsonObject termsObject = new JsonObject();
     termsObject.addProperty("field", fieldName);
     if (size != 0)
       termsObject.addProperty("size", size);
-    JsonArray orderArray = translateTermsOrder(fieldName, order);
+    JsonArray orderArray = translateTermsOrder(fieldName, order,
+        translationContext);
     if (orderArray != null)
       termsObject.add("order", orderArray);
     jsonObject.add("terms", termsObject);
   }
 
-  protected JsonArray translateTermsOrder(String fieldName, Order order) {
+  protected JsonArray translateTermsOrder(String fieldName, Order order,
+      Map<String, Object> translationContext) {
     if (order == null)
       return null;
     OrderImpl orderImpl = (OrderImpl) order;
@@ -342,32 +382,33 @@ public class ElasticSearchTranslator implements SqlTranslator {
 
   protected void translate2DistinctAggregations(
       ColumnsRecordSetOperator columnsRecordSetOperator, JsonObject jsonObject,
-      Limit limit, Order order) {
+      Limit limit, Order order, Map<String, Object> translationContext) {
     JsonObject baseObject = jsonObject;
     int size = getLimitSize(limit);
     for (Column column : columnsRecordSetOperator.getColumns().getColumns()) {
-      baseObject = translate2TermsAggs(column, baseObject, size, order);
+      baseObject = translate2TermsAggs(column, baseObject, size, order,
+          translationContext);
       size = 0;
     }
   }
 
   protected void translateColumnAggregations(
-      ColumnsRecordSetOperator columnsRecordSetOperator,
-      JsonObject jsonObject) {
+      ColumnsRecordSetOperator columnsRecordSetOperator, JsonObject jsonObject,
+      Map<String, Object> translationContext) {
     for (Column column : columnsRecordSetOperator.getColumns().getColumns()) {
       JsonObject aggsObject = new JsonObject();
       jsonObject.add("aggs", aggsObject);
       if (column.getOperand() instanceof AggregationFunction) {
         JsonObject aggregation = new JsonObject();
         translateFunctionAggregation((AggregationFunction) column.getOperand(),
-            aggregation);
+            aggregation, translationContext);
         aggsObject.add(column.getColumnMetadata().getName(), aggregation);
       }
     }
   }
 
   protected void translate2CommonQuery(SelectorImpl selector,
-      JsonObject jsonObject) {
+      JsonObject jsonObject, Map<String, Object> translationContext) {
     JsonObject queryObject = new JsonObject();
     jsonObject.add("query", queryObject);
 
@@ -375,14 +416,16 @@ public class ElasticSearchTranslator implements SqlTranslator {
       JsonElement jsonElement;
       if (selector.getWhere() != null) {
         jsonElement = translateWhereClause(selector.getWhere(), queryObject,
-            true);
+            true, translationContext);
       } else {
         jsonElement = new JsonObject();
         queryObject.add("bool", jsonElement);
       }
-      translateHavingClause((HavingImpl) selector.getHaving(), jsonElement);
+      translateHavingClause((HavingImpl) selector.getHaving(), jsonElement,
+          translationContext);
     } else {
-      translateWhereClause(selector.getWhere(), queryObject, false);
+      translateWhereClause(selector.getWhere(), queryObject, false,
+          translationContext);
     }
   }
 
@@ -396,7 +439,8 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected JsonElement translateWhereClause(Condition condition,
-      JsonElement jsonElement, boolean hasHaving) {
+      JsonElement jsonElement, boolean hasHaving,
+      Map<String, Object> translationContext) {
     if (condition == null) {
       if (!hasHaving) {
         JsonObject matchAll = new JsonObject();
@@ -406,19 +450,19 @@ public class ElasticSearchTranslator implements SqlTranslator {
     }
     Operand operand = condition.getOperand();
     if (isLogicExpression(operand)) {
-      return shellLogicExpression(operand, jsonElement);
+      return shellLogicExpression(operand, jsonElement, translationContext);
     }
     if (hasHaving) {
-      return shellHasHaving(operand, jsonElement);
+      return shellHasHaving(operand, jsonElement, translationContext);
     }
-    translateOperand(operand, jsonElement, false);
+    translateOperand(operand, jsonElement, false, translationContext);
     return jsonElement;
   }
 
   protected JsonElement shellLogicExpression(Operand operand,
-      JsonElement jsonElement) {
+      JsonElement jsonElement, Map<String, Object> translationContext) {
     JsonObject shellObject = new JsonObject();
-    translateOperand(operand, shellObject, false);
+    translateOperand(operand, shellObject, false, translationContext);
     for (Map.Entry<String, JsonElement> entry : shellObject.entrySet()) {
       putObject(jsonElement, entry.getKey(), entry.getValue());
       return entry.getValue();
@@ -437,24 +481,26 @@ public class ElasticSearchTranslator implements SqlTranslator {
     }
   }
 
-  protected JsonElement shellHasHaving(Operand operand,
-      JsonElement jsonElement) {
+  protected JsonElement shellHasHaving(Operand operand, JsonElement jsonElement,
+      Map<String, Object> translationContext) {
     JsonObject boolObject = new JsonObject();
     JsonObject mustObject = new JsonObject();
-    translateOperand(operand, mustObject, false);
+    translateOperand(operand, mustObject, false, translationContext);
     putObject(boolObject, "must", mustObject);
     putObject(jsonElement, "bool", boolObject);
     return boolObject;
   }
 
   protected void translateOperand(Operand operand, JsonElement jsonElement,
-      boolean having) {
+      boolean having, Map<String, Object> translationContext) {
     if (operand instanceof AbstractOperationExpression) {
       AbstractOperationExpression expression = (AbstractOperationExpression) operand;
       if (expression.getExpressionType() == ExpressionType.LOGIC) {
-        translateLogicExpression(expression, jsonElement, having);
+        translateLogicExpression(expression, jsonElement, having,
+            translationContext);
       } else if (expression.getExpressionType() == ExpressionType.RELATION) {
-        translateRelationExpression(expression, jsonElement, having);
+        translateRelationExpression(expression, jsonElement, having,
+            translationContext);
       } else if (expression.getExpressionType() == ExpressionType.ARITHMETIC) {
         throw new MoqlTranslationException(StringFormater
             .format("The expression '{}' does not support!",
@@ -462,10 +508,11 @@ public class ElasticSearchTranslator implements SqlTranslator {
       }
     } else if (operand instanceof ParenExpression) {
       ParenExpression parenExpression = (ParenExpression) operand;
-      translateParenExpression(parenExpression, jsonElement, having);
+      translateParenExpression(parenExpression, jsonElement, having,
+          translationContext);
     } else if (operand instanceof AbstractFunction) {
       AbstractFunction function = (AbstractFunction) operand;
-      translateFunction(function, jsonElement);
+      translateFunction(function, jsonElement, translationContext);
     } else {
       throw new MoqlTranslationException(StringFormater
           .format("The operand '{}' does not support!",
@@ -475,10 +522,11 @@ public class ElasticSearchTranslator implements SqlTranslator {
 
   protected void translateLogicExpression(
       AbstractOperationExpression expression, JsonElement jsonElement,
-      boolean having) {
+      boolean having, Map<String, Object> translationContext) {
     JsonObject boolObject = new JsonObject();
     if (expression.getOperator() == LogicOperator.NOT) {
-      translateNotExpression((NotExpression) expression, boolObject, having);
+      translateNotExpression((NotExpression) expression, boolObject, having,
+          translationContext);
     } else {
       if (expression.getOperator() == LogicOperator.AND) {
         String operator = "must";
@@ -486,81 +534,94 @@ public class ElasticSearchTranslator implements SqlTranslator {
           operator = "filter";
         }
         translateLogicBinaryExpression(operator, expression.getLeftOperand(),
-            expression.getRightOperand(), boolObject, having);
+            expression.getRightOperand(), boolObject, having,
+            translationContext);
       } else {
         translateLogicBinaryExpression("should", expression.getLeftOperand(),
-            expression.getRightOperand(), boolObject, having);
+            expression.getRightOperand(), boolObject, having,
+            translationContext);
       }
     }
     putObject(jsonElement, "bool", boolObject);
   }
 
   protected void translateNotExpression(NotExpression expression,
-      JsonElement jsonElement, boolean having) {
+      JsonElement jsonElement, boolean having,
+      Map<String, Object> translationContext) {
     JsonObject not = new JsonObject();
     if (expression.getRightOperand() instanceof IsExpression) {
       IsExpression isExpression = (IsExpression) expression.getRightOperand();
-      translateIsExpression(isExpression.getLeftOperand(), jsonElement, true);
+      translateIsExpression(isExpression.getLeftOperand(), jsonElement, true,
+          translationContext);
     } else {
-      translateOperand(expression.getRightOperand(), not, having);
+      translateOperand(expression.getRightOperand(), not, having,
+          translationContext);
       putObject(jsonElement, "must_not", not);
     }
   }
 
   protected void translateLogicBinaryExpression(String operator,
       Operand lOperand, Operand rOperand, JsonElement jsonElement,
-      boolean having) {
+      boolean having, Map<String, Object> translationContext) {
     JsonArray logicArray = new JsonArray();
-    translateOperand(lOperand, logicArray, having);
-    translateOperand(rOperand, logicArray, having);
+    translateOperand(lOperand, logicArray, having, translationContext);
+    translateOperand(rOperand, logicArray, having, translationContext);
     putObject(jsonElement, operator, logicArray);
   }
 
   protected void translateRelationExpression(
       AbstractOperationExpression expression, JsonElement jsonElement,
-      boolean having) {
+      boolean having, Map<String, Object> translationContext) {
     if (expression.getOperator() == RelationOperator.EQ) {
       translateEQExpression(expression.getLeftOperand(),
-          expression.getRightOperand(), jsonElement, having);
+          expression.getRightOperand(), jsonElement, having,
+          translationContext);
     } else if (expression.getOperator() == RelationOperator.GT) {
       translateLGExpression("gt", expression.getLeftOperand(),
-          expression.getRightOperand(), jsonElement);
+          expression.getRightOperand(), jsonElement, translationContext);
     } else if (expression.getOperator() == RelationOperator.GE) {
       translateLGExpression("gte", expression.getLeftOperand(),
-          expression.getRightOperand(), jsonElement);
+          expression.getRightOperand(), jsonElement, translationContext);
     } else if (expression.getOperator() == RelationOperator.LT) {
       translateLGExpression("lt", expression.getLeftOperand(),
-          expression.getRightOperand(), jsonElement);
+          expression.getRightOperand(), jsonElement, translationContext);
     } else if (expression.getOperator() == RelationOperator.LE) {
       translateLGExpression("lte", expression.getLeftOperand(),
-          expression.getRightOperand(), jsonElement);
+          expression.getRightOperand(), jsonElement, translationContext);
     } else if (expression.getOperator() == RelationOperator.NE) {
       translateNEExpression(expression.getLeftOperand(),
-          expression.getRightOperand(), jsonElement);
+          expression.getRightOperand(), jsonElement, translationContext);
     } else if (expression.getOperator() == RelationOperator.BETWEEN) {
-      translateBetweenExpression((BetweenExpression) expression, jsonElement);
+      translateBetweenExpression((BetweenExpression) expression, jsonElement,
+          translationContext);
     } else if (expression.getOperator() == RelationOperator.LIKE) {
       translateLikeExpression(expression.getLeftOperand(),
-          expression.getRightOperand(), jsonElement);
+          expression.getRightOperand(), jsonElement, translationContext);
     } else if (expression.getOperator() == RelationOperator.IN) {
-      translateInExpression((InExpression) expression, jsonElement);
+      translateInExpression((InExpression) expression, jsonElement,
+          translationContext);
     } else if (expression.getOperator() == RelationOperator.IS) {
-      translateIsExpression(expression.getLeftOperand(), jsonElement, false);
+      translateIsExpression(expression.getLeftOperand(), jsonElement, false,
+          translationContext);
     } else if (expression.getOperator() == RelationOperator.EXISTS) {
       throw new UnsupportedOperationException(
           "Does't support 'exists' operator.Please use 'is' operator!");
     } else {
-      translateOperand(expression.getRightOperand(), jsonElement, having);
+      translateOperand(expression.getRightOperand(), jsonElement, having,
+          translationContext);
     }
   }
 
   protected void translateParenExpression(ParenExpression expression,
-      JsonElement jsonElement, boolean having) {
-    translateOperand(expression.getOperand(), jsonElement, having);
+      JsonElement jsonElement, boolean having,
+      Map<String, Object> translationContext) {
+    translateOperand(expression.getOperand(), jsonElement, having,
+        translationContext);
   }
 
   protected void translateEQExpression(Operand lOperand, Operand rOperand,
-      JsonElement jsonElement, boolean having) {
+      JsonElement jsonElement, boolean having,
+      Map<String, Object> translationContext) {
     JsonObject eq = new JsonObject();
     eq.addProperty(getOperandName(lOperand), getOperandName(rOperand));
     putObject(jsonElement, "term", eq);
@@ -582,7 +643,8 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translateLGExpression(String operator, Operand lOperand,
-      Operand rOperand, JsonElement jsonElement) {
+      Operand rOperand, JsonElement jsonElement,
+      Map<String, Object> translationContext) {
     JsonObject range = new JsonObject();
     JsonObject cmp = new JsonObject();
     cmp.addProperty(operator, getOperandName(rOperand));
@@ -591,7 +653,7 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translateNEExpression(Operand lOperand, Operand rOperand,
-      JsonElement jsonElement) {
+      JsonElement jsonElement, Map<String, Object> translationContext) {
     JsonObject boolObject = new JsonObject();
     JsonObject notObject = new JsonObject();
     JsonObject term = new JsonObject();
@@ -603,7 +665,7 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translateBetweenExpression(BetweenExpression expression,
-      JsonElement jsonElement) {
+      JsonElement jsonElement, Map<String, Object> translationContext) {
     JsonObject range = new JsonObject();
     JsonObject cmp = new JsonObject();
     int i = 0;
@@ -620,7 +682,7 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translateLikeExpression(Operand lOperand, Operand rOperand,
-      JsonElement jsonElement) {
+      JsonElement jsonElement, Map<String, Object> translationContext) {
     JsonObject regex = new JsonObject();
     regex.addProperty(getOperandName(lOperand),
         LikeExpression.translatePattern2Regex(getOperandName(rOperand)));
@@ -628,7 +690,7 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translateInExpression(InExpression expression,
-      JsonElement jsonElement) {
+      JsonElement jsonElement, Map<String, Object> translationContext) {
     JsonObject terms = new JsonObject();
     JsonArray array = new JsonArray();
     for (Operand rOperand : expression.getrOperands()) {
@@ -639,7 +701,8 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translateIsExpression(Operand lOperand,
-      JsonElement jsonElement, boolean isNot) {
+      JsonElement jsonElement, boolean isNot,
+      Map<String, Object> translationContext) {
     if (!isNot) {
       JsonObject boolObject = new JsonObject();
       JsonObject notObject = new JsonObject();
@@ -658,7 +721,7 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translateFunction(AbstractFunction function,
-      JsonElement jsonObject) {
+      JsonElement jsonObject, Map<String, Object> translationContext) {
     ESFunctionTranslator functionTranslator = functionTranslators
         .get(function.getName());
     if (functionTranslator == null) {
@@ -670,17 +733,26 @@ public class ElasticSearchTranslator implements SqlTranslator {
   }
 
   protected void translateHavingClause(HavingImpl having,
-      JsonElement jsonElement) {
+      JsonElement jsonElement, Map<String, Object> translationContext) {
     JsonObject filterObject = new JsonObject();
-    translateOperand(having.getCondition().getOperand(), filterObject, true);
+    translateOperand(having.getCondition().getOperand(), filterObject, true,
+        translationContext);
     putObject(jsonElement, "filter", filterObject);
   }
 
-  protected String translate2Sql(SetlectorImpl setlector) {
+  protected String translate2Sql(SetlectorImpl setlector,
+      Map<String, Object> translationContext) {
     throw new UnsupportedOperationException("pending...");
   }
 
-  @Override public String translate2Condition(Filter filter) {
+  @Override
+  public String translate2Condition(Filter filter,
+      Map<String, Object> translationContext) {
+    throw new UnsupportedOperationException("");
+  }
+
+  @Override
+  public String translate2Condition(Filter filter) {
     throw new UnsupportedOperationException("");
   }
 
@@ -700,7 +772,8 @@ public class ElasticSearchTranslator implements SqlTranslator {
     return null;
   }
 
-  @Override public List<FunctionTranslator> getFunctionTranslators() {
+  @Override
+  public List<FunctionTranslator> getFunctionTranslators() {
     return null;
   }
 }
