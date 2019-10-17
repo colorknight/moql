@@ -940,3 +940,74 @@ String sql = "select ip.src, max(ip.sport), min(ip.sport) from ip3 ip group by i
 | type                | type(value)  value：字符串，字段值               |
 | ids                 | ids(type,  values)  type：字符串，与ids子句同名属性一致。  values：字符串数组，多个值之间用”,”隔开。与ids子句同名属性一致。 |
 | more_like_this      | moreLike(fields,likeText,minTermFreq,maxQueryTerms)  fields：字符串数组，表示多个字段时，字段间用“,”隔开。表示more_like_this的fields属性  likeText：字符串，表示表示more_like_this的like_text属性  minTermFreq：整数，表示more_like_this的min_term_freq属性  maxQueryTerms：整数，表示more_like_this的max_query_terms属性 |
+
+## SQL to ElasticSearch DSL改进
+
+​	最近团队在使用MOQL的SQL到ElasticSearch DSL转换时提出，该转换器不能完成深度分页场景的应用。而ElasticSearch为该类应用提供了“search_after”的参数解决方案。ElasticSearch的这个解决方案使得前后两个QUERY DSL有了上下文依赖，后续的查询要依赖上一个查询结果中返回的内容作为条件拼装检索语句。为满足这个需求，MOQL升级了moql-translator和moql-querier两个模块。
+
+ 	在moql-translator中整体升级了SqlTranslator接口，允许传入一个Map类型的translationContext参数，该参数可以带入语法转换时所需的参数，这样所有的语法转换器都可以支持有上下文依赖的语法转换了。示例代码如下：
+
+```
+// 带有limit的SQL语句，按照search_after的说明，limit语法中的数字20表示from，将被忽略
+
+String sql = "select w.* from web w where w.port=443 limit 20,10";
+
+Map<String, Object> translationContext = new HashMap<String, Object>();
+
+Object[] features = new Object[] { 133, "test" };
+
+// RESULT_SORT_FEATURES常量为传递给search_after语法的参数的名字
+
+translationContext
+
+    .put(EsTranslationContextConstants.RESULT_SORT_FEATURES, features);
+
+testESDialect(sql, translationContext);
+```
+
+该代码执行完转换后，输出的ElasticSearch DSL语法为：
+
+```
+{
+  "search_after": [
+    133,
+    "test"
+  ],
+  "size": 10,
+  "query": {
+    "term": {
+      "port": "443"
+    }
+  }
+}
+```
+
+
+
+​	即然语法转换有了上下文的需求，后续的查询依赖于前序查询的结果，就需要能够从结果中取出后续查询所依赖的上下文信息。之前的moql-querier只能读取结果中的部分数据，并以RecordSet的形式返回。而search_after所依赖的结果中的sort字段无法获得。故此次也对DataQuerier接口进行了升级，为接口中加入了一个SupplementReader参数。用户可以通过实现SupplementReader接口读取返回结果集中的其它信息。MOQL提供了一个CommonSupplementReader的缺省实现，可以读取检索结果中的total，max_score及sort等字段信息。
+
+​	示例代码如下：
+
+```
+String sql = "select t.DVC_ADDRESS, t.MESSAGE from ins_test t order by t.SEVERITY LIMIT 5";
+
+try {
+
+  CommonSupplementReader supplementReader = new CommonSupplementReader();
+
+  RecordSet recordSet = dataQuerier.query(sql, supplementReader);
+
+  outputRecordSet(recordSet);
+
+  System.out.println(supplementReader.getTotalHits());
+
+} catch (IOException e) {
+
+  e.printStackTrace();
+
+}
+```
+
+​	使用者可以通过访问supplementReader获取结果集中返回的其它结果信息。
+
+​	注：开发时需在pom文件中将moql-translator和moql-querier升级到1.1.1版本。
