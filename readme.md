@@ -252,7 +252,9 @@ max(num) FUNCTION
 test(1,num,'a') FUNCTION
 ```
 
-​	MOQL目前已支持了部分的函数Operand，如聚集函数Operand：count、sum、avg、min、以及max等。这些Operand在生成后调用operate方法就可以直接对数据进行计算。但如果要创建一个MOQL未支持的函数，MOQL会为其创建一个缺省的Operand，该Operand只是对函数字符串进行了解析，如上面的代码片段中的函数“test(1, num, 'a')”。该函数字符串被解析为一个缺省的函数Operand，但是当我们调用它的operate方法时，它会抛出一个java.lang.UnsupportedOperationException，表示该Operand不支持该方法。为了能够让MOQL也支持test函数，我们需要为test做一个对应的Operand的实现。相关的实现代码如下：
+#### 自定义函数
+
+​	MOQL目前已支持了部分的函数Operand，如聚集函数Operand：count、sum、avg、min、以及max等(详见**附录:函数**部分)。这些Operand在生成后调用operate方法就可以直接对数据进行计算。但如果要创建一个MOQL未支持的函数，MOQL会为其创建一个缺省的Operand，该Operand只是对函数字符串进行了解析，如上面的代码片段中的函数“test(1, num, 'a')”。该函数字符串被解析为一个缺省的函数Operand，但是当我们调用它的operate方法时，它会抛出一个java.lang.UnsupportedOperationException，表示该Operand不支持该方法。为了能够让MOQL也支持test函数，我们需要为test做一个对应的Operand的实现。相关的实现代码如下：
 
 ```
 public class TestRegistFunction {
@@ -370,9 +372,9 @@ bean[4]['bean'].getArray()[5] EXPRESSION
 5
 ```
 
-### 数学运算表达式Operand
+### 算数运算表达式Operand
 
-​	数学运算表达式Operand的格式如下：“Operand1 运算符 Operand2”。数学运算表达式支持的数学运算符都是二元运算符，他们按执行的优先顺序划分为：乘法(*)、除法(/)、模(%)优于加法(+)、减法(-)优于按位与(&)优于异或(^)优于按位或(|)运算。运算符两端的两个操作数可以是除列筛选Operand以外的任意类型的Operand。若其中一个Operand是另一个数学运算表达式Operand，则整个表达式就是一个包含连续多个运算符操作的表达式，如：a + 1 * 10 / 5 等。
+​	算数运算表达式Operand的格式如下：“Operand1 运算符 Operand2”。算数运算表达式支持的算数运算符都是二元运算符，他们按执行的优先顺序划分为：乘法(*)、除法(/)、模(%)优于加法(+)、减法(-)运算。运算符两端的两个操作数可以是除列筛选Operand以外的任意类型的Operand。若其中一个Operand是另一个数学运算表达式Operand，则整个表达式就是一个包含连续多个运算符操作的表达式，如：a + 1 * 10 / 5 等。
 
 ​	数学运算表达式Operand的相关示例代码如下:
 
@@ -395,6 +397,39 @@ try {
 ```
 (num * num1) / num2 * 2.2 + 2 - 1 EXPRESSION
 20.8
+```
+
+### 位运算表达式Operand
+
+​	位运算表达式Operand的格式与算数运算表达式相同，如下：“Operand1 运算符 Operand2”。其运算优先级为：按位与(&)优于异或(^)优于按位或(|)运算，且所有的位运算优先级均低于算数运算符。
+
+​	位运算表达式Operand的相关示例代码如下:
+
+```
+    EntityMap entityMap = new EntityMapImpl();
+    entityMap.putEntity("num", 2);
+    entityMap.putEntity("num1", 3);
+    entityMap.putEntity("num2", 4);
+    try {
+      Operand arithmetic = MoqlEngine
+          .createOperand(" num << num1 + 1");
+      System.out.println(arithmetic.toString() + " = " + arithmetic.operate(entityMap));
+      arithmetic = MoqlEngine.createOperand("num2 | num1 & num");
+      System.out.println(arithmetic.toString() + " = " + arithmetic.operate(entityMap));
+      arithmetic = MoqlEngine.createOperand("~num2 ^ num2");
+      System.out.println(arithmetic.toString() + " = " + arithmetic.operate(entityMap));
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+```
+
+​	其执行结果如下：
+
+```
+num << num1 + 1 = 32
+num2 | num1 & num = 6
+~ (num2) ^ num2 = -1
 ```
 
 ### 成员表达式Operand
@@ -1011,3 +1046,60 @@ try {
 ​	使用者可以通过访问supplementReader获取结果集中返回的其它结果信息。
 
 ​	注：开发时需在pom文件中将moql-translator和moql-querier升级到1.1.1版本。
+
+# 附录
+
+## 函数
+
+### 聚集函数
+
+| 函数名                                                       | 函数说明                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| avg(String column)                                           | 求给定列的所有值中的平均值<br />参数：<br />column: 求平均值的列的名字，列的数据类型必须为数值型 |
+| count(String column[, boolean  distinct])                    | 求给定列的所有值的数量<br />参数：<br />column: 求计数的列的名字<br />distinct: 布尔型可选参数，表示是否只对不同的值进行计数，true：表示只对不同值的记录计数，false:表示所有记录计数，缺省为false |
+| joint(String column[, String separator])                     | 字串连接运算，将所给列的所有值用给定的分隔符连接成一个字符串。<br />参数：<br />column: 要做字串连接的列的名字<br />separator: 连接串所用的分隔符 |
+| kurtosis(String column)                                      | 求给定列的峰度值<br />参数：<br />column: 求峰度的列的名字，列的数据类型必须为数值型 |
+| median(String column)                                        | 求给定列的中位数，若数值为奇数个，返回最中间的值；若为偶数个，返回中间的两个数的平均值<br />参数：<br />column: 求中位数的列的名字，列的数据类型必须为数值型 |
+| max(String column)                                           | 求给定列的所有值中的最大值<br />参数：<br />column: 求最大值的列的名字 |
+| min(String column)                                           | 求给定列的所有值中的最小值<br />参数：<br />column: 求最小值的列的名字 |
+| mode(String column)                                          | 求给定列的众数，返回一个众数数组<br />参数：<br />column: 求众数的列的名字 |
+| notNull(String column[, String defaultVale[,boolean first]]) | 求给定列的非空值，若列无非空值允许为其设置缺省值。缺省情况下，该函数会取得列的第一个非空值，若想取得最后一个非空值，可通过将可选参数设为false<br />参数：<br />column: 要取非空值的列的名字<br />defaultValue: 当列无非null值时的缺省值<br />first: 是否取第一个非null值 |
+| percentile(String column[, double percentile])               | 求给定列的指定百分位的数值。<br />参数：<br />column: 要做百分比计算的列的名字，列的数据类型必须为数值型<br />percentile: 百分比数值，取值在(0,1]之间，缺省为0.5 |
+| range(String column)                                         | 求给定列的极差<br />参数：<br />column: 求极差的列的名字，列的数据类型必须为数值型 |
+| semiVariance(String column)                                  | 求给定列的半方差<br />参数：<br />column: 求半方差的列的名字，列的数据类型必须为数值型 |
+| skewness(String column)                                      | 求给定列的偏度值<br />参数：<br />column: 求偏度的列的名字，列的数据类型必须为数值型 |
+| standardDeviation(String column)                             | 求给定列的标准差<br />参数：<br />column: 求标准差的列的名字，列的数据类型必须为数值型 |
+| sum(String column)                                           | 求给定列的所有值的和<br />参数：<br />column: 求和的列的名字，列的数据类型必须为数值型 |
+| variance(String column)                                      | 求给定列的方差<br />参数：<br />column: 求方差的列的名字，列的数据类型必须为数值型 |
+|                                                              |                                                              |
+
+### 数学计算函数
+
+| 函数名                                | 函数说明                                                     |
+| ------------------------------------- | ------------------------------------------------------------ |
+| abs(String field)                     | 取绝对值<br />参数：<br />field: 取绝对值的字段的名字，列的数据类型必须为数值型 |
+| cbrt(String field)                    | 求立方根<br />参数：<br />field: 求立方的字段的名字，列的数据类型必须为数值型 |
+| ceil(String field)                    | 向上取整<br />参数：<br />field: 取整的字段的名字，列的数据类型必须为数值型 |
+| cos(String field)                     | 对指定字段求余弦<br />参数：<br />field: 求cos的字段的名字，列的数据类型必须为数值型 |
+| exp(String field)                     | 以自然数e为底的指数幂<br />参数：<br />field: 字段的名字，列的数据类型必须为数值型 |
+| floor(String field)                   | 向下取整<br />参数：<br />field: 取整的字段的名字，列的数据类型必须为数值型 |
+| log(String field)                     | 以自然数e为底，求对数<br />参数：<br />field: 字段的名字，列的数据类型必须为数值型 |
+| log10(String field)                   | 以10为底，求对数<br />参数：<br />field: 字段的名字，列的数据类型必须为数值型 |
+| pow(String field, double power)       | 求指数<br />参数：<br />field: 字段的名字，列的数据类型必须为数值型<br />power:指数 |
+| precent(String field[,int precision]) | 将数值转换为百分数形式，如：0.23转换为23%<br />参数：<br />field: 待转换字段的名字，列的数据类型必须为数值型<br />precision：精度，转换为百分数时保留的小数的精度，缺省为0表示百分数不留小数位 |
+| round(String field)                   | 四舍五入取整<br />参数：<br />field: 取整的字段的名字，列的数据类型必须为数值型 |
+| sin(String field)                     | 求正弦<br />参数：<br />field: 字段的名字，列的数据类型必须为数值型 |
+| sqrt(String field)                    | 求平方根<br />参数：<br />field: 字段的名字，列的数据类型必须为数值型 |
+| tan(String field)                     | 求正切<br />参数：<br />field: 字段的名字，列的数据类型必须为数值型 |
+|                                       |                                                              |
+
+
+
+### 其它函数
+
+| 函数名                            | 函数说明                                                     |
+| --------------------------------- | ------------------------------------------------------------ |
+| regex(String field, String regex) | 对指定字段进行正则匹配，匹配成功返回true，失败返回false。<br />参数：<br />field: 待正则匹配的列的名字<br />regex: 正则表达式 |
+| trunc(String field,int precision) | 浮点数格式化操作<br />参数：<br />field: 待格式化字段的名字，列的数据类型必须为数值型<br />precision：精度，浮点数要格式化的精度，当数值精度不够时补0。如：浮点数3.23，精度为3时，输出为3.230 |
+|                                   |                                                              |
+
