@@ -88,6 +88,28 @@ public class FunctionFactoryImpl implements FunctionFactory {
         new FunctionBean(Floor.FUNCTION_NAME, Floor.class.getName(), true));
     functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
         new FunctionBean(Trunc.FUNCTION_NAME, Trunc.class.getName(), true));
+    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Trunc.FUNCTION_NAME, Round.class.getName(), true));
+    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Trunc.FUNCTION_NAME, Abs.class.getName(), true));
+    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Trunc.FUNCTION_NAME, Cbrt.class.getName(), true));
+    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Trunc.FUNCTION_NAME, Cos.class.getName(), true));
+    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Trunc.FUNCTION_NAME, Exp.class.getName(), true));
+    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Trunc.FUNCTION_NAME, Log.class.getName(), true));
+    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Trunc.FUNCTION_NAME, Log10.class.getName(), true));
+    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Trunc.FUNCTION_NAME, Pow.class.getName(), true));
+    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Trunc.FUNCTION_NAME, Sin.class.getName(), true));
+    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Trunc.FUNCTION_NAME, Sqrt.class.getName(), true));
+    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Trunc.FUNCTION_NAME, Tan.class.getName(), true));
     functionMap.put(GroupOrdinal.FUNCTION_NAME.toLowerCase(),
         new FunctionBean(GroupOrdinal.FUNCTION_NAME,
             GroupOrdinal.class.getName(), true));
@@ -136,12 +158,14 @@ public class FunctionFactoryImpl implements FunctionFactory {
     return func;
   }
 
-  @Override public void importFunction(InputStream is) {
+  @Override
+  public void importFunction(InputStream is) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("");
   }
 
-  @Override public String registFunction(String name, String className) {
+  @Override
+  public String registFunction(String name, String className) {
     // TODO Auto-generated method stub
     Validate.notEmpty(name, "Parameter name is empty!");
     Validate.notEmpty(name, "Parameter className is empty!");
@@ -158,7 +182,8 @@ public class FunctionFactoryImpl implements FunctionFactory {
     return null;
   }
 
-  @Override public String unregistFunction(String name) {
+  @Override
+  public String unregistFunction(String name) {
     // TODO Auto-generated method stub
     Validate.notEmpty(name, "Parameter name is empty!");
     FunctionBean bean = functionMap.get(name);

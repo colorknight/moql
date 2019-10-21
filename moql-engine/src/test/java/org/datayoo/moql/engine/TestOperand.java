@@ -130,11 +130,11 @@ public class TestOperand extends TestCase {
     try {
       Operand arithmetic = MoqlEngine
           .createOperand(" num << num1 + 1");
-      System.out.println(arithmetic.toString() + " " + arithmetic.operate(entityMap));
+      System.out.println(arithmetic.toString() + " = " + arithmetic.operate(entityMap));
       arithmetic = MoqlEngine.createOperand("num2 | num1 & num");
-      System.out.println(arithmetic.toString() + " " + arithmetic.operate(entityMap));
+      System.out.println(arithmetic.toString() + " = " + arithmetic.operate(entityMap));
       arithmetic = MoqlEngine.createOperand("~num2 ^ num2");
-      System.out.println(arithmetic.toString() + " " + arithmetic.operate(entityMap));
+      System.out.println(arithmetic.toString() + " = " + arithmetic.operate(entityMap));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
