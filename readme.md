@@ -8,7 +8,7 @@ DataSetMap dataSetMap = new DataSetMapImpl();
 dataSetMap.putDataSet("BeanA", beanAList);
 String sql = "select count(a.id) cnt, sum(a.num) sum, a.num%500 mod from BeanA a group by 3 having mod > 10 order by 1";
 try {
-		Selector selector = MoqlUtils.createSelector(sql);
+		Selector selector = MoqlEngine.createSelector(sql);
 		selector.select(dataSetMap);
 		RecordSet recordSet = selector.getRecordSet();
 		outputRecordSet(recordSet);
@@ -30,9 +30,9 @@ try {
 
 ```
 try {
-	Filter filter1 = MoqlUtils.createFilter("bean.num < 100 and num > 100 or bean.num = 100 and bean.name in ('Abean', 'Bbean')");
+	Filter filter1 = MoqlEngine.createFilter("bean.num < 100 and num > 100 or bean.num = 100 and bean.name in ('Abean', 'Bbean')");
 	assertTrue(filter1.isMatch(entityMap));
-	filter1 = MoqlUtils.createFilter("bean.num < 100 and (num > 100 or bean.num = 100)");
+	filter1 = MoqlEngine.createFilter("bean.num < 100 and (num > 100 or bean.num = 100)");
 	assertFalse(filter1.isMatch(entityMap));
 } catch (MoqlException e) {
 	// TODO Auto-generated catch block
@@ -48,7 +48,7 @@ entityMap.putEntity("bean", new BeanA("bean", 5));
 entityMap.putEntity("num1", 3);
 entityMap.putEntity("num2", 4);
 try {
-	Operand arithmetic = MoqlUtils.createOperand("(bean.getNum() * num1) / num2 * 2.2 + 2 - 1");
+	Operand arithmetic = MoqlEngine.createOperand("(bean.getNum() * num1) / num2 * 2.2 + 2 - 1");
 	System.out.println(arithmetic.toString() + " " + arithmetic.getOperandType());
 	System.out.println(arithmetic.operate(entityMap));
 } catch (MoqlException e) {
@@ -75,7 +75,7 @@ entityMap.putEntity("num", 12);
 entityMap.putEntity("num1", 3);
 entityMap.putEntity("num2", 4);
 try {
-	Operand arithmetic = MoqlUtils.createOperand("(num * num1) / num2 * 2.2 + 2 - 1");
+	Operand arithmetic = MoqlEngine.createOperand("(num * num1) / num2 * 2.2 + 2 - 1");
 	System.out.println(arithmetic.operate(entityMap));
 } catch (MoqlException e) {
 	e.printStackTrace();
@@ -146,15 +146,15 @@ public enum OperandType {
 
 ```
 try {	
-	Operand constant = MoqlUtils.createOperand("1234");
+	Operand constant = MoqlEngine.createOperand("1234");
 	System.out.println(constant.toString() + " " + constant.getOperandType());
-	constant = MoqlUtils.createOperand("192.16");
+	constant = MoqlEngine.createOperand("192.16");
 	System.out.println(constant.toString() + " " + constant.getOperandType());
-	constant = MoqlUtils.createOperand("'中国''china'");
+	constant = MoqlEngine.createOperand("'中国''china'");
 	System.out.println(constant.toString() + " " + constant.getOperandType());
-	constant = MoqlUtils.createOperand("null");
+	constant = MoqlEngine.createOperand("null");
 	System.out.println(constant.toString() + " " + constant.getOperandType());
-	constant = MoqlUtils.createOperand("Null");
+	constant = MoqlEngine.createOperand("Null");
 	System.out.println(constant.toString() + " " + constant.getOperandType());
 } catch (MoqlException e) {
 	e.printStackTrace();
@@ -186,16 +186,16 @@ entityMap.putEntity("长度", 184);
 entityMap.putEntity("$a", 38);
 entityMap.putEntity("_data", 32);
 try {
-	Operand variable = MoqlUtils.createOperand("num");
+	Operand variable = MoqlEngine.createOperand("num");
 	System.out.println(variable.toString() + " " + variable.getOperandType());
 	System.out.println(variable.operate(entityMap));
-	variable = MoqlUtils.createOperand("长度");
+	variable = MoqlEngine.createOperand("长度");
 	System.out.println(variable.toString() + " " + variable.getOperandType());
 	System.out.println(variable.operate(entityMap));
-	variable = MoqlUtils.createOperand("$a");
+	variable = MoqlEngine.createOperand("$a");
 	System.out.println(variable.toString() + " " + variable.getOperandType());
 	System.out.println(variable.operate(entityMap));
-	variable = MoqlUtils.createOperand("_data");
+	variable = MoqlEngine.createOperand("_data");
 	System.out.println(variable.toString() + " " + variable.getOperandType());
 	System.out.println(variable.operate(entityMap));
 } catch (MoqlException e) {
@@ -226,7 +226,7 @@ _data VARIABLE
 EntityMap entityMap = new EntityMapImpl();
 entityMap.putEntity("num", 123);
 try {
-	Operand function = MoqlUtils.createOperand("max(num)");
+	Operand function = MoqlEngine.createOperand("max(num)");
 	System.out.println(function.toString() + " " + function.getOperandType());
 	System.out.println(function.operate(entityMap));
 	entityMap.putEntity("num", 345);
@@ -235,7 +235,7 @@ try {
 	function.reset();
 	entityMap.putEntity("num", 12);
 	System.out.println(function.operate(entityMap));
-	function = MoqlUtils.createOperand("test(1, num, 'a')");
+	function = MoqlEngine.createOperand("test(1, num, 'a')");
 	System.out.println(function.toString() + " " + function.getOperandType());
 } catch (MoqlException e) {
 	e.printStackTrace();
@@ -335,19 +335,19 @@ EntityMap entityMap = new EntityMapImpl();
 entityMap.putEntity("bean", BeanFactory.createMapList(5));
 try {
 	//访问链表中第3个Map对象的以‘value’做索引的数据的值
-	Operand member = MoqlUtils.createOperand("bean[2]['value']");
+	Operand member = MoqlEngine.createOperand("bean[2]['value']");
 	System.out.println(member.toString() + " " + member.getOperandType());
 	System.out.println(member.operate(entityMap));
 	//访问链表中的所有Map对象
-	member = MoqlUtils.createOperand("bean[]");
+	member = MoqlEngine.createOperand("bean[]");
 	System.out.println(member.toString() + " " + member.getOperandType());
 	System.out.println(member.operate(entityMap));
 	/*访问第5个Map元素中以’bean’为索引的Bean对象的num属性，该例子结合了成员表达式Operand的格式*/
-	member = MoqlUtils.createOperand("bean[4]['bean'].num");
+	member = MoqlEngine.createOperand("bean[4]['bean'].num");
 	System.out.println(member.toString() + " " + member.getOperandType());
 	System.out.println(member.operate(entityMap));
 	/*访问第5个Map元素中以’bean’为索引的Bean对象的getArray()方法返回数组的第6个元素*/
-	member = MoqlUtils.createOperand("bean[4]['bean'].getArray()[5]");
+	member = MoqlEngine.createOperand("bean[4]['bean'].getArray()[5]");
 	System.out.println(member.toString() + " " + member.getOperandType());
 	System.out.println(member.operate(entityMap));
 } catch (MoqlException e) {
@@ -442,10 +442,10 @@ num2 | num1 & num = 6
 EntityMap entityMap = new EntityMapImpl();
 entityMap.putEntity("bean", new BeanA("bean", 5));
 try {
-	Operand member = MoqlUtils.createOperand("bean.name");
+	Operand member = MoqlEngine.createOperand("bean.name");
 	System.out.println(member.toString() + " " + member.getOperandType());
 	System.out.println(member.operate(entityMap));
-	member = MoqlUtils.createOperand("bean.getNum()");
+	member = MoqlEngine.createOperand("bean.getNum()");
 	System.out.println(member.toString() + " " + member.getOperandType());
 	System.out.println(member.operate(entityMap));
 } catch (MoqlException e) {
@@ -481,45 +481,45 @@ try {
 	EntityMap entityMap = new EntityMapImpl();
 	entityMap.putEntity("num", 123);
 	entityMap.putEntity("bean", new BeanA("bean", 100)
-	Filter filter = MoqlUtils.createFilter("num = 123");
+	Filter filter = MoqlEngine.createFilter("num = 123");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("num < 160");
+	filter = MoqlEngine.createFilter("num < 160");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("bean.num > 0 ");
+	filter = MoqlEngine.createFilter("bean.num > 0 ");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("num <> 123");
+	filter = MoqlEngine.createFilter("num <> 123");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("num >= 123");
+	filter = MoqlEngine.createFilter("num >= 123");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("num <= 100");
+	filter = MoqlEngine.createFilter("num <= 100");
 	System.out.println(filter.isMatch(entityMap));
 	// between..and
-	filter = MoqlUtils.createFilter("bean.num between 0 and 200");
+	filter = MoqlEngine.createFilter("bean.num between 0 and 200");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("bean.num between 0 and 100");
+	filter = MoqlEngine.createFilter("bean.num between 0 and 100");
 	System.out.println(filter.isMatch(entityMap));
 	// like
-	filter = MoqlUtils.createFilter("bean.name like '%ean'");
+	filter = MoqlEngine.createFilter("bean.name like '%ean'");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("bean.name like '%ea.'");
+	filter = MoqlEngine.createFilter("bean.name like '%ea.'");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("bean.name like '%e%'");
+	filter = MoqlEngine.createFilter("bean.name like '%e%'");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("bean.name like '%c%'");
+	filter = MoqlEngine.createFilter("bean.name like '%c%'");
 	System.out.println(filter.isMatch(entityMap));
 	// in
-	filter = MoqlUtils.createFilter("bean.name in ('Abean', 'Bbean')");
+	filter = MoqlEngine.createFilter("bean.name in ('Abean', 'Bbean')");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("bean.name in ('Cbean', 'Bbean')");
+	filter = MoqlEngine.createFilter("bean.name in ('Cbean', 'Bbean')");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("50 in (bean.getArray())");
+	filter = MoqlEngine.createFilter("50 in (bean.getArray())");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("150 in (bean.getArray())");
+	filter = MoqlEngine.createFilter("150 in (bean.getArray())");
 	System.out.println(filter.isMatch(entityMap));
 	// is
-	filter = MoqlUtils.createFilter("bean.name is null");
+	filter = MoqlEngine.createFilter("bean.name is null");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("bean.name is not null");
+	filter = MoqlEngine.createFilter("bean.name is not null");
 	System.out.println(filter.isMatch(entityMap));
 } catch (MoqlException e) {
 	e.printStackTrace();
@@ -533,26 +533,26 @@ try {
 	EntityMap entityMap = new EntityMapImpl();
 	entityMap.putEntity("num", 123);
 	entityMap.putEntity("bean", new BeanA("bean", 100));
-	Filter filter = MoqlUtils.createFilter("num > 100 and bean.num < 200 and bean.name like'%ean'");
+	Filter filter = MoqlEngine.createFilter("num > 100 and bean.num < 200 and bean.name like'%ean'");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("bean.num > 0 and bean.num < 100");
+	filter = MoqlEngine.createFilter("bean.num > 0 and bean.num < 100");
 	System.out.println(filter.isMatch(entityMap));
 	// 	or
-	filter = MoqlUtils.createFilter("num > 150 or bean.num = 100");
+	filter = MoqlEngine.createFilter("num > 150 or bean.num = 100");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("num > 150 or bean.num <> 100");
+	filter = MoqlEngine.createFilter("num > 150 or bean.num <> 100");
 	System.out.println(filter.isMatch(entityMap));
 	// 	not
-	filter = MoqlUtils.createFilter("not bean.num <> 100");
+	filter = MoqlEngine.createFilter("not bean.num <> 100");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("not num > 150 or bean.num = 100");
+	filter = MoqlEngine.createFilter("not num > 150 or bean.num = 100");
 	//	paren
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("not (num > 150 or bean.num = 100)");
+	filter = MoqlEngine.createFilter("not (num > 150 or bean.num = 100)");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("bean.num < 100 and num > 100 or bean.num = 100");
+	filter = MoqlEngine.createFilter("bean.num < 100 and num > 100 or bean.num = 100");
 	System.out.println(filter.isMatch(entityMap));
-	filter = MoqlUtils.createFilter("bean.num < 100 and (num > 100 or bean.num = 100)");
+	filter = MoqlEngine.createFilter("bean.num < 100 and (num > 100 or bean.num = 100)");
 	System.out.println(filter.isMatch(entityMap));
 } catch (MoqlException e) {
 	e.printStackTrace();
@@ -572,7 +572,7 @@ DataSetMap dataSetMap = new DataSetMapImpl();
 dataSetMap.putDataSet("BeanA", beanAList);
 String sql = "select count(a.id) cnt, sum(a.num) sum, a.num%500 mod from BeanA a group by 3 having mod > 10 order by 1";
 try {
-	Selector selector = MoqlUtils.createSelector(sql);
+	Selector selector = MoqlEngine.createSelector(sql);
 	//对第一组数据进行统计分析
 	selector.select(dataSetMap);
 	RecordSet recordSet = selector.getRecordSet();
@@ -658,7 +658,7 @@ DataSetMap dataSetMap = new DataSetMapImpl();
 dataSetMap.putDataSet("BeanA", beanAList);
 String sql = "select a.id, a.name, a.num%500 from BeanA a where a.num%500 > 10 order by 3";
 try {
-	Selector selector = MoqlUtils.createSelector(sql);
+	Selector selector = MoqlEngine.createSelector(sql);
 	selector.select(dataSetMap);
 	RecordSet recordSet = selector.getRecordSet();
 	outputRecordSet(recordSet);
@@ -829,19 +829,19 @@ select count(a.id) cnt, sum(a.num) sum, a.num%500 mod from BeanA a group by 3 ha
 ```
 String sql = "select count(a.id) cnt, sum(a.num) sum, a.num%500 mod from BeanA a group by 3 having mod > 10 order by 1 limit 10,3";
 try {	
-	String xml = MoqlUtils.translateMoql2Xml(sql);
+	String xml = MoqlTranslator.translateMoql2Xml(sql);
 	System.out.println(xml);
-	sql = MoqlUtils.translateXml2Sql(xml, SqlDialectType.MOQL);
+	sql = MoqlTranslator.translateXml2Sql(xml, SqlDialectType.MOQL);
 	System.out.println(sql);
-	sql = MoqlUtils.translateXml2Sql(xml, SqlDialectType.ORACLE);
+	sql = MoqlTranslator.translateXml2Sql(xml, SqlDialectType.ORACLE);
 	System.out.println(sql);
-	sql = MoqlUtils.translateXml2Sql(xml, SqlDialectType.SQLSERVER);
+	sql = MoqlTranslator.translateXml2Sql(xml, SqlDialectType.SQLSERVER);
 	System.out.println(sql);
-	sql = MoqlUtils.translateXml2Sql(xml, SqlDialectType.MYSQL);
+	sql = MoqlTranslator.translateXml2Sql(xml, SqlDialectType.MYSQL);
 	System.out.println(sql);
-	sql = MoqlUtils.translateXml2Sql(xml, SqlDialectType.POSTGRESQL);
+	sql = MoqlTranslator.translateXml2Sql(xml, SqlDialectType.POSTGRESQL);
 	System.out.println(sql);
-	sql = MoqlUtils.translateXml2Sql(xml, SqlDialectType.DB2);
+	sql = MoqlTranslator.translateXml2Sql(xml, SqlDialectType.DB2);
 	System.out.println(sql);
 } catch (MoqlException e) {
 	// TODO Auto-generated catch block
