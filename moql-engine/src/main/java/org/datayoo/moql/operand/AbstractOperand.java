@@ -23,20 +23,20 @@ import org.datayoo.moql.Operand;
 import org.datayoo.moql.OperandType;
 
 /**
- * 
+ *
  * @author Tang Tadin
  *
  */
 public abstract class AbstractOperand implements Operand, OperandSourceAware {
-	
+
 	protected String name;
-	
+
 	protected Object source;
-	
+
 	protected OperandType operandType = OperandType.UNKNOWN;
-	
+
 	protected boolean constantReturn = false;
-	
+
 	protected EntityMap entityMap;
 
 	@Override
@@ -84,7 +84,7 @@ public abstract class AbstractOperand implements Operand, OperandSourceAware {
 		// TODO Auto-generated method stub
 		return isTrue(operate(entityMap));
 	}
-	
+
 	public static boolean isTrue(Object obj) {
 		if (obj == null)
 			return false;
@@ -92,8 +92,7 @@ public abstract class AbstractOperand implements Operand, OperandSourceAware {
 			return ((Boolean)(obj)).booleanValue();
 		return true;
 	}
-	
-	
+
 	@Override
 	public void increment(EntityMap entityMap) {
 		// TODO Auto-generated method stub
@@ -121,5 +120,5 @@ public abstract class AbstractOperand implements Operand, OperandSourceAware {
 		// TODO Auto-generated method stub
 		return name;
 	}
-	
+
 }

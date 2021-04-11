@@ -21,20 +21,21 @@ import com.google.gson.JsonArray;
 import org.datayoo.moql.RecordSet;
 import org.datayoo.moql.operand.OperandContextList;
 import org.datayoo.moql.util.StringFormater;
+import org.dom4j.Element;
 
 import java.sql.ResultSet;
 import java.util.Map;
 
 /**
- *
  * @author Tang Tadin
- *
  */
 public class ArrayExpressionUtils {
 
   protected static final ArrayAccessor arrayAccessor = new SystemArrayAccessor();
 
   protected static final JsonArrayAccessor jsonArrayAccessor = new JsonArrayAccessor();
+
+  protected static final ElementAttrAccessor elementAttrAccessor = new ElementAttrAccessor();
 
   protected static final ArrayAccessor mapAccessor = new MapAccessor();
 
@@ -50,6 +51,9 @@ public class ArrayExpressionUtils {
     }
     if (o instanceof JsonArray) {
       return jsonArrayAccessor;
+    }
+    if (o instanceof Element) {
+      return elementAttrAccessor;
     }
     if (o instanceof Map) {
       return mapAccessor;

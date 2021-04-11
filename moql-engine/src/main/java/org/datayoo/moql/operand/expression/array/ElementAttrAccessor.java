@@ -5,26 +5,27 @@ import org.datayoo.moql.NumberConvertable;
 import org.datayoo.moql.operand.OperandContextArrayList;
 import org.datayoo.moql.operand.OperandContextList;
 import org.datayoo.moql.util.StringFormater;
+import org.dom4j.Element;
 
 import java.lang.reflect.Array;
 
 /**
- * Created by tangtadin on 17/2/5.
+ * Created by tangtadin on 21/4/11.
  */
-public class JsonArrayAccessor implements ArrayAccessor {
+public class ElementAttrAccessor implements ArrayAccessor {
 
   @Override
   public Object getObject(Object array, Object index) {
-    JsonArray jsonArray = (JsonArray) array;
+    Element element = (Element) array;
     if (index instanceof Number) {
-      return jsonArray.get(((Number) index).intValue());
+      return element.attribute((((Number) index).intValue())).getValue();
     }
-    //    if (index.getClass().equals(String.class)) {
-    //      return jsonArray.get(Integer.valueOf((String)index));
-    //    }
+    if (index instanceof String) {
+      return element.attribute(index.toString()).getValue();
+    }
     if (index instanceof NumberConvertable) {
       Number inx = ((NumberConvertable) index).toNumber();
-      return jsonArray.get(inx.intValue());
+      return element.attribute(inx.intValue()).getValue();
     }
     throw new IllegalArgumentException(StringFormater
         .format("Unsupport 'index' of class '{}'!",
@@ -33,11 +34,11 @@ public class JsonArrayAccessor implements ArrayAccessor {
 
   @Override
   public OperandContextList toOperandContextList(Object array) {
-    JsonArray jsonArray = (JsonArray) array;
+    Element element = (Element) array;
     OperandContextList ctxList = new OperandContextArrayList(
         Array.getLength(array));
-    for (int i = 0; i < jsonArray.size(); i++) {
-      ctxList.add(jsonArray.get(i));
+    for (int i = 0; i < element.attributeCount(); i++) {
+      ctxList.add(element.attribute(i).getValue());
     }
     return ctxList;
   }

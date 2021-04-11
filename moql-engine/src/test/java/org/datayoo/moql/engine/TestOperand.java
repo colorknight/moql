@@ -8,7 +8,12 @@ import org.datayoo.moql.MoqlException;
 import org.datayoo.moql.Operand;
 import org.datayoo.moql.simulation.BeanA;
 import org.datayoo.moql.simulation.BeanFactory;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public class TestOperand extends TestCase {
@@ -101,21 +106,21 @@ public class TestOperand extends TestCase {
           .createOperand("(num*num1) / num2 * 2.2 + 2 - 1");
       Operand arithmetic2 = MoqlEngine
           .createOperand("(经济|文化) + (十八大|中国) + 美国 - 病闹");
-      Operand arithmetic3 = MoqlEngine
-          .createOperand("6+ 5*2");
-      System.out.println(arithmetic3.toString() + " "
-          + arithmetic3.operate(entityMap));
-      System.out.println(arithmetic2.toString() + " "
-          + arithmetic2.getOperandType());
-      System.out.println(arithmetic.toString() + " "
-          + arithmetic.getOperandType());
+      Operand arithmetic3 = MoqlEngine.createOperand("6+ 5*2");
+      System.out.println(
+          arithmetic3.toString() + " " + arithmetic3.operate(entityMap));
+      System.out
+          .println(arithmetic2.toString() + " " + arithmetic2.getOperandType());
+      System.out
+          .println(arithmetic.toString() + " " + arithmetic.getOperandType());
       System.out.println(arithmetic.operate(entityMap));
       arithmetic = MoqlEngine.createOperand("num + 21");
-      System.out.println(arithmetic.toString() + " "
-          + arithmetic.getOperandType());
+      System.out
+          .println(arithmetic.toString() + " " + arithmetic.getOperandType());
       System.out.println(arithmetic.operate(entityMap));
       arithmetic = MoqlEngine.createOperand("num + num1 + num2");
-      System.out.println(arithmetic.toString() + " " + arithmetic.operate(entityMap));
+      System.out
+          .println(arithmetic.toString() + " " + arithmetic.operate(entityMap));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -128,13 +133,15 @@ public class TestOperand extends TestCase {
     entityMap.putEntity("num1", 3);
     entityMap.putEntity("num2", 4);
     try {
-      Operand arithmetic = MoqlEngine
-          .createOperand(" num << num1 + 1");
-      System.out.println(arithmetic.toString() + " = " + arithmetic.operate(entityMap));
+      Operand arithmetic = MoqlEngine.createOperand(" num << num1 + 1");
+      System.out.println(
+          arithmetic.toString() + " = " + arithmetic.operate(entityMap));
       arithmetic = MoqlEngine.createOperand("num2 | num1 & num");
-      System.out.println(arithmetic.toString() + " = " + arithmetic.operate(entityMap));
+      System.out.println(
+          arithmetic.toString() + " = " + arithmetic.operate(entityMap));
       arithmetic = MoqlEngine.createOperand("~num2 ^ num2");
-      System.out.println(arithmetic.toString() + " = " + arithmetic.operate(entityMap));
+      System.out.println(
+          arithmetic.toString() + " = " + arithmetic.operate(entityMap));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -198,7 +205,7 @@ public class TestOperand extends TestCase {
     EntityMap entityMap = new EntityMapImpl();
     String json = "{\"obj\":{\"name\":\"test\";\"value\":[1,2,3]}}";
     JsonParser parser = new JsonParser();
-    entityMap.putEntity("j",parser.parse(json));
+    entityMap.putEntity("j", parser.parse(json));
     try {
       Operand member = MoqlEngine.createOperand("j.obj.name");
       System.out.println(member.toString() + " " + member.getOperandType());
@@ -220,6 +227,28 @@ public class TestOperand extends TestCase {
       System.out.println(operands.size());
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  public void testElementExpression() {
+    EntityMap entityMap = new EntityMapImpl();
+    String xml = "<e1><e10 a1=\"t1\" a2=\"t2\">test</e10><e11>ddd</e11></e1>";
+    ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes());
+    SAXReader reader = new SAXReader();
+    try {
+      Document document = reader.read(bais);
+      entityMap.putEntity("e", document.getRootElement());
+      Operand member = MoqlEngine.createOperand("e.e10.getText()");
+      System.out.println(member.toString() + " " + member.getOperandType());
+      System.out.println(member.operate(entityMap));
+      member = MoqlEngine.createOperand("e.e10[1]");
+      System.out.println(member.toString() + " " + member.getOperandType());
+      System.out.println(member.operate(entityMap));
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (DocumentException e) {
       e.printStackTrace();
     }
   }

@@ -46,6 +46,7 @@ public class EsDataQuerierTest extends TestCase {
       CommonSupplementReader supplementReader = new CommonSupplementReader();
       RecordSet recordSet = dataQuerier.query(sql, supplementReader);
       outputRecordSet(recordSet);
+      System.out.println(supplementReader.getTotalHits());
     } catch (IOException e) {
       e.printStackTrace();
     }

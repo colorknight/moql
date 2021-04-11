@@ -27,6 +27,7 @@ import org.datayoo.moql.metadata.OperatorType;
  * @author Tang Tadin
  *
  */
+// unsupported in moql grammar
 public class ExistsExpression extends AbstractRelationExpression {
 
 	public ExistsExpression(Operand operand) {

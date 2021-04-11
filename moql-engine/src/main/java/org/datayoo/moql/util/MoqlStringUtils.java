@@ -42,6 +42,7 @@ public abstract class MoqlStringUtils {
 			}
 			sbuf.append(string.charAt(i));
 		}
+		sbuf.append(SelectorConstants.QUOTE);
 		return sbuf.toString();
 	}
 	

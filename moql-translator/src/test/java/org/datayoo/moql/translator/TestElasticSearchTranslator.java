@@ -172,10 +172,17 @@ public class TestElasticSearchTranslator extends TestCase {
     testESDialect(sql);
   }
 
+  public void testQuery4() {
+    String sql = "select n.* from zz_news_entity-202001 n where n.titleWords.term = '冠状病毒' order by n.publishTime desc limit 100 ";
+    testESDialect(sql);
+  }
+
   public void testSearchAfter() {
+    // 带有limit的SQL语句，按照search_after的说明，limit语法中的数字20表示from，将被忽略
     String sql = "select w.* from web w where w.port=443 limit 20,10";
     Map<String, Object> translationContext = new HashMap<String, Object>();
     Object[] features = new Object[] { 133, "test" };
+    // RESULT_SORT_FEATURES常量为传递给search_after语法的参数的名字
     translationContext
         .put(EsTranslationContextConstants.RESULT_SORT_FEATURES, features);
     testESDialect(sql, translationContext);
