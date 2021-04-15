@@ -82,9 +82,6 @@ public abstract class AbstractFunction extends AbstractOperand
   protected void initializeFunction() {
     functionString = buildFunctionString();
     constantReturn = determineConstantsReturn(parameters);
-    if (constantReturn) {
-      constantReturnValue = innerOperate(null);
-    }
   }
 
   protected String buildFunctionString() {
