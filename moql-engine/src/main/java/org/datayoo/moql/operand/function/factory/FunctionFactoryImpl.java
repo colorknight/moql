@@ -178,7 +178,7 @@ public class FunctionFactoryImpl implements FunctionFactory {
       return bean.getClassName();
     } else {
       functionMap.put(name, new FunctionBean(name, className, false));
-      return bean.getClassName();
+      return className;
     }
   }
 
