@@ -22,6 +22,7 @@ import org.datayoo.moql.operand.function.Function;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -37,5 +38,9 @@ public interface FunctionFactory {
 	String unregistFunction(String name);
 	
 	void importFunction(InputStream is);
+
+	String getFunction(String name);
+
+	Map<String, String> getAllFunctions();
 	
 }

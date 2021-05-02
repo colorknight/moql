@@ -139,7 +139,6 @@ public class FunctionFactoryImpl implements FunctionFactory {
 
   @Override
   public Function createFunction(String name, List<Operand> parameters) {
-    // TODO Auto-generated method stub
     Validate.notEmpty(name, "Parameter name is empty!");
     FunctionBean bean = functionMap.get(name.toLowerCase());
     if (bean == null) {
@@ -151,7 +150,6 @@ public class FunctionFactoryImpl implements FunctionFactory {
       func = (Function) bean.getCstr().newInstance(new Object[] { parameters
       });
     } catch (Exception e) {
-      // TODO Auto-generated catch block
       throw new MoqlRuntimeException(
           StringFormater.format("Create function '{}' failed!", name), e);
     }
@@ -160,13 +158,11 @@ public class FunctionFactoryImpl implements FunctionFactory {
 
   @Override
   public void importFunction(InputStream is) {
-    // TODO Auto-generated method stub
     throw new UnsupportedOperationException("");
   }
 
   @Override
   public String registFunction(String name, String className) {
-    // TODO Auto-generated method stub
     Validate.notEmpty(name, "Parameter name is empty!");
     Validate.notEmpty(name, "Parameter className is empty!");
     name = name.toLowerCase();
@@ -193,6 +189,23 @@ public class FunctionFactoryImpl implements FunctionFactory {
       return bean.getClassName();
     }
     return null;
+  }
+
+  @Override
+  public String getFunction(String name) {
+    FunctionBean functionBean = functionMap.get(name);
+    if (functionBean == null)
+      return null;
+    return functionBean.getClassName();
+  }
+
+  @Override
+  public Map<String, String> getAllFunctions() {
+    Map<String, String> allFunctions = new HashMap<>();
+    for (Map.Entry<String, FunctionBean> entry : functionMap.entrySet()) {
+      allFunctions.put(entry.getKey(), entry.getValue().getClassName());
+    }
+    return allFunctions;
   }
 
   static class FunctionBean {
