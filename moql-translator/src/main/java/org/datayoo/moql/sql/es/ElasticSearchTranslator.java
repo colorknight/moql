@@ -107,16 +107,11 @@ public class ElasticSearchTranslator implements SqlTranslator {
       JsonObject jsonObject, Map<String, Object> translationContext) {
     ColumnsMetadata columnsMetadata = ((SelectorMetadata) selectorDefinition)
         .getColumns();
-    List<ColumnMetadata> columnMetadatas = columnsMetadata.getColumns();
-    if (columnMetadatas.size() == 1) {
-      ColumnMetadata columnMetadata = columnMetadatas.get(0);
-      String value = columnMetadata.getValue();
-      if (value.endsWith(".*"))
-        return;
-    }
+    if (isSelectAll(columnsMetadata))
+      return;
     JsonObject source = new JsonObject();
     JsonArray includes = new JsonArray();
-    for (ColumnMetadata columnMetadata : columnMetadatas) {
+    for (ColumnMetadata columnMetadata : columnsMetadata.getColumns()) {
       if (columnMetadata.getNestedSelector() != null)
         throw new UnsupportedOperationException(
             "Unsupported nested selector in select clause!");
@@ -130,6 +125,17 @@ public class ElasticSearchTranslator implements SqlTranslator {
     }
     source.add("includes", includes);
     jsonObject.add("_source", source);
+  }
+
+  protected boolean isSelectAll(ColumnsMetadata columnsMetadata) {
+    List<ColumnMetadata> columnMetadatas = columnsMetadata.getColumns();
+    if (columnMetadatas.size() == 1) {
+      ColumnMetadata columnMetadata = columnMetadatas.get(0);
+      String value = columnMetadata.getValue();
+      if (value.endsWith(".*"))
+        return true;
+    }
+    return false;
   }
 
   protected void translateLimitClause(Limit limit, JsonObject jsonObject,

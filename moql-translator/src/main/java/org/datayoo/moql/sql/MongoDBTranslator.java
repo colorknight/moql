@@ -42,6 +42,7 @@ import java.util.Map;
 /**
  * @author Tang Tadin
  */
+@Deprecated
 public class MongoDBTranslator implements SqlTranslator {
 
   protected Map<String, FunctionTranslator> functionTranslators = new HashMap<String, FunctionTranslator>();
@@ -78,7 +79,7 @@ public class MongoDBTranslator implements SqlTranslator {
       Map<String, Object> translationContext) {
     StringBuffer sbuf = new StringBuffer();
     sbuf.append("db.");
-    sbuf.append(getTableName(selector.getTables(), translationContext));
+    sbuf.append(getTableName(selector.getTables()));
     if (isDistinct(selector.getRecordSetOperator())) {
       sbuf.append(translate2DistinctClause(selector.getRecordSetOperator()));
     } else {
@@ -111,8 +112,7 @@ public class MongoDBTranslator implements SqlTranslator {
   }
 
   @SuppressWarnings("rawtypes")
-  protected String getTableName(Tables tables,
-      Map<String, Object> translationContext) {
+  protected String getTableName(Tables tables) {
     Queryable queryable = tables.getQueryable();
     TableMetadata tableMetadata;
     if (queryable instanceof Table) {

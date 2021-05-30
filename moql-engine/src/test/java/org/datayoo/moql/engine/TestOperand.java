@@ -233,7 +233,7 @@ public class TestOperand extends TestCase {
 
   public void testElementExpression() {
     EntityMap entityMap = new EntityMapImpl();
-    String xml = "<e1><e10 a1=\"t1\" a2=\"t2\">test</e10><e11>ddd</e11></e1>";
+    String xml = "<e1><e10 a1=\"t1\" a2=\"t2\">test</e10><e11>ddd</e11><e11 a3=\"t3\">eee</e11><e11>fff</e11></e1>";
     ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes());
     SAXReader reader = new SAXReader();
     try {
@@ -243,6 +243,12 @@ public class TestOperand extends TestCase {
       System.out.println(member.toString() + " " + member.getOperandType());
       System.out.println(member.operate(entityMap));
       member = MoqlEngine.createOperand("e.e10[1]");
+      System.out.println(member.toString() + " " + member.getOperandType());
+      System.out.println(member.operate(entityMap));
+      member = MoqlEngine.createOperand("e.e11[1].getText()");
+      System.out.println(member.toString() + " " + member.getOperandType());
+      System.out.println(member.operate(entityMap));
+      member = MoqlEngine.createOperand("e.e11[1]['a3']");
       System.out.println(member.toString() + " " + member.getOperandType());
       System.out.println(member.operate(entityMap));
     } catch (MoqlException e) {

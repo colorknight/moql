@@ -33,6 +33,7 @@ import org.dom4j.Element;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -148,7 +149,10 @@ public class MemberVariableExpression extends AbstractExpression
   // added 2017/02/05
   protected Object operate(Element element) {
     String name = variable.getName();
-    return element.element(name);
+    List list = element.elements(name);
+    if (list.size() > 1)
+      return list;
+    return list.get(0);
   }
 
   protected Object operate(Object o) {

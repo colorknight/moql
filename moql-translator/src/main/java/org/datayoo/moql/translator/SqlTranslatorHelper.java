@@ -21,6 +21,7 @@ import org.datayoo.moql.Filter;
 import org.datayoo.moql.Selector;
 import org.datayoo.moql.sql.*;
 import org.datayoo.moql.sql.es.ElasticSearchTranslator;
+import org.datayoo.moql.sql.mongodb.MongoDBTranslator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +45,8 @@ public abstract class SqlTranslatorHelper {
 
   public static ElasticSearchTranslator elasticSearchTranslator;
 
+  public static MongoDBTranslator mongoDBTranslator;
+
   public static String translate2Sql(Selector selector,
       SqlDialectType dialectType) {
     return translate2Sql(selector, dialectType, new HashMap<String, Object>());
@@ -66,6 +69,8 @@ public abstract class SqlTranslatorHelper {
       sqlTranslator = getPostgreSQLTranslator();
     } else if (dialectType.equals(SqlDialectType.ELASTICSEARCH)) {
       sqlTranslator = getElasticSearchTranslator();
+    } else if (dialectType.equals(SqlDialectType.MONGODB)) {
+      sqlTranslator = getMongoDBTranslator();
     } else {
       throw new UnsupportedOperationException();
     }
@@ -146,5 +151,12 @@ public abstract class SqlTranslatorHelper {
       elasticSearchTranslator = new ElasticSearchTranslator();
     }
     return elasticSearchTranslator;
+  }
+
+  protected static synchronized MongoDBTranslator getMongoDBTranslator() {
+    if (mongoDBTranslator == null) {
+      mongoDBTranslator = new MongoDBTranslator();
+    }
+    return mongoDBTranslator;
   }
 }

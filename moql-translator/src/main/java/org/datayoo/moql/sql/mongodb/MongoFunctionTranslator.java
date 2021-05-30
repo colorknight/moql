@@ -15,19 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datayoo.moql.sql;
+package org.datayoo.moql.sql.mongodb;
+
+import com.google.gson.JsonElement;
+import org.datayoo.moql.operand.function.Function;
+import org.datayoo.moql.sql.FunctionTranslator;
+
 /**
- * 
  * @author Tang Tadin
- *
  */
-public enum SqlDialectType {
-	MOQL,
-	ORACLE,
-	SQLSERVER,
-	DB2,
-	MYSQL,
-	POSTGRESQL,
-	ELASTICSEARCH,
-	MONGODB
+public interface MongoFunctionTranslator extends FunctionTranslator {
+
+  void translate(Function function, JsonElement jsonObject);
 }
