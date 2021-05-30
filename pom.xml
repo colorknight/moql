@@ -14,8 +14,6 @@
     <modules>
         <module>moql-meta</module>
         <module>moql-engine</module>
-        <module>moql-translator</module>
-        <module>moql-querier</module>
     </modules>
     <packaging>pom</packaging>
 
