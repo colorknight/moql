@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,28 +17,29 @@
  */
 package org.datayoo.moql;
 
+import java.io.Serializable;
 
 /**
- * 
+ *
  * @author Tang Tadin
  * 若结果列中的数据没有重载Object的hashCode方法及equals方法
  * 则无法进行正常的DISTINCT及GROUP计算。如：数组、链表等
  */
-public interface Selector  {
-  
+public interface Selector extends Serializable {
+
   void setAlias(String alias);
-  
+
   String getAlias();
-	
-	SelectorDefinition getSelectorDefinition();
-	
-	void select(DataSetMap dataSetMap);
-	
-	RecordSet getRecordSet();
-	
-	void clear();
-	
-	SelectorContext getSelectorContext();
-	
-	void setSelectorContext(SelectorContext context);
+
+  SelectorDefinition getSelectorDefinition();
+
+  void select(DataSetMap dataSetMap);
+
+  RecordSet getRecordSet();
+
+  void clear();
+
+  SelectorContext getSelectorContext();
+
+  void setSelectorContext(SelectorContext context);
 }

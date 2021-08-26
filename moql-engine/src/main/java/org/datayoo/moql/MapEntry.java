@@ -17,10 +17,12 @@
  */
 package org.datayoo.moql;
 
+import java.io.Serializable;
+
 /**
  * @author Tang Tadin
  */
-public interface MapEntry<K,V> {
+public interface MapEntry<K,V> extends Serializable {
 	
 	K getKey();
 	

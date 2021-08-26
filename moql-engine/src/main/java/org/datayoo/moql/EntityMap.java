@@ -17,13 +17,14 @@
  */
 package org.datayoo.moql;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * @author Tang Tadin
  */
-public interface EntityMap {
+public interface EntityMap extends Serializable {
 
 	Object getEntity(String entityName);
 	
