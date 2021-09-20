@@ -24,9 +24,7 @@ import org.datayoo.moql.util.StringFormater;
 import java.util.List;
 
 /**
- *
  * @author Tang Tadin
- *
  */
 public class First extends AggregationFunction {
 
@@ -47,6 +45,15 @@ public class First extends AggregationFunction {
     // TODO Auto-generated method stub
     if (!settedValue) {
       first = parameters.get(0).operate(entityMap);
+      settedValue = true;
+    }
+  }
+
+  @Override
+  public void increment(Object[] entityArray) {
+    // TODO Auto-generated method stub
+    if (!settedValue) {
+      first = parameters.get(0).operate(entityArray);
       settedValue = true;
     }
   }

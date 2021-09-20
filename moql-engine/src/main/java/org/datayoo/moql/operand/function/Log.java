@@ -44,6 +44,10 @@ public class Log extends AbstractFunction {
   protected Object innerOperate(EntityMap entityMap) {
     // TODO Auto-generated method stub
     Object obj = operand.operate(entityMap);
+    return innerOperateProc(obj);
+  }
+
+  protected Object innerOperateProc(Object obj) {
     if (obj == null)
       return null;
     double val = 0;
@@ -54,6 +58,12 @@ public class Log extends AbstractFunction {
       val = Double.valueOf(obj.toString());
     }
     return Math.log(val);
+  }
+
+  @Override
+  protected Object innerOperate(Object[] entityArray) {
+    Object obj = operand.operate(entityArray);
+    return innerOperateProc(obj);
   }
 
 }

@@ -62,8 +62,7 @@ public abstract class AbstractBitwiseExpression
     }
   }
 
-  protected Long getNumber(Operand operand, EntityMap entityMap) {
-    Object obj = operand.operate(entityMap);
+  protected Long getNumber(Operand operand, Object obj) {
     if (obj == null)
       return null;
     if (obj instanceof Long || obj instanceof Integer || obj instanceof Short
@@ -81,12 +80,28 @@ public abstract class AbstractBitwiseExpression
         .format("Operand '{}' is not a number!", operand.toString()));
   }
 
-  @Override public Object operate(EntityMap entityMap) {
+  @Override
+  public Object operate(EntityMap entityMap) {
     // TODO Auto-generated method stub
     if (constantReturn)
       return constantReturnValue;
-    Long lNumber = getNumber(lOperand, entityMap);
-    Long rNumber = getNumber(rOperand, entityMap);
+    Object lNum = lOperand.operate(entityMap);
+    Object rNum = rOperand.operate(entityMap);
+    Long lNumber = getNumber(lOperand, lNum);
+    Long rNumber = getNumber(rOperand, rNum);
+    if (lNumber == null || rNumber == null)
+      return null;
+    return calc(lNumber, rNumber);
+  }
+
+  @Override
+  public Object operate(Object[] entityArray) {
+    if (constantReturn)
+      return constantReturnValue;
+    Object lNum = lOperand.operate(entityArray);
+    Object rNum = rOperand.operate(entityArray);
+    Long lNumber = getNumber(lOperand, lNum);
+    Long rNumber = getNumber(rOperand, rNum);
     if (lNumber == null || rNumber == null)
       return null;
     return calc(lNumber, rNumber);

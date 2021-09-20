@@ -26,9 +26,7 @@ import org.datayoo.moql.operand.AbstractOperand;
 import org.datayoo.moql.operand.OperandContextArrayList;
 
 /**
- *
  * @author Tang Tadin
- *
  */
 public class ColumnSelectorOperand extends AbstractOperand {
 
@@ -43,13 +41,15 @@ public class ColumnSelectorOperand extends AbstractOperand {
     this.columnSelector = columnSelector;
   }
 
-  @Override public Object operate(EntityMap entityMap) {
+  @Override
+  public Object operate(EntityMap entityMap) {
     // TODO Auto-generated method stub
     RecordSet recordSet = columnSelector.getRecordSet();
     return new OperandContextArrayList(recordSet.getRecordsAsMaps());
   }
 
-  @Override public void clear() {
+  @Override
+  public void clear() {
     // TODO Auto-generated method stub
     columnSelector.clear();
   }
@@ -58,4 +58,13 @@ public class ColumnSelectorOperand extends AbstractOperand {
     return columnSelector;
   }
 
+  @Override
+  public Object operate(Object[] entityArray) {
+    throw new UnsupportedOperationException("");
+  }
+
+  @Override
+  public void bind(String[] entityNames) {
+    throw new UnsupportedOperationException("");
+  }
 }

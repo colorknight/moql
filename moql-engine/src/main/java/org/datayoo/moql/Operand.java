@@ -19,7 +19,7 @@ package org.datayoo.moql;
 
 import java.io.Serializable;
 
-public interface Operand extends Serializable {
+public interface Operand extends EnhanceOperate, Serializable {
   /**
    * get the name of operand
    */
@@ -27,6 +27,7 @@ public interface Operand extends Serializable {
 
   /**
    * get the position of the operand in the expression text
+   *
    * @return org.antlr.runtime.Token
    */
   Object getSource();

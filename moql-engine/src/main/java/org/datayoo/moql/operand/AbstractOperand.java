@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,102 +23,109 @@ import org.datayoo.moql.Operand;
 import org.datayoo.moql.OperandType;
 
 /**
- *
  * @author Tang Tadin
- *
  */
-public abstract class AbstractOperand implements Operand, OperandSourceAware {
+public abstract class AbstractOperand
+    implements Operand, OperandSourceAware {
 
-	protected String name;
+  protected String name;
 
-	protected Object source;
+  protected Object source;
 
-	protected OperandType operandType = OperandType.UNKNOWN;
+  protected OperandType operandType = OperandType.UNKNOWN;
 
-	protected boolean constantReturn = false;
+  protected boolean constantReturn = false;
 
-	protected EntityMap entityMap;
+  protected EntityMap entityMap;
 
-	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return name;
-	}
+  protected boolean binded = false;
 
-	@Override
-	public Object getSource() {
-		// TODO Auto-generated method stub
-		return source;
-	}
+  protected int operandIndex = -1;
 
-	/* (non-Javadoc)
-	 * @see org.moql.operand.OperandAware#setSource(java.lang.Object)
-	 */
-	@Override
-	public void setSource(Object source) {
-		// TODO Auto-generated method stub
-		Validate.notNull(source, "source is null!");
-		this.source = source;
-	}
+  @Override
+  public String getName() {
+    // TODO Auto-generated method stub
+    return name;
+  }
 
-	@Override
-	public OperandType getOperandType() {
-		// TODO Auto-generated method stub
-		return operandType;
-	}
+  @Override
+  public Object getSource() {
+    // TODO Auto-generated method stub
+    return source;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.moql.operand.Operand#isConstantReturn()
-	 */
-	@Override
-	public boolean isConstantReturn() {
-		// TODO Auto-generated method stub
-		return constantReturn;
-	}
+  /* (non-Javadoc)
+   * @see org.moql.operand.OperandAware#setSource(java.lang.Object)
+   */
+  @Override
+  public void setSource(Object source) {
+    // TODO Auto-generated method stub
+    Validate.notNull(source, "source is null!");
+    this.source = source;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.moql.operand.Operand#booleanOperate(org.moql.data.EntityMap)
-	 */
-	@Override
-	public boolean booleanOperate(EntityMap entityMap) {
-		// TODO Auto-generated method stub
-		return isTrue(operate(entityMap));
-	}
+  @Override
+  public OperandType getOperandType() {
+    // TODO Auto-generated method stub
+    return operandType;
+  }
 
-	public static boolean isTrue(Object obj) {
-		if (obj == null)
-			return false;
-		if (obj.getClass() == Boolean.class)
-			return ((Boolean)(obj)).booleanValue();
-		return true;
-	}
+  /* (non-Javadoc)
+   * @see org.moql.operand.Operand#isConstantReturn()
+   */
+  @Override
+  public boolean isConstantReturn() {
+    // TODO Auto-generated method stub
+    return constantReturn;
+  }
 
-	@Override
-	public void increment(EntityMap entityMap) {
-		// TODO Auto-generated method stub
-		Validate.notNull(entityMap, "entityMap is null!");
-		this.entityMap = entityMap;
-	}
+  /* (non-Javadoc)
+   * @see org.moql.operand.Operand#booleanOperate(org.moql.data.EntityMap)
+   */
+  @Override
+  public boolean booleanOperate(EntityMap entityMap) {
+    // TODO Auto-generated method stub
+    return isTrue(operate(entityMap));
+  }
 
-	@Override
-	public Object getValue() {
-		// TODO Auto-generated method stub
-		return operate(entityMap);
-	}
+  public static boolean isTrue(Object obj) {
+    if (obj == null)
+      return false;
+    if (obj.getClass() == Boolean.class)
+      return ((Boolean) (obj)).booleanValue();
+    return true;
+  }
 
-	@Override
-	public void clear() {
-		// TODO Auto-generated method stub
-		entityMap = null;
-	}
+  @Override
+  public void increment(EntityMap entityMap) {
+    // TODO Auto-generated method stub
+    Validate.notNull(entityMap, "entityMap is null!");
+    this.entityMap = entityMap;
+  }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return name;
-	}
+  @Override
+  public Object getValue() {
+    // TODO Auto-generated method stub
+    return operate(entityMap);
+  }
 
+  @Override
+  public void clear() {
+    // TODO Auto-generated method stub
+    entityMap = null;
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    // TODO Auto-generated method stub
+    return name;
+  }
+
+  @Override
+  public boolean isBinded() {
+    return binded;
+  }
 }

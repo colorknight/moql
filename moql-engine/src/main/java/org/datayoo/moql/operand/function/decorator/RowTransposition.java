@@ -19,10 +19,7 @@
 package org.datayoo.moql.operand.function.decorator;
 
 import org.apache.commons.lang3.Validate;
-import org.datayoo.moql.ColumnDefinition;
-import org.datayoo.moql.Operand;
-import org.datayoo.moql.RecordSet;
-import org.datayoo.moql.RecordSetDefinition;
+import org.datayoo.moql.*;
 import org.datayoo.moql.core.Columns;
 import org.datayoo.moql.core.RecordSetImpl;
 import org.datayoo.moql.core.RecordSetMetadata;
@@ -66,21 +63,21 @@ public class RowTransposition extends DecorateFunction {
           "Invalid function format! The format should be 'rowTranspose(headerColumn[,valueColumns,valueColumnsName,groupColumns])'");
     }
     // TODO Auto-generated constructor stub
-    headerColumn = (String) parameters.get(0).operate(null);
+    headerColumn = (String) parameters.get(0).operate((EntityMap)null);
     Validate.notEmpty(headerColumn, "rowColumn is empty!");
     if (parameters.size() > 1) {
-      String valueColumnsString = (String) parameters.get(1).operate(null);
+      String valueColumnsString = (String) parameters.get(1).operate((EntityMap)null);
       if (valueColumnsString != null && valueColumnsString.length() > 0)
         valueColumns = valueColumnsString.split(",");
     }
     if (parameters.size() > 2) {
-      String valueColumnsName = (String) parameters.get(2).operate(null);
+      String valueColumnsName = (String) parameters.get(2).operate((EntityMap)null);
       if (valueColumnsName != null && valueColumnsName.length() > 0) {
         this.valueColumnsName = valueColumnsName;
       }
     }
     if (parameters.size() > 3) {
-      String groupColumnsString = (String) parameters.get(3).operate(null);
+      String groupColumnsString = (String) parameters.get(3).operate((EntityMap)null);
       if (groupColumnsString != null && groupColumnsString.length() > 0)
         groupColumns = groupColumnsString.split(",");
     }

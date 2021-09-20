@@ -20,7 +20,8 @@ public class BitwiseNotExpression extends AbstractOperationExpression {
   protected void initializeBitwise() {
     Long rNumber = null;
     if (rOperand.isConstantReturn()) {
-      rNumber = getNumber(rOperand, null);
+      Object num = rOperand.operate(entityMap);
+      rNumber = getNumber(rOperand, num);
     }
     if (rNumber != null) {
       constantReturn = true;
@@ -28,8 +29,7 @@ public class BitwiseNotExpression extends AbstractOperationExpression {
     }
   }
 
-  protected Long getNumber(Operand operand, EntityMap entityMap) {
-    Object obj = operand.operate(entityMap);
+  protected Long getNumber(Operand operand, Object obj) {
     if (obj == null)
       return null;
     if (obj instanceof Long || obj instanceof Integer || obj instanceof Short
@@ -47,14 +47,26 @@ public class BitwiseNotExpression extends AbstractOperationExpression {
         .format("Operand '{}' is not a number!", operand.toString()));
   }
 
-  @Override public Object operate(EntityMap entityMap) {
+  @Override
+  public Object operate(EntityMap entityMap) {
     // TODO Auto-generated method stub
     if (constantReturn)
       return constantReturnValue;
-    Long rNumber = getNumber(rOperand, entityMap);
+    Object num = rOperand.operate(entityMap);
+    Long rNumber = getNumber(rOperand, num);
     if (rNumber == null)
       return null;
     return ~rNumber;
   }
 
+  @Override
+  public Object operate(Object[] entityArray) {
+    if (constantReturn)
+      return constantReturnValue;
+    Object num = rOperand.operate(entityArray);
+    Long rNumber = getNumber(rOperand, num);
+    if (rNumber == null)
+      return null;
+    return ~rNumber;
+  }
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,51 +22,57 @@ import org.datayoo.moql.OperandType;
 import org.datayoo.moql.operand.AbstractOperand;
 
 /**
- * 
  * @author Tang Tadin
- *
  */
-public abstract class AbstractConstant extends AbstractOperand implements Constant {
-	
-	protected Object data;
-	
-	protected ConstantType constantType;
-	
-	{
-		operandType = OperandType.CONSTANT;
-		constantReturn = true;
-	}
-	
-	@Override
-	public Object operate(EntityMap entityMap) {
-		// TODO Auto-generated method stub
-		return data;
-	}
+public abstract class AbstractConstant extends AbstractOperand
+    implements Constant {
 
-	@Override
-	public void increment(EntityMap entityMap) {
-		// TODO Auto-generated method stub
-		
-	}
+  protected Object data;
 
-	@Override
-	public Object getValue() {
-		// TODO Auto-generated method stub
-		return data;
-	}
+  protected ConstantType constantType;
 
+  {
+    operandType = OperandType.CONSTANT;
+    constantReturn = true;
+  }
 
+  @Override
+  public Object operate(EntityMap entityMap) {
+    // TODO Auto-generated method stub
+    return data;
+  }
 
-	@Override
-	public void clear() {
-		// TODO Auto-generated method stub
-		
-	}
+  @Override
+  public void increment(EntityMap entityMap) {
+    // TODO Auto-generated method stub
 
-	@Override
-	public ConstantType getConstantType() {
-		// TODO Auto-generated method stub
-		return constantType;
-	}
+  }
 
+  @Override
+  public Object getValue() {
+    // TODO Auto-generated method stub
+    return data;
+  }
+
+  @Override
+  public void clear() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public ConstantType getConstantType() {
+    // TODO Auto-generated method stub
+    return constantType;
+  }
+
+  @Override
+  public void bind(String[] entityNames) {
+    this.binded = true;
+  }
+
+  @Override
+  public Object operate(Object[] entityArray) {
+    return data;
+  }
 }

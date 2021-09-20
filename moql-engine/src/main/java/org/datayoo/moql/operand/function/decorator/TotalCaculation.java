@@ -63,7 +63,7 @@ public class TotalCaculation extends DecorateFunction {
     int i = 0;
     int length = 0;
     for (Operand parameter : parameters) {
-      Object obj = parameter.operate(null);
+      Object obj = parameter.operate((EntityMap) null);
       if (obj != null)
         totalAliases[i] = obj.toString();
       if (totalAliases[i] != null) {
@@ -82,7 +82,8 @@ public class TotalCaculation extends DecorateFunction {
 
   }
 
-  @Override public RecordSet decorate(RecordSet recordSet, Columns columns) {
+  @Override
+  public RecordSet decorate(RecordSet recordSet, Columns columns) {
     // TODO Auto-generated method stub
     if (recordSet == null)
       return null;

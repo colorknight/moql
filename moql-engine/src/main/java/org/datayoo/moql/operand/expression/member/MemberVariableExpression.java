@@ -109,6 +109,10 @@ public class MemberVariableExpression extends AbstractExpression
   public Object operate(EntityMap entityMap) {
     // TODO Auto-generated method stub
     Object o = target.operate(entityMap);
+    return operateProc(o);
+  }
+
+  protected Object operateProc(Object o) {
     if (o == null)
       return null;
     if (!(o instanceof OperandContextList)) {
@@ -201,4 +205,15 @@ public class MemberVariableExpression extends AbstractExpression
     return m;
   }
 
+  @Override
+  public void bind(String[] entityNames) {
+    target.bind(entityNames);
+    this.binded = true;
+  }
+
+  @Override
+  public Object operate(Object[] entityArray) {
+    Object o = target.operate(entityArray);
+    return operateProc(o);
+  }
 }

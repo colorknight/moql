@@ -23,9 +23,7 @@ import org.datayoo.moql.Operand;
 import java.util.List;
 
 /**
- *
  * @author Tang Tadin
- *
  */
 public class Round extends AbstractFunction {
 
@@ -46,6 +44,10 @@ public class Round extends AbstractFunction {
   protected Object innerOperate(EntityMap entityMap) {
     // TODO Auto-generated method stub
     Object obj = operand.operate(entityMap);
+    return innerOperateProc(obj);
+  }
+
+  protected Object innerOperateProc(Object obj) {
     if (obj == null)
       return null;
     double val = 0;
@@ -60,4 +62,9 @@ public class Round extends AbstractFunction {
     return (long) val + 1;
   }
 
+  @Override
+  protected Object innerOperate(Object[] entityArray) {
+    Object obj = operand.operate(entityArray);
+    return innerOperateProc(obj);
+  }
 }

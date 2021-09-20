@@ -51,7 +51,8 @@ public class RangeExpression extends AbstractExpression {
     return sbuf.toString();
   }
 
-  @Override public Object operate(EntityMap entityMap) {
+  @Override
+  public Object operate(EntityMap entityMap) {
     // TODO Auto-generated method stub
     return operands;
   }
@@ -66,5 +67,18 @@ public class RangeExpression extends AbstractExpression {
 
   public boolean isrClosure() {
     return rClosure;
+  }
+
+  @Override
+  public void bind(String[] entityNames) {
+    for (Operand operand : operands) {
+      operand.bind(entityNames);
+    }
+    this.binded = true;
+  }
+
+  @Override
+  public Object operate(Object[] entityArray) {
+    return operands;
   }
 }

@@ -46,6 +46,12 @@ public class Last extends AggregationFunction {
   }
 
   @Override
+  public void increment(Object[] entityArray) {
+    // TODO Auto-generated method stub
+    last = parameters.get(0).operate(entityArray);
+  }
+
+  @Override
   public Object getValue() {
     return last;
   }

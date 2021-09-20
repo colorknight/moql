@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,102 +27,119 @@ import org.datayoo.moql.operand.expression.ExpressionType;
 import org.datayoo.moql.util.StringFormater;
 
 /**
- * 
  * @author Tang Tadin
- *
  */
-public abstract class AbstractArithmeticExpression extends
-		AbstractOperationExpression {
-	
-	protected ConstantType lOperandType;
-	
-	protected ConstantType rOperandType;
-	
-	protected Object constantReturnValue;
-	
-	{
-		expressionType = ExpressionType.ARITHMETIC;
-	}
+public abstract class AbstractArithmeticExpression
+    extends AbstractOperationExpression {
 
-	
-	public AbstractArithmeticExpression(ArithmeticOperator operator, Operand lOperand, Operand rOperand) {
-		super(OperatorType.BINARY, operator, lOperand, rOperand);
-		initializeArithmetic();
-	}
-	
-	protected void initializeArithmetic() {
-		Number lNumber = null;
-		Number rNumber = null;
-		if (lOperand.isConstantReturn()) {
-			lNumber = getNumber(lOperand, null);
-			lOperandType = getConstantType(lNumber);
-		}
-		if (rOperand.isConstantReturn()) {
-			rNumber = getNumber(rOperand, null);
-			rOperandType = getConstantType(rNumber);
-		}
-		if (lOperandType != null 
-				&& rOperandType != null) {
-			constantReturn = true;
-			constantReturnValue = calc(lNumber, rNumber, detemineReturnType(lOperandType, rOperandType));
-		}
-	}
-	
-	protected Number getNumber(Operand operand ,EntityMap entityMap) {
-		Object obj = operand.operate(entityMap);
-		if (obj == null)
-			return null;
-		if (obj instanceof Number)
-			return (Number)obj;
-		if (obj instanceof NumberConvertable) {
-			return ((NumberConvertable)obj).toNumber();
-		}
-		throw new IllegalArgumentException(
-				StringFormater.format("Operand '{}' is not a number!", operand.toString()));
-	}
-	
-	protected ConstantType getConstantType(Number number) {
-		if (number instanceof Float 
-				|| number instanceof Double)
-			return ConstantType.DOUBLE;
-		
-		return ConstantType.LONG;
-	}
-	
-	protected ConstantType detemineReturnType(ConstantType lOperandType, ConstantType rOperandType) {
-		if (lOperandType == ConstantType.DOUBLE 
-				|| rOperandType == ConstantType.DOUBLE)
-			return ConstantType.DOUBLE;
-		return ConstantType.LONG;
-	}
-	
-	@Override
-	public Object operate(EntityMap entityMap) {
-		// TODO Auto-generated method stub
-		if (constantReturn)
-			return constantReturnValue;
-		Number lNumber = getNumber(lOperand, entityMap);
-		Number rNumber = getNumber(rOperand, entityMap);
-		if (lNumber == null || rNumber == null)
-			return null;
-		ConstantType lOperandType = getConstantType(lNumber, this.lOperandType);
-		ConstantType rOperandType = getConstantType(rNumber, this.rOperandType);
-		return calc(lNumber, rNumber, detemineReturnType(lOperandType, rOperandType));
-	}
-	
-	protected ConstantType getConstantType(Number number, ConstantType initializedType) {
-		if (initializedType != null)
-			return initializedType;
-		return getConstantType(number);
-	}
-	
-	protected abstract Object calc(Number lNumber, Number rNumber, ConstantType returnType);
-	
-	protected Object convertReturnValue(double ret, ConstantType returnType) {
-		if (returnType == ConstantType.DOUBLE)
-			return ret;
-		else
-			return Double.valueOf(ret).longValue();
-	}
-	
+  protected ConstantType lOperandType;
+
+  protected ConstantType rOperandType;
+
+  protected Object constantReturnValue;
+
+  {
+    expressionType = ExpressionType.ARITHMETIC;
+  }
+
+  public AbstractArithmeticExpression(ArithmeticOperator operator,
+      Operand lOperand, Operand rOperand) {
+    super(OperatorType.BINARY, operator, lOperand, rOperand);
+    initializeArithmetic();
+  }
+
+  protected void initializeArithmetic() {
+    Number lNumber = null;
+    Number rNumber = null;
+    if (lOperand.isConstantReturn()) {
+      lNumber = getNumber(lOperand, lOperand.operate((EntityMap) null));
+      lOperandType = getConstantType(lNumber);
+    }
+    if (rOperand.isConstantReturn()) {
+      rNumber = getNumber(rOperand, rOperand.operate((EntityMap) null));
+      rOperandType = getConstantType(rNumber);
+    }
+    if (lOperandType != null && rOperandType != null) {
+      constantReturn = true;
+      constantReturnValue = calc(lNumber, rNumber,
+          detemineReturnType(lOperandType, rOperandType));
+    }
+  }
+
+  protected Number getNumber(Operand operand, Object obj) {
+    if (obj == null)
+      return null;
+    if (obj instanceof Number)
+      return (Number) obj;
+    if (obj instanceof NumberConvertable) {
+      return ((NumberConvertable) obj).toNumber();
+    }
+    throw new IllegalArgumentException(StringFormater
+        .format("Operand '{}' is not a number!", operand.toString()));
+  }
+
+  protected ConstantType getConstantType(Number number) {
+    if (number instanceof Float || number instanceof Double)
+      return ConstantType.DOUBLE;
+
+    return ConstantType.LONG;
+  }
+
+  protected ConstantType detemineReturnType(ConstantType lOperandType,
+      ConstantType rOperandType) {
+    if (lOperandType == ConstantType.DOUBLE
+        || rOperandType == ConstantType.DOUBLE)
+      return ConstantType.DOUBLE;
+    return ConstantType.LONG;
+  }
+
+  @Override
+  public Object operate(EntityMap entityMap) {
+    // TODO Auto-generated method stub
+    if (constantReturn)
+      return constantReturnValue;
+    Object lNum = lOperand.operate(entityMap);
+    Object rNum = rOperand.operate(entityMap);
+    Number lNumber = getNumber(lOperand, lNum);
+    Number rNumber = getNumber(rOperand, rNum);
+    if (lNumber == null || rNumber == null)
+      return null;
+    ConstantType lOperandType = getConstantType(lNumber, this.lOperandType);
+    ConstantType rOperandType = getConstantType(rNumber, this.rOperandType);
+    return calc(lNumber, rNumber,
+        detemineReturnType(lOperandType, rOperandType));
+  }
+
+  protected ConstantType getConstantType(Number number,
+      ConstantType initializedType) {
+    if (initializedType != null)
+      return initializedType;
+    return getConstantType(number);
+  }
+
+  protected abstract Object calc(Number lNumber, Number rNumber,
+      ConstantType returnType);
+
+  protected Object convertReturnValue(double ret, ConstantType returnType) {
+    if (returnType == ConstantType.DOUBLE)
+      return ret;
+    else
+      return Double.valueOf(ret).longValue();
+  }
+
+  @Override
+  public Object operate(Object[] entityArray) {
+    if (constantReturn)
+      return constantReturnValue;
+    Object lNum = lOperand.operate(entityArray);
+    Object rNum = rOperand.operate(entityArray);
+    Number lNumber = getNumber(lOperand, lNum);
+    Number rNumber = getNumber(rOperand, rNum);
+    if (lNumber == null || rNumber == null)
+      return null;
+    ConstantType lOperandType = getConstantType(lNumber, this.lOperandType);
+    ConstantType rOperandType = getConstantType(rNumber, this.rOperandType);
+    return calc(lNumber, rNumber,
+        detemineReturnType(lOperandType, rOperandType));
+  }
 }

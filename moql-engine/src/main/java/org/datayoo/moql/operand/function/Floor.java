@@ -46,16 +46,25 @@ public class Floor extends AbstractFunction {
 	protected Object innerOperate(EntityMap entityMap) {
 		// TODO Auto-generated method stub
 		Object obj = operand.operate(entityMap);
+		return innerOperateProc(obj);
+	}
+
+	protected Object innerOperateProc(Object obj) {
 		if (obj == null)
-		  return null;
+			return null;
 		double val = 0;
-    if (obj instanceof Number) {
-      Number num = (Number)obj;
-      val = num.doubleValue();
-    } else {
-      val = Double.valueOf(obj.toString());
-    }
+		if (obj instanceof Number) {
+			Number num = (Number)obj;
+			val = num.doubleValue();
+		} else {
+			val = Double.valueOf(obj.toString());
+		}
 		return (long)val;
 	}
 
+	@Override
+	protected Object innerOperate(Object[] entityArray) {
+		Object obj = operand.operate(entityArray);
+		return innerOperateProc(obj);
+	}
 }

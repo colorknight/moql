@@ -17,10 +17,7 @@
  */
 package org.datayoo.moql.operand.function;
 
-import org.datayoo.moql.EntityMap;
-import org.datayoo.moql.Operand;
-import org.datayoo.moql.OperandType;
-import org.datayoo.moql.SelectorConstants;
+import org.datayoo.moql.*;
 import org.datayoo.moql.operand.AbstractOperand;
 import org.datayoo.moql.util.StringFormater;
 
@@ -28,9 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author Tang Tadin
- *
  */
 public abstract class AbstractFunction extends AbstractOperand
     implements Function {
@@ -126,6 +121,27 @@ public abstract class AbstractFunction extends AbstractOperand
   }
 
   protected abstract Object innerOperate(EntityMap entityMap);
+
+  @Override
+  public void bind(String[] entityNames) {
+    for (Operand parameter : this.parameters) {
+      parameter.bind(entityNames);
+    }
+    this.binded = true;
+  }
+
+  @Override
+  public Object operate(Object[] entityArray) {
+    if (constantReturn) {
+      if (constantReturnValue == this) {
+        constantReturnValue = innerOperate(entityArray);
+      }
+      return constantReturnValue;
+    }
+    return innerOperate(entityArray);
+  }
+
+  protected abstract Object innerOperate(Object[] entityArray);
 
   @Override
   public FunctionType getFunctionType() {

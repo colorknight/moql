@@ -69,6 +69,25 @@ public class TestOperand extends TestCase {
     }
   }
 
+  public void testEnhanceVariable() {
+    String[] names = new String[] { "num", "长度", "$a", "_data" };
+    Object[] data = new Object[] { 123, 184, 38, 32 };
+    try {
+      Operand variable = MoqlEngine.createOperand("num");
+      variable.bind(names);
+      System.out.println(variable.operate(data));
+      variable = MoqlEngine.createOperand("长度");
+      variable.bind(names);
+      System.out.println(variable.operate(data));
+      variable = MoqlEngine.createOperand("$a");
+      variable.bind(names);
+      System.out.println(variable.operate(data));
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   public void testFunction() {
     EntityMap entityMap = new EntityMapImpl();
     entityMap.putEntity("num", 123);
@@ -90,6 +109,26 @@ public class TestOperand extends TestCase {
       function = MoqlEngine.createOperand("trunc(13/15,2)");
       System.out.println(function.toString() + " " + function.getOperandType());
       System.out.println(function.operate(entityMap));
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  public void testEnhanceFunction() {
+    String[] names = new String[] { "num" };
+    Object[] data = new Object[] { 123 };
+    try {
+      Operand function = MoqlEngine.createOperand("max(num)");
+      function.bind(names);
+      System.out.println(function.operate(data));
+      data = new Object[] { 345 };
+      System.out.println(function.operate(data));
+      function.clear();
+      data = new Object[] { 12 };
+      System.out.println(function.operate(data));
+      function = MoqlEngine.createOperand("trunc(13/15,2)");
+      System.out.println(function.operate(data));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -127,6 +166,31 @@ public class TestOperand extends TestCase {
     }
   }
 
+  public void testEnhanceArithmeticExpression() {
+    String[] names = new String[] { "num", "num1", "num2" };
+    Object[] data = new Object[] { 12, 3, 4 };
+    try {
+      Operand arithmetic = MoqlEngine
+          .createOperand("(num*num1) / num2 * 2.2 + 2 - 1");
+      arithmetic.bind(names);
+      System.out.println(arithmetic.operate(data));
+
+      Operand arithmetic3 = MoqlEngine.createOperand("6+ 5*2");
+      System.out
+          .println(arithmetic3.toString() + " " + arithmetic3.operate(data));
+      arithmetic = MoqlEngine.createOperand("num + 21");
+      arithmetic.bind(names);
+      System.out.println(arithmetic.operate(data));
+      arithmetic = MoqlEngine.createOperand("num + num1 + num2");
+      arithmetic.bind(names);
+      System.out
+          .println(arithmetic.toString() + " " + arithmetic.operate(data));
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   public void testBitwiseExpression() {
     EntityMap entityMap = new EntityMapImpl();
     entityMap.putEntity("num", 2);
@@ -148,9 +212,32 @@ public class TestOperand extends TestCase {
     }
   }
 
+  public void testEhanceBitwiseExpression() {
+    String[] names = new String[] { "num", "num1", "num2" };
+    Object[] data = new Object[] { 2, 3, 4 };
+    try {
+      Operand arithmetic = MoqlEngine.createOperand(" num << num1 + 1");
+      arithmetic.bind(names);
+      System.out
+          .println(arithmetic.toString() + " = " + arithmetic.operate(data));
+      arithmetic = MoqlEngine.createOperand("num2 | num1 & num");
+      arithmetic.bind(names);
+      System.out
+          .println(arithmetic.toString() + " = " + arithmetic.operate(data));
+      arithmetic = MoqlEngine.createOperand("~num2 ^ num2");
+      arithmetic.bind(names);
+      System.out
+          .println(arithmetic.toString() + " = " + arithmetic.operate(data));
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   public void testMemberExpression() {
     EntityMap entityMap = new EntityMapImpl();
     entityMap.putEntity("bean", new BeanA("bean", 5));
+    entityMap.putEntity("ary", new String[] { "1", "2" });
     try {
       Operand member = MoqlEngine.createOperand("bean.name");
       System.out.println(member.toString() + " " + member.getOperandType());
@@ -160,6 +247,24 @@ public class TestOperand extends TestCase {
       System.out.println(member.operate(entityMap));
       member = MoqlEngine.createOperand("bean.getNum().getX()");
       System.out.println(member.toString() + " " + member.getOperandType());
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  public void testEhanceMemberExpression() {
+    String[] names = new String[] { "bean", "ary" };
+    Object[] data = new Object[] { new BeanA("bean", 5),
+        new String[] { "1", "2" }
+    };
+    try {
+      Operand member = MoqlEngine.createOperand("bean.name");
+      member.bind(names);
+      System.out.println(member.operate(data));
+      member = MoqlEngine.createOperand("bean.getNum()");
+      member.bind(names);
+      System.out.println(member.operate(data));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -188,12 +293,36 @@ public class TestOperand extends TestCase {
     }
   }
 
+  public void testEhanceArrayExpression() {
+    String[] names = new String[] { "bean" };
+    Object[] data = new Object[] { BeanFactory.createMapList(5)
+    };
+    try {
+      Operand member = MoqlEngine.createOperand("bean[2]['value']");
+      member.bind(names);
+      System.out.println(member.operate(data));
+      member = MoqlEngine.createOperand("bean[]");
+      member.bind(names);
+      System.out.println(member.operate(data));
+      member = MoqlEngine.createOperand("bean[4]['bean'].num");
+      member.bind(names);
+      System.out.println(member.operate(data));
+      member = MoqlEngine.createOperand("bean[4]['bean'].getArray()[5]");
+      member.bind(names);
+      System.out.println(member.operate(data));
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public void testOperandsExpression() {
     try {
       Operand operand = MoqlEngine.createOperand("(1, 2, 3)");
       System.out.println(operand.toString() + " " + operand.getOperandType());
-      List<Operand> operands = (List<Operand>) operand.operate(null);
+      List<Operand> operands = (List<Operand>) operand
+          .operate((EntityMap) null);
       System.out.println(operands.size());
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
@@ -223,7 +352,8 @@ public class TestOperand extends TestCase {
     try {
       Operand operand = MoqlEngine.createOperand("[1, 2}");
       System.out.println(operand.toString() + " " + operand.getOperandType());
-      List<Operand> operands = (List<Operand>) operand.operate(null);
+      List<Operand> operands = (List<Operand>) operand
+          .operate((EntityMap) null);
       System.out.println(operands.size());
     } catch (MoqlException e) {
       // TODO Auto-generated catch block

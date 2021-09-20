@@ -26,9 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
  * @author Tang Tadin
- *
  */
 public class Count extends AggregationFunction {
 
@@ -49,7 +47,7 @@ public class Count extends AggregationFunction {
       throw new IllegalArgumentException(
           StringFormater.format("Function '{}' need 1 or 2 parameters!", name));
     if (parameters.size() == 2) {
-      Object object = parameters.get(1).operate(null);
+      Object object = parameters.get(1).operate((EntityMap) null);
       if (object instanceof Boolean) {
         distinct = ((Boolean) (object)).booleanValue();
       } else {
@@ -68,6 +66,19 @@ public class Count extends AggregationFunction {
       count++;
     else {
       Object value = operand.operate(entityMap);
+      if (cache.add(value)) {
+        count++;
+      }
+    }
+  }
+
+  @Override
+  public void increment(Object[] entityArray) {
+    // TODO Auto-generated method stub
+    if (!distinct)
+      count++;
+    else {
+      Object value = operand.operate(entityArray);
       if (cache.add(value)) {
         count++;
       }

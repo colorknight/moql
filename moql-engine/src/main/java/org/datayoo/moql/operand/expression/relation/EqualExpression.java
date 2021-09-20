@@ -23,9 +23,7 @@ import org.datayoo.moql.metadata.OperatorType;
 import org.datayoo.moql.util.CompareHelper;
 
 /**
- *
  * @author Tang Tadin
- *
  */
 public class EqualExpression extends AbstractRelationExpression {
 
@@ -53,4 +51,15 @@ public class EqualExpression extends AbstractRelationExpression {
     return booleanOperate(entityMap);
   }
 
+  @Override
+  public Object operate(Object[] entityArray) {
+    Object lValue = lOperand.operate(entityArray);
+    Object rValue = rOperand.operate(entityArray);
+    if (lValue == null && rValue == null)
+      return true;
+    else if (lValue == null || rValue == null)
+      return false;
+    int ret = CompareHelper.compare(lValue, rValue);
+    return ret == 0 ? true : false;
+  }
 }

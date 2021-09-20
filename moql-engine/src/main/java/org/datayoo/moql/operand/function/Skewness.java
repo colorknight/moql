@@ -54,6 +54,17 @@ public class Skewness extends AggregationFunction {
 	}
 
 	@Override
+	public void increment(Object[] entityArray) {
+		// TODO Auto-generated method stub
+		Object obj = operand.operate(entityArray);
+		if (obj == null) {
+			return;
+		}
+		Number num = toNumber(obj);
+		skewness.increment(num.doubleValue());
+	}
+
+	@Override
 	public Object getValue() {
 		// TODO Auto-generated method stub
 		return skewness.getResult();

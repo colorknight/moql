@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,33 +29,38 @@ import java.util.List;
 /**
  * @author Tang Tadin
  */
-public abstract class DecorateFunction extends AbstractFunction implements
-		RecordSetDecorator {
-	
-	{
-		functionType = FunctionType.DECORATE;
-	}
+public abstract class DecorateFunction extends AbstractFunction
+    implements RecordSetDecorator {
 
-	protected DecorateFunction(String name, int parameterCount,
-			List<Operand> parameters) {
-		super(name, parameterCount, parameters);
-		// TODO Auto-generated constructor stub
-	}
+  {
+    functionType = FunctionType.DECORATE;
+  }
 
-	public DecorateFunction(String name, List<Operand> parameters) {
-		super(name, parameters);
-		// TODO Auto-generated constructor stub
-	}
-	
-	protected void initializeFunction() {
-		functionString = buildFunctionString();
-	}
+  protected DecorateFunction(String name, int parameterCount,
+      List<Operand> parameters) {
+    super(name, parameterCount, parameters);
+    // TODO Auto-generated constructor stub
+  }
 
-	@Override
-	protected Object innerOperate(EntityMap entityMap) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("This method doesn't support in decorate function!");
-	}
+  public DecorateFunction(String name, List<Operand> parameters) {
+    super(name, parameters);
+    // TODO Auto-generated constructor stub
+  }
 
-	
+  protected void initializeFunction() {
+    functionString = buildFunctionString();
+  }
+
+  @Override
+  protected Object innerOperate(EntityMap entityMap) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException(
+        "This method doesn't support in decorate function!");
+  }
+
+  @Override
+  protected Object innerOperate(Object[] entityArray) {
+    throw new UnsupportedOperationException(
+        "This method doesn't support in decorate function!");
+  }
 }

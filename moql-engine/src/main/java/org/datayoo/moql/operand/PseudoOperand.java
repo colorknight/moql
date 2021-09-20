@@ -92,4 +92,18 @@ public class PseudoOperand implements Operand, OperandSourceAware {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
+	public void bind(String[] entityNames) {
+
+	}
+
+	@Override
+	public boolean isBinded() {
+		return false;
+	}
+
+	@Override
+	public Object operate(Object[] entityArray) {
+		return null;
+	}
 }

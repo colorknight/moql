@@ -44,6 +44,10 @@ public class Tan extends AbstractFunction {
   protected Object innerOperate(EntityMap entityMap) {
     // TODO Auto-generated method stub
     Object obj = operand.operate(entityMap);
+    return innerOperateProc(obj);
+  }
+
+  protected Object innerOperateProc(Object obj) {
     if (obj == null)
       return null;
     double val = 0;
@@ -56,4 +60,9 @@ public class Tan extends AbstractFunction {
     return Math.tan(val);
   }
 
+  @Override
+  protected Object innerOperate(Object[] entityArray) {
+    Object obj = operand.operate(entityArray);
+    return innerOperateProc(obj);
+  }
 }

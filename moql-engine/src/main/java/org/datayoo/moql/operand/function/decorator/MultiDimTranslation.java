@@ -1,9 +1,6 @@
 package org.datayoo.moql.operand.function.decorator;
 
-import org.datayoo.moql.ColumnDefinition;
-import org.datayoo.moql.Operand;
-import org.datayoo.moql.RecordSet;
-import org.datayoo.moql.RecordSetDefinition;
+import org.datayoo.moql.*;
 import org.datayoo.moql.core.Column;
 import org.datayoo.moql.core.Columns;
 import org.datayoo.moql.core.RecordSetImpl;
@@ -41,17 +38,17 @@ public class MultiDimTranslation extends DecorateFunction {
       throw new IllegalArgumentException(
           "Invalid function format! The format should be 'multiDimTranslation(xAxisColumns, yAxisColumns, measureColumns)'");
     }
-    String parameter = (String) parameters.get(0).operate(null);
+    String parameter = (String) parameters.get(0).operate((EntityMap) null);
     if (parameter != null) {
       xAxises = parameter.split(",");
       trim(xAxises);
     }
-    parameter = (String) parameters.get(1).operate(null);
+    parameter = (String) parameters.get(1).operate((EntityMap) null);
     if (parameter != null) {
       yAxises = parameter.split(",");
       trim(yAxises);
     }
-    parameter = (String) parameters.get(2).operate(null);
+    parameter = (String) parameters.get(2).operate((EntityMap) null);
     if (parameter == null || parameter.isEmpty())
       throw new IllegalArgumentException("measureColumns are empty!");
     measures = parameter.split(",");
@@ -87,7 +84,8 @@ public class MultiDimTranslation extends DecorateFunction {
     }
   }
 
-  @Override public RecordSet decorate(RecordSet recordSet, Columns columns) {
+  @Override
+  public RecordSet decorate(RecordSet recordSet, Columns columns) {
     initializeColumnIndexes(recordSet, columns);
     RecordSetMetadata recordSetMetadata = buildRecordSetMetadata(recordSet);
     return buildRecordSet(recordSet, recordSetMetadata);

@@ -63,7 +63,7 @@ public class OtherCaculation extends DecorateFunction {
     int i = 0;
     OtherAlias lastOtherAlias = null;
     for (Operand parameter : parameters) {
-      Object obj = parameter.operate(null);
+      Object obj = parameter.operate((EntityMap)null);
       String value = null;
       if (obj != null) {
         value = obj.toString();

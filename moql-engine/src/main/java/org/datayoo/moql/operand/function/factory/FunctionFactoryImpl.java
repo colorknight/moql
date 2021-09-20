@@ -87,29 +87,29 @@ public class FunctionFactoryImpl implements FunctionFactory {
     functionMap.put(Floor.FUNCTION_NAME.toLowerCase(),
         new FunctionBean(Floor.FUNCTION_NAME, Floor.class.getName(), true));
     functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
-        new FunctionBean(Trunc.FUNCTION_NAME, Trunc.class.getName(), true));
-    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
-        new FunctionBean(Trunc.FUNCTION_NAME, Round.class.getName(), true));
-    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
-        new FunctionBean(Trunc.FUNCTION_NAME, Abs.class.getName(), true));
-    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
-        new FunctionBean(Trunc.FUNCTION_NAME, Cbrt.class.getName(), true));
-    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
-        new FunctionBean(Trunc.FUNCTION_NAME, Cos.class.getName(), true));
-    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
-        new FunctionBean(Trunc.FUNCTION_NAME, Exp.class.getName(), true));
-    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
-        new FunctionBean(Trunc.FUNCTION_NAME, Log.class.getName(), true));
-    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
-        new FunctionBean(Trunc.FUNCTION_NAME, Log10.class.getName(), true));
-    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
-        new FunctionBean(Trunc.FUNCTION_NAME, Pow.class.getName(), true));
-    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
-        new FunctionBean(Trunc.FUNCTION_NAME, Sin.class.getName(), true));
-    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
-        new FunctionBean(Trunc.FUNCTION_NAME, Sqrt.class.getName(), true));
-    functionMap.put(Trunc.FUNCTION_NAME.toLowerCase(),
-        new FunctionBean(Trunc.FUNCTION_NAME, Tan.class.getName(), true));
+        new FunctionBean(Round.FUNCTION_NAME, Trunc.class.getName(), true));
+    functionMap.put(Round.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Round.FUNCTION_NAME, Round.class.getName(), true));
+    functionMap.put(Abs.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Abs.FUNCTION_NAME, Abs.class.getName(), true));
+    functionMap.put(Cbrt.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Cbrt.FUNCTION_NAME, Cbrt.class.getName(), true));
+    functionMap.put(Cos.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Cos.FUNCTION_NAME, Cos.class.getName(), true));
+    functionMap.put(Exp.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Exp.FUNCTION_NAME, Exp.class.getName(), true));
+    functionMap.put(Log.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Log.FUNCTION_NAME, Log.class.getName(), true));
+    functionMap.put(Log10.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Log10.FUNCTION_NAME, Log10.class.getName(), true));
+    functionMap.put(Pow.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Pow.FUNCTION_NAME, Pow.class.getName(), true));
+    functionMap.put(Sin.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Sin.FUNCTION_NAME, Sin.class.getName(), true));
+    functionMap.put(Sqrt.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Sqrt.FUNCTION_NAME, Sqrt.class.getName(), true));
+    functionMap.put(Tan.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Tan.FUNCTION_NAME, Tan.class.getName(), true));
     functionMap.put(GroupOrdinal.FUNCTION_NAME.toLowerCase(),
         new FunctionBean(GroupOrdinal.FUNCTION_NAME,
             GroupOrdinal.class.getName(), true));

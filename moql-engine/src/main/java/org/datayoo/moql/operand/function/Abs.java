@@ -44,6 +44,10 @@ public class Abs extends AbstractFunction {
   protected Object innerOperate(EntityMap entityMap) {
     // TODO Auto-generated method stub
     Object obj = operand.operate(entityMap);
+    return innerOperateProc(obj);
+  }
+
+  protected Object innerOperateProc(Object obj) {
     if (obj == null)
       return null;
     if (obj instanceof Double || obj instanceof Float) {
@@ -65,4 +69,9 @@ public class Abs extends AbstractFunction {
     }
   }
 
+  @Override
+  protected Object innerOperate(Object[] entityArray) {
+    Object obj = operand.operate(entityArray);
+    return innerOperateProc(obj);
+  }
 }

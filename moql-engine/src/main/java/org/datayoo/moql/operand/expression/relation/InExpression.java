@@ -75,7 +75,8 @@ public class InExpression extends AbstractRelationExpression {
     }
   }
 
-  @Override public boolean booleanOperate(EntityMap entityMap) {
+  @Override
+  public boolean booleanOperate(EntityMap entityMap) {
     // TODO Auto-generated method stub
     Object lValue = lOperand.operate(entityMap);
     if (lValue == null)
@@ -104,7 +105,8 @@ public class InExpression extends AbstractRelationExpression {
     return false;
   }
 
-  @Override public Object operate(EntityMap entityMap) {
+  @Override
+  public Object operate(EntityMap entityMap) {
     // TODO Auto-generated method stub
     return booleanOperate(entityMap);
   }
@@ -113,4 +115,32 @@ public class InExpression extends AbstractRelationExpression {
     return rOperands;
   }
 
+  @Override
+  public Object operate(Object[] entityArray) {
+    Object lValue = lOperand.operate(entityArray);
+    if (lValue == null)
+      return false;
+    if (rValues != null) {
+      return rValues.contains(lValue);
+    } else {
+      for (Operand rOperand : rOperands) {
+        int ret = 0;
+        Object rValue = rOperand.operate(entityArray);
+        if (rValue == null)
+          continue;
+        if (ArrayExpressionUtils.isArray(rValue)) {
+          for (Object obj : ArrayExpressionUtils.toOperandContextList(rValue)) {
+            ret = CompareHelper.compare(lValue, obj);
+            if (ret == 0)
+              return true;
+          }
+        } else {
+          ret = CompareHelper.compare(lValue, rValue);
+          if (ret == 0)
+            return true;
+        }
+      }
+    }
+    return false;
+  }
 }

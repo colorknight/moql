@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,41 +25,48 @@ import org.datayoo.moql.Selector;
 import org.datayoo.moql.operand.AbstractOperand;
 
 /**
- * 
  * @author Tang Tadin
- *
  */
 public class ValueSelectorOperand extends AbstractOperand {
 
-	{
-		operandType = OperandType.COLUMNSELECTOR;
-	}
-	
-	protected Selector valueSelector;
-	
-	public ValueSelectorOperand(Selector valueSelector) {
-		Validate.notNull(valueSelector, "Parameter 'valueSelector' is null!");
-		this.valueSelector = valueSelector;
-	}
-	
-	@Override
-	public Object operate(EntityMap entityMap) {
-		// TODO Auto-generated method stub
-		RecordSet recordSet = valueSelector.getRecordSet();
-		if (recordSet.getRecordsCount() == 0)
-			return null;
-		Object[] record = recordSet.getRecord(0);
-		return record[0];
-	}
+  {
+    operandType = OperandType.COLUMNSELECTOR;
+  }
 
-	@Override
-	public void clear() {
-		// TODO Auto-generated method stub
-		valueSelector.clear();
-	}
+  protected Selector valueSelector;
 
-	public Selector getValueSelector() {
-		return valueSelector;
-	}
+  public ValueSelectorOperand(Selector valueSelector) {
+    Validate.notNull(valueSelector, "Parameter 'valueSelector' is null!");
+    this.valueSelector = valueSelector;
+  }
 
+  @Override
+  public Object operate(EntityMap entityMap) {
+    // TODO Auto-generated method stub
+    RecordSet recordSet = valueSelector.getRecordSet();
+    if (recordSet.getRecordsCount() == 0)
+      return null;
+    Object[] record = recordSet.getRecord(0);
+    return record[0];
+  }
+
+  @Override
+  public void clear() {
+    // TODO Auto-generated method stub
+    valueSelector.clear();
+  }
+
+  public Selector getValueSelector() {
+    return valueSelector;
+  }
+
+  @Override
+  public Object operate(Object[] entityArray) {
+    throw new UnsupportedOperationException("");
+  }
+
+  @Override
+  public void bind(String[] entityNames) {
+    throw new UnsupportedOperationException("");
+  }
 }

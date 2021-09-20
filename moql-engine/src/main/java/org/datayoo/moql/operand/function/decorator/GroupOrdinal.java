@@ -18,6 +18,7 @@
 
 package org.datayoo.moql.operand.function.decorator;
 
+import org.datayoo.moql.EntityMap;
 import org.datayoo.moql.Operand;
 import org.datayoo.moql.RecordSet;
 import org.datayoo.moql.RecordSetDefinition;
@@ -51,11 +52,11 @@ public class GroupOrdinal extends DecorateFunction {
 	public GroupOrdinal(List<Operand> parameters) {
 		super(FUNCTION_NAME, 2, parameters);
 		// TODO Auto-generated constructor stub
-		String groupColumnsString = (String)parameters.get(0).operate(null);
+		String groupColumnsString = (String)parameters.get(0).operate((EntityMap) null);
 		if (groupColumnsString == null || groupColumnsString.isEmpty())
 			throw new IllegalArgumentException("groupColumns is empty!");
 		groupColumns = groupColumnsString.split(",");
-		valueColumn = (String)parameters.get(1).operate(null);
+		valueColumn = (String)parameters.get(1).operate((EntityMap)null);
 		if (valueColumn == null || valueColumn.isEmpty()) {
 			throw new IllegalArgumentException("valueColumn is empty!");
 		}

@@ -37,7 +37,7 @@ public class Pow extends AbstractFunction {
     super(FUNCTION_NAME, 1, parameters);
     // TODO Auto-generated constructor stub
     operand = parameters.get(0);
-    Object object = parameters.get(1).operate(null);
+    Object object = parameters.get(1).operate((EntityMap) null);
     if (object instanceof Number) {
       Number num = (Number) object;
       power = num.doubleValue();
@@ -54,6 +54,10 @@ public class Pow extends AbstractFunction {
   protected Object innerOperate(EntityMap entityMap) {
     // TODO Auto-generated method stub
     Object obj = operand.operate(entityMap);
+    return innerOperateProc(obj);
+  }
+
+  protected Object innerOperateProc(Object obj) {
     if (obj == null)
       return null;
     double val = 0;
@@ -66,4 +70,9 @@ public class Pow extends AbstractFunction {
     return Math.pow(val, power);
   }
 
+  @Override
+  protected Object innerOperate(Object[] entityArray) {
+    Object obj = operand.operate(entityArray);
+    return innerOperateProc(obj);
+  }
 }

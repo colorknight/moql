@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,51 +24,62 @@ import org.datayoo.moql.util.StringFormater;
 import java.util.List;
 
 /**
- * 
  * @author Tang Tadin
- *
  */
 public class Joint extends AggregationFunction {
 
-	public static final String FUNCTION_NAME = "joint";
+  public static final String FUNCTION_NAME = "joint";
 
-	protected Operand operand;
+  protected Operand operand;
 
-	protected String separator;
+  protected String separator;
 
-	protected StringBuffer sbuf;
+  protected StringBuffer sbuf;
 
-	public Joint(List<Operand> parameters) {
-		super(FUNCTION_NAME, VARIANT_PARAMETERS, parameters);
-		// TODO Auto-generated constructor stub
-		if (this.parameters.size() > 2)
-			throw new IllegalArgumentException(StringFormater.format(
-					"Function '{}' need 1 or 2 parameters!", name));
-		operand = parameters.get(0);
-		if (parameters.size() == 2) {
-			separator = (String)parameters.get(1).operate(null);
-		}
-	}
+  public Joint(List<Operand> parameters) {
+    super(FUNCTION_NAME, VARIANT_PARAMETERS, parameters);
+    // TODO Auto-generated constructor stub
+    if (this.parameters.size() > 2)
+      throw new IllegalArgumentException(
+          StringFormater.format("Function '{}' need 1 or 2 parameters!", name));
+    operand = parameters.get(0);
+    if (parameters.size() == 2) {
+      separator = (String) parameters.get(1).operate((EntityMap) null);
+    }
+  }
 
-	@Override
-	public void increment(EntityMap entityMap) {
-		// TODO Auto-generated method stub
-		Object obj = operand.operate(entityMap);
-		if (obj == null)
-			return;
-		if (sbuf.length() != 0 && separator != null) {
-			sbuf.append(separator);
-		}
-		sbuf.append(obj.toString());
-	}
+  @Override
+  public void increment(EntityMap entityMap) {
+    // TODO Auto-generated method stub
+    Object obj = operand.operate(entityMap);
+    if (obj == null)
+      return;
+    if (sbuf.length() != 0 && separator != null) {
+      sbuf.append(separator);
+    }
+    sbuf.append(obj.toString());
+  }
 
-	@Override
-	public Object getValue() {
-		// TODO Auto-generated method stub
-		return sbuf.toString();
-	}
+  @Override
+  public void increment(Object[] entityArray) {
+    // TODO Auto-generated method stub
+    Object obj = operand.operate(entityArray);
+    if (obj == null)
+      return;
+    if (sbuf.length() != 0 && separator != null) {
+      sbuf.append(separator);
+    }
+    sbuf.append(obj.toString());
+  }
 
-	@Override public void clear() {
-		sbuf = new StringBuffer();
-	}
+  @Override
+  public Object getValue() {
+    // TODO Auto-generated method stub
+    return sbuf.toString();
+  }
+
+  @Override
+  public void clear() {
+    sbuf = new StringBuffer();
+  }
 }
