@@ -39,7 +39,7 @@ public class SemiVariance extends AggregationFunction {
   protected List<Double> numbers = new LinkedList<Double>();
 
   public SemiVariance(List<Operand> parameters) {
-    super(FUNCTION_NAME, 1, parameters);
+    super(FUNCTION_NAME, -1, parameters);
     // TODO Auto-generated constructor stub
     if (parameters.size() == 0 || parameters.size() > 3) {
       throw new IllegalArgumentException(
