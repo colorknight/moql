@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,6 @@ import org.datayoo.moql.operand.function.AggregationFunction;
 import org.datayoo.moql.operand.function.Count;
 import org.datayoo.moql.operand.function.Sum;
 import org.datayoo.moql.operand.function.factory.FunctionFactory;
-import org.datayoo.moql.operand.function.factory.FunctionFactoryImpl;
 import org.datayoo.moql.operand.variable.SingleVariable;
 
 import java.util.LinkedList;
@@ -55,7 +54,6 @@ public class OtherCaculation extends DecorateFunction {
     initializeOtherAlias();
     groupIndexes = new int[otherAliases.length];
     otherRecords = new OtherRecord[otherAliases.length];
-    functionFactory = FunctionFactoryImpl.createFunctionFactory();
   }
 
   protected void initializeOtherAlias() {
@@ -63,7 +61,7 @@ public class OtherCaculation extends DecorateFunction {
     int i = 0;
     OtherAlias lastOtherAlias = null;
     for (Operand parameter : parameters) {
-      Object obj = parameter.operate((EntityMap)null);
+      Object obj = parameter.operate((EntityMap) null);
       String value = null;
       if (obj != null) {
         value = obj.toString();
@@ -106,7 +104,8 @@ public class OtherCaculation extends DecorateFunction {
     initializeOtherRecords(recordSetDefinition, columns);
   }
 
-  protected void initializeGroupIndexes(RecordSetDefinition recordSetDefinition) {
+  protected void initializeGroupIndexes(
+      RecordSetDefinition recordSetDefinition) {
     List<ColumnDefinition> columnDefinitions = recordSetDefinition
         .getGroupColumns();
     if (columnDefinitions.size() == 0 && otherAliases.length != 1) {
@@ -121,8 +120,8 @@ public class OtherCaculation extends DecorateFunction {
     }
   }
 
-  protected void initializeOtherRecords(
-      RecordSetDefinition recordSetDefinition, Columns columns) {
+  protected void initializeOtherRecords(RecordSetDefinition recordSetDefinition,
+      Columns columns) {
     for (int i = 0; i < otherRecords.length; i++) {
       if (otherAliases[i] != null) {
         otherRecords[i] = new OtherRecord(i + 1, columns.getColumns().size(),
@@ -287,7 +286,7 @@ public class OtherCaculation extends DecorateFunction {
     protected void fillGroups(Object[] record) {
       int i = 0;
       if (groups != null) {
-        for (; i < groups.length-1; i++) {
+        for (; i < groups.length - 1; i++) {
           record[groupIndexes[i]] = groups[i];
         }
       }

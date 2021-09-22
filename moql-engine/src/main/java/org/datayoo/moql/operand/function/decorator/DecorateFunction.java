@@ -23,6 +23,7 @@ import org.datayoo.moql.Operand;
 import org.datayoo.moql.core.RecordSetDecorator;
 import org.datayoo.moql.operand.function.AbstractFunction;
 import org.datayoo.moql.operand.function.FunctionType;
+import org.datayoo.moql.operand.function.factory.FunctionFactory;
 
 import java.util.List;
 
@@ -35,6 +36,8 @@ public abstract class DecorateFunction extends AbstractFunction
   {
     functionType = FunctionType.DECORATE;
   }
+
+  protected FunctionFactory functionFactory;
 
   protected DecorateFunction(String name, int parameterCount,
       List<Operand> parameters) {
@@ -62,5 +65,9 @@ public abstract class DecorateFunction extends AbstractFunction
   protected Object innerOperate(Object[] entityArray) {
     throw new UnsupportedOperationException(
         "This method doesn't support in decorate function!");
+  }
+
+  public void setFunctionFactory(FunctionFactory functionFactory) {
+    this.functionFactory = functionFactory;
   }
 }

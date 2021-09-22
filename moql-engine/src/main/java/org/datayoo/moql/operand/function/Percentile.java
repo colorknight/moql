@@ -25,9 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
  * @author Tang Tadin
- *
  */
 public class Percentile extends AggregationFunction {
 
@@ -38,8 +36,7 @@ public class Percentile extends AggregationFunction {
   protected Set<Double> numbers = new HashSet<Double>();
 
   public Percentile(List<Operand> parameters) {
-    super(FUNCTION_NAME, parameters.size(), parameters);
-    // TODO Auto-generated constructor stub
+    super(FUNCTION_NAME, -1, parameters);
     if (parameters.size() == 0 || parameters.size() > 2) {
       throw new IllegalArgumentException(
           "Invalid format! The format is 'percentile(field [, p])'");
@@ -51,7 +48,6 @@ public class Percentile extends AggregationFunction {
 
   @Override
   public void increment(EntityMap entityMap) {
-    // TODO Auto-generated method stub
     if (percentile == null) {
       Object obj = parameters.get(1).operate(entityMap);
       Number num = toNumber(obj);

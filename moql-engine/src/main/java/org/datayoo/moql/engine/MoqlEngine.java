@@ -19,22 +19,17 @@ package org.datayoo.moql.engine;
 
 import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.*;
-import org.datayoo.moql.core.MoqlFactory;
 import org.datayoo.moql.core.factory.MoqlFactoryImpl;
 import org.datayoo.moql.metadata.ConditionMetadata;
-import org.datayoo.moql.operand.factory.OperandFactoryImpl;
 import org.datayoo.moql.parser.MoqlParser;
 import org.datayoo.moql.util.StringFormater;
 
 /**
- *
  * @author Tang Tadin
- *
  */
 public abstract class MoqlEngine {
 
-  protected static MoqlFactory moqlFactory = MoqlFactoryImpl
-      .createSelectorFactory();
+  protected static MoqlFactoryImpl moqlFactory = new MoqlFactoryImpl();
 
   public static Selector createSelector(SelectorDefinition selectorDefinition)
       throws MoqlException {
@@ -84,7 +79,7 @@ public abstract class MoqlEngine {
   public static Operand createOperand(String operand) throws MoqlException {
     Validate.notEmpty(operand, "Parameter 'operand' is empty!");
     try {
-      return OperandFactoryImpl.createOperandFactory().createOperand(operand);
+      return moqlFactory.getOperandFactory().createOperand(operand);
     } catch (Exception e) {
       // TODO Auto-generated catch block
       throw new MoqlException(
@@ -93,10 +88,10 @@ public abstract class MoqlEngine {
   }
 
   public static String registFunction(String name, String className) {
-    return OperandFactoryImpl.registFunction(name, className);
+    return moqlFactory.getOperandFactory().registFunction(name, className);
   }
 
   public static String unregistFunction(String name) {
-    return OperandFactoryImpl.unregistFunction(name);
+    return moqlFactory.getOperandFactory().unregistFunction(name);
   }
 }

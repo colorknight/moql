@@ -21,6 +21,7 @@ import org.datayoo.moql.*;
 import org.datayoo.moql.core.Column;
 import org.datayoo.moql.core.Columns;
 import org.datayoo.moql.core.RecordSetImpl;
+import org.datayoo.moql.core.factory.MoqlFactoryImpl;
 import org.datayoo.moql.operand.function.AggregationFunction;
 import org.datayoo.moql.operand.function.Count;
 import org.datayoo.moql.operand.function.Sum;
@@ -45,8 +46,6 @@ public class TotalCaculation extends DecorateFunction {
 
   protected TotalRecord[] totalRecords;
 
-  protected FunctionFactory functionFactory;
-
   protected boolean firstTime = true;
 
   public TotalCaculation(List<Operand> parameters) {
@@ -55,7 +54,6 @@ public class TotalCaculation extends DecorateFunction {
     initializeTotalAlias();
     groupIndexes = new int[totalAliases.length];
     totalRecords = new TotalRecord[totalAliases.length];
-    functionFactory = FunctionFactoryImpl.createFunctionFactory();
   }
 
   protected void initializeTotalAlias() {

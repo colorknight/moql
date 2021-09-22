@@ -37,8 +37,6 @@ public class FunctionFactoryImpl implements FunctionFactory {
 
   protected Map<String, FunctionBean> functionMap = new HashMap<String, FunctionBean>();
 
-  protected static FunctionFactory functionFactory;
-
   {
     functionMap.put(Count.FUNCTION_NAME.toLowerCase(),
         new FunctionBean(Count.FUNCTION_NAME, Count.class.getName(), true));
@@ -127,14 +125,7 @@ public class FunctionFactoryImpl implements FunctionFactory {
             MultiDimTranslation.class.getName(), true));
   }
 
-  protected FunctionFactoryImpl() {
-  }
-
-  public static synchronized FunctionFactory createFunctionFactory() {
-    if (functionFactory == null) {
-      functionFactory = new FunctionFactoryImpl();
-    }
-    return functionFactory;
+  public FunctionFactoryImpl() {
   }
 
   @Override
@@ -149,6 +140,10 @@ public class FunctionFactoryImpl implements FunctionFactory {
     try {
       func = (Function) bean.getCstr().newInstance(new Object[] { parameters
       });
+      if (func instanceof DecorateFunction) {
+        DecorateFunction decorateFunction = (DecorateFunction) func;
+        decorateFunction.setFunctionFactory(this);
+      }
     } catch (Exception e) {
       throw new MoqlRuntimeException(
           StringFormater.format("Create function '{}' failed!", name), e);

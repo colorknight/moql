@@ -92,4 +92,12 @@ public class ArrayExpression extends AbstractExpression {
       return arrayAccessor.toOperandContextList(o);
     }
   }
+
+  public Operand getArray() {
+    return array;
+  }
+
+  public Operand getIndex() {
+    return index;
+  }
 }

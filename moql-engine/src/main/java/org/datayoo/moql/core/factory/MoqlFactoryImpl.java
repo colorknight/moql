@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,25 +39,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 
  * @author Tang Tadin
- * 
  */
 public class MoqlFactoryImpl implements MoqlFactory {
 
-  protected OperandFactory operandFactory = OperandFactoryImpl
-      .createOperandFactory();
+  protected OperandFactory operandFactory = new OperandFactoryImpl();
 
-  protected static MoqlFactory moqlFactory;
-
-  protected MoqlFactoryImpl() {
-  }
-
-  public static synchronized MoqlFactory createSelectorFactory() {
-    if (moqlFactory == null) {
-      moqlFactory = new MoqlFactoryImpl();
-    }
-    return moqlFactory;
+  public MoqlFactoryImpl() {
   }
 
   @Override
@@ -110,39 +98,42 @@ public class MoqlFactoryImpl implements MoqlFactory {
     }
     Operand rOperand = createOperand(logicOperationMetadata.getRightOperand(),
         selector);
-    return LogicExpressionFactory.createLogicExpression(
-        logicOperationMetadata.getOperator(), lOperand, rOperand);
+    return LogicExpressionFactory
+        .createLogicExpression(logicOperationMetadata.getOperator(), lOperand,
+            rOperand);
   }
 
   protected Operand createRelationOperand(
-      RelationOperationMetadata relationOperationMetadata, SelectorImpl selector)
-      throws MoqlException {
+      RelationOperationMetadata relationOperationMetadata,
+      SelectorImpl selector) throws MoqlException {
     Operand lOperand = null;
-    if (!RelationExpressionFactory.isUnary(relationOperationMetadata
-        .getOperator())) {
-      lOperand = operandFactory.createOperand(relationOperationMetadata
-          .getLeftOperand());
+    if (!RelationExpressionFactory
+        .isUnary(relationOperationMetadata.getOperator())) {
+      lOperand = operandFactory
+          .createOperand(relationOperationMetadata.getLeftOperand());
     }
     Operand rOperand = null;
     if (relationOperationMetadata.getNestedSelector() != null) {
       if (selector == null) {
-        throw new MoqlException("Doesn't support nested selector in condition!");
+        throw new MoqlException(
+            "Doesn't support nested selector in condition!");
       }
-      Selector nestedSelector = createSelector(relationOperationMetadata
-          .getNestedSelector());
+      Selector nestedSelector = createSelector(
+          relationOperationMetadata.getNestedSelector());
       selector.getNestedTableSelectors().add(nestedSelector);
       rOperand = new ColumnSelectorOperand(nestedSelector);
     } else {
-      rOperand = operandFactory.createOperand(relationOperationMetadata
-          .getRightOperand());
+      rOperand = operandFactory
+          .createOperand(relationOperationMetadata.getRightOperand());
     }
-    return RelationExpressionFactory.createRelationExpression(
-        relationOperationMetadata.getOperator(), lOperand, rOperand);
+    return RelationExpressionFactory
+        .createRelationExpression(relationOperationMetadata.getOperator(),
+            lOperand, rOperand);
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.moql.core.SelectorFactory#createSelectors(java.util.List)
    */
   @Override
@@ -224,11 +215,11 @@ public class MoqlFactoryImpl implements MoqlFactory {
     }
   }
 
-  protected Table createTable(TableMetadata tableMetadata, SelectorImpl selector)
-      throws MoqlException {
+  protected Table createTable(TableMetadata tableMetadata,
+      SelectorImpl selector) throws MoqlException {
     if (tableMetadata.getNestedSelector() != null) {
-      Selector nestedSelector = createSelector(tableMetadata
-          .getNestedSelector());
+      Selector nestedSelector = createSelector(
+          tableMetadata.getNestedSelector());
       nestedSelector.setAlias(tableMetadata.getName());
       selector.getNestedTableSelectors().add(nestedSelector);
       return new SelectorTable(tableMetadata, nestedSelector);
@@ -285,8 +276,8 @@ public class MoqlFactoryImpl implements MoqlFactory {
       }
       JoinMetadata joinMetadata = new JoinMetadata(JoinType.INNER,
           lQueryableMetadata, queryableMetadata);
-      lQueryable = JoinFactory.createJoin(joinMetadata, lQueryable, rQueryable,
-          null);
+      lQueryable = JoinFactory
+          .createJoin(joinMetadata, lQueryable, rQueryable, null);
       lQueryableMetadata = joinMetadata;
     }
     return (Join) lQueryable;
@@ -309,8 +300,8 @@ public class MoqlFactoryImpl implements MoqlFactory {
         try {
           int index = Integer.valueOf(column);
           if (index > columns.size() || index < 0) {
-            throw new MoqlException(StringFormater.format(
-                "Order index {} is out of boundary!", index));
+            throw new MoqlException(StringFormater
+                .format("Order index {} is out of boundary!", index));
           }
           continue;
         } catch (Throwable t) {
@@ -324,8 +315,8 @@ public class MoqlFactoryImpl implements MoqlFactory {
           // "Order by column must appear in SELECT list when SELECT used GROUP BY or DISTINCT!");
           // }
           ColumnMetadata columnMetadata = new ColumnMetadata(column, column);
-          Operand operand = operandFactory.createOperand(columnMetadata
-              .getValue());
+          Operand operand = operandFactory
+              .createOperand(columnMetadata.getValue());
           columns.add(new ColumnImpl(columnMetadata, operand, true));
         }
       }
@@ -349,8 +340,8 @@ public class MoqlFactoryImpl implements MoqlFactory {
       operand = operandFactory.createOperand(columnMetadata.getValue());
       return new ColumnImpl(columnMetadata, operand);
     } else {
-      Selector nestedSelector = createSelector(columnMetadata
-          .getNestedSelector());
+      Selector nestedSelector = createSelector(
+          columnMetadata.getNestedSelector());
       nestedSelector.setAlias(columnMetadata.getName());
       nestedColumnSelectors.add(nestedSelector);
       Operand operand = new ValueSelectorOperand(nestedSelector);
@@ -385,8 +376,8 @@ public class MoqlFactoryImpl implements MoqlFactory {
     }
     if (setlectorMetadata.getDecorateBy() != null
         && setlectorMetadata.getDecorateBy().size() != 0) {
-      Decorator decorator = new DecoratorImpl(
-          setlectorMetadata.getDecorateBy(), operandFactory);
+      Decorator decorator = new DecoratorImpl(setlectorMetadata.getDecorateBy(),
+          operandFactory);
       setlector.setDecorator(decorator);
     }
     return setlector;
