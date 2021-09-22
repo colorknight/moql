@@ -164,7 +164,23 @@ public class FunctionFactoryImpl implements FunctionFactory {
     FunctionBean bean = functionMap.get(name);
     if (bean != null) {
       if (bean.isReadonly())
-        return null;
+        throw new IllegalArgumentException(
+            String.format("Function %s is read only. Cann't be overwritten!"));
+      functionMap.put(name, new FunctionBean(name, className, false));
+      return bean.getClassName();
+    } else {
+      functionMap.put(name, new FunctionBean(name, className, false));
+      return className;
+    }
+  }
+
+  @Override
+  public String forceRegistFunction(String name, String className) {
+    Validate.notEmpty(name, "Parameter name is empty!");
+    Validate.notEmpty(name, "Parameter className is empty!");
+    name = name.toLowerCase();
+    FunctionBean bean = functionMap.get(name);
+    if (bean != null) {
       functionMap.put(name, new FunctionBean(name, className, false));
       return bean.getClassName();
     } else {

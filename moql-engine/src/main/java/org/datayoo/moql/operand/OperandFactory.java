@@ -32,6 +32,8 @@ public interface OperandFactory {
 
   String registFunction(String name, String className);
 
+  String forceRegistFunction(String name, String className);
+
   String unregistFunction(String name);
 
 }

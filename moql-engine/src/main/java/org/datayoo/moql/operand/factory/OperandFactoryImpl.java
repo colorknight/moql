@@ -76,6 +76,11 @@ public class OperandFactoryImpl implements OperandFactory {
     return functionFactory.registFunction(name, className);
   }
 
+  @Override
+  public String forceRegistFunction(String name, String className) {
+    return functionFactory.forceRegistFunction(name, className);
+  }
+
   public String unregistFunction(String name) {
     return functionFactory.unregistFunction(name);
   }

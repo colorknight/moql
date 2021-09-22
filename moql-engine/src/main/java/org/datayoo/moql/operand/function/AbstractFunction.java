@@ -170,4 +170,16 @@ public abstract class AbstractFunction extends AbstractOperand
     return functionString;
   }
 
+  @Override
+  public int hashCode() {
+    return functionString.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Function) {
+      return functionString.equals(obj.toString());
+    }
+    return false;
+  }
 }
