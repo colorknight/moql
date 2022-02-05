@@ -128,4 +128,6 @@ public abstract class AbstractOperand
   public boolean isBinded() {
     return binded;
   }
+
+
 }
