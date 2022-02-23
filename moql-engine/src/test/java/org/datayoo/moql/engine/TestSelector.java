@@ -93,6 +93,7 @@ public class TestSelector extends TestCase {
     String sql = "select a.id, a.name, a.num%50 from db.BeanA a where a.num%500 > 10 order by 3";
     try {
       Selector selector = MoqlEngine.createSelector(sql);
+
       selector.select(dataSetMap);
       RecordSet recordSet = selector.getRecordSet();
       outputRecordSet(recordSet);
