@@ -37,21 +37,21 @@
             <version>3.3</version>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>log4j</groupId>-->
-            <!--<artifactId>log4j</artifactId>-->
-            <!--<version>1.2.17</version>-->
-            <!--<scope>test</scope>-->
+        <!--<groupId>log4j</groupId>-->
+        <!--<artifactId>log4j</artifactId>-->
+        <!--<version>1.2.17</version>-->
+        <!--<scope>test</scope>-->
         <!--</dependency>-->
         <!--<dependency>-->
-            <!--<groupId>org.slf4j</groupId>-->
-            <!--<artifactId>slf4j-api</artifactId>-->
-            <!--<version>1.6.6</version>-->
+        <!--<groupId>org.slf4j</groupId>-->
+        <!--<artifactId>slf4j-api</artifactId>-->
+        <!--<version>1.6.6</version>-->
         <!--</dependency>-->
         <!--<dependency>-->
-            <!--<groupId>org.slf4j</groupId>-->
-            <!--<artifactId>slf4j-log4j12</artifactId>-->
-            <!--<version>1.6.6</version>-->
-            <!--<scope>test</scope>-->
+        <!--<groupId>org.slf4j</groupId>-->
+        <!--<artifactId>slf4j-log4j12</artifactId>-->
+        <!--<version>1.6.6</version>-->
+        <!--<scope>test</scope>-->
         <!--</dependency>-->
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>org.datayoo.moql</groupId>
             <artifactId>moql-meta</artifactId>
-            <version>1.1.0</version>
+            <version>RELEASE</version>
         </dependency>
     </dependencies>
     <build>

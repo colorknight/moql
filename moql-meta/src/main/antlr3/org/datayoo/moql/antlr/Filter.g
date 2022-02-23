@@ -70,7 +70,7 @@ if (not != null) {
 booleanPrimary returns[OperationMetadata operationMetadata]
 	: predicateMetadata = predicate {operationMetadata = predicateMetadata;}
 	| '(' conditionMetadata = searchCondition {operationMetadata = new ParenMetadata(conditionMetadata);}')'
-	| expr = expression {operationMetadata = new RelationOperationMetadata(SelectorConstants.EXPR, expr.expressionText);}
+	| expr = expression {operationMetadata = new RelationOperationMetadata(SelectorConstants.EXPR, $expr.expressionText);}
 	;
 	
 predicate returns[OperationMetadata operationMetadata]
@@ -83,15 +83,15 @@ predicate returns[OperationMetadata operationMetadata]
 	
 comparisonPredicate returns[OperationMetadata operationMetadata]
 @after {
-operationMetadata = new RelationOperationMetadata(op.getText(), lExpr.expressionText, rExpr.expressionText);
+operationMetadata = new RelationOperationMetadata(op.getText(), $lExpr.expressionText, $rExpr.expressionText);
 }
 	: lExpr = expression op = ('=' | '<' | '<=' | '>' | '>=' | '<>' | '!=') rExpr = expression
 	;
 
 betweenPredicate returns[OperationMetadata operationMetadata]
 @after {
-String rExpr = StringFormater.format("({},{})", rExpr1.expressionText, rExpr2.expressionText);
-operationMetadata = new RelationOperationMetadata(SelectorConstants.BETWEEN, lExpr.expressionText, rExpr);
+String rExpr = StringFormater.format("({},{})", $rExpr1.expressionText, $rExpr2.expressionText);
+operationMetadata = new RelationOperationMetadata(SelectorConstants.BETWEEN, $lExpr.expressionText, rExpr);
 if (not != null) {
 	operationMetadata = new LogicOperationMetadata(not.getText(), operationMetadata);
 }
@@ -102,12 +102,12 @@ if (not != null) {
 inPredicate returns[OperationMetadata operationMetadata]
 @after {
 if (!lr.getText().equals("(")) {
-    String[] tokens = rExpr.expressionText.split(",");
+    String[] tokens = $rExpr.expressionText.split(",");
     if (tokens.length != 2)
         throw new MoqlRuntimeException("Expressions' count are not 2!");
 }
-String inExpressionText = StringFormater.format("{}{}{}", lr.getText(), rExpr.expressionText, rr.getText());
-operationMetadata = new RelationOperationMetadata(SelectorConstants.IN, lExpr.expressionText, inExpressionText);
+String inExpressionText = StringFormater.format("{}{}{}", lr.getText(), $rExpr.expressionText, rr.getText());
+operationMetadata = new RelationOperationMetadata(SelectorConstants.IN, $lExpr.expressionText, inExpressionText);
 if (not != null) {
 	operationMetadata = new LogicOperationMetadata(not.getText(), operationMetadata);
 }
@@ -118,7 +118,7 @@ if (not != null) {
 
 likePredicate returns[OperationMetadata operationMetadata]
 @after {
-operationMetadata = new RelationOperationMetadata(SelectorConstants.LIKE, lExpr.expressionText, rExpr.expressionText);
+operationMetadata = new RelationOperationMetadata(SelectorConstants.LIKE, $lExpr.expressionText, $rExpr.expressionText);
 if (not != null) {
 	operationMetadata = new LogicOperationMetadata(not.getText(), operationMetadata);
 }
@@ -128,7 +128,7 @@ if (not != null) {
 	
 nullPredicate returns[OperationMetadata operationMetadata]
 @after {
-operationMetadata = new RelationOperationMetadata(SelectorConstants.IS, lExpr.expressionText, rExpr.getText());
+operationMetadata = new RelationOperationMetadata(SelectorConstants.IS, $lExpr.expressionText, rExpr.getText());
 if (not != null) {
 	operationMetadata = new LogicOperationMetadata(not.getText(), operationMetadata);
 }

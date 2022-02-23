@@ -249,9 +249,9 @@ orders = new LinkedList<OrderMetadata>();
 sortSpecification returns[OrderMetadata order]
 @after {
 if (type == null) {
-	order = new OrderMetadata(expr.expressionText);
+	order = new OrderMetadata($expr.expressionText);
 } else {
-	order = new OrderMetadata(expr.expressionText, type);
+	order = new OrderMetadata($expr.expressionText, type);
 }
 }
 	: expr = expression type = orderingSpecification?
@@ -407,9 +407,9 @@ String name = null;
 	  if (t != null) {
 	  	name = t.getText();
 	  } else {
-	  	name = expr.expressionText;
+	  	name = $expr.expressionText;
 	  }
-	  column = new ColumnMetadata(name, expr.expressionText);
+	  column = new ColumnMetadata(name, $expr.expressionText);
 	}
 	| expr2 = Identifier'.*'
 	{
@@ -439,9 +439,13 @@ tableReference returns[QueryableMetadata queryableMetadata]
 	;
 
 nonJoinTableReference returns[TableMetadata tableMetadata]
-	: value = Identifier AS? name = Identifier {tableMetadata = new TableMetadata(name.getText(),value.getText());}
+	: value = tableName AS? name = Identifier {tableMetadata = new TableMetadata(name.getText(),$value.tableName);}
 	| '(' queryMetadata = queryExpression ')' AS? name = Identifier {tableMetadata = new TableMetadata(name.getText(), queryMetadata);}
 	;
+
+tableName returns[String tableName]
+    : Identifier('.'Identifier)? {$tableName=$text;}
+    ;
 
 whereClause returns[ConditionMetadata whereMetadata]
 	: WHERE operationMetadata = searchCondition {whereMetadata = new ConditionMetadata(operationMetadata);}
@@ -451,7 +455,7 @@ groupByClause returns[List<GroupMetadata> groupBy]
 @init {
 groupBy = new LinkedList<GroupMetadata>();
 }
-	: GROUP BY expr = expression {groupBy.add(new GroupMetadata(expr.expressionText));}(',' expr = expression {groupBy.add(new GroupMetadata(expr.expressionText));})*
+	: GROUP BY expr = expression {groupBy.add(new GroupMetadata($expr.expressionText));}(',' expr = expression {groupBy.add(new GroupMetadata($expr.expressionText));})*
 	;
 	
 havingClause returns[ConditionMetadata havingMetadata]
@@ -462,7 +466,7 @@ decorateByClause returns[List<DecorateMetadata> decorateBy]
 @init {
 decorateBy = new LinkedList<DecorateMetadata>();
 }
-	: DECORATE BY dec = decorator {decorateBy.add(new DecorateMetadata(dec.expressionText));}(',' dec = decorator {decorateBy.add(new DecorateMetadata(dec.expressionText));})*
+	: DECORATE BY dec = decorator {decorateBy.add(new DecorateMetadata($dec.expressionText));}(',' dec = decorator {decorateBy.add(new DecorateMetadata($dec.expressionText));})*
 	;
 	
 decorator returns[String expressionText]
@@ -544,7 +548,7 @@ if (not != null) {
 booleanPrimary returns[OperationMetadata operationMetadata]
 	: predicateMetadata = predicate {operationMetadata = predicateMetadata;}
 	| '(' conditionMetadata = searchCondition {operationMetadata = new ParenMetadata(conditionMetadata);}')'
-	| expr = expression {operationMetadata = new RelationOperationMetadata(SelectorConstants.EXPR, expr.expressionText);}
+	| expr = expression {operationMetadata = new RelationOperationMetadata(SelectorConstants.EXPR, $expr.expressionText);}
 	;
 	
 predicate returns[OperationMetadata operationMetadata]
@@ -558,15 +562,15 @@ predicate returns[OperationMetadata operationMetadata]
 	
 comparisonPredicate returns[OperationMetadata operationMetadata]
 @after {
-operationMetadata = new RelationOperationMetadata(op.getText(), lExpr.expressionText, rExpr.expressionText);
+operationMetadata = new RelationOperationMetadata(op.getText(), $lExpr.expressionText, $rExpr.expressionText);
 }
 	: lExpr = expression op = ('=' | '<' | '<=' | '>' | '>=' | '<>'| '!=') rExpr = expression
 	;
 	
 betweenPredicate returns[OperationMetadata operationMetadata]
 @after {
-String rExpr = StringFormater.format("({},{})", rExpr1.expressionText, rExpr2.expressionText);
-operationMetadata = new RelationOperationMetadata(SelectorConstants.BETWEEN, lExpr.expressionText, rExpr);
+String rExpr = StringFormater.format("({},{})", $rExpr1.expressionText, $rExpr2.expressionText);
+operationMetadata = new RelationOperationMetadata(SelectorConstants.BETWEEN, $lExpr.expressionText, rExpr);
 if (not != null) {
 	operationMetadata = new LogicOperationMetadata(not.getText(), operationMetadata);
 }
@@ -577,10 +581,10 @@ if (not != null) {
 inPredicate returns[OperationMetadata operationMetadata]
 @after {
 if (selectorDefinition != null) {
-	operationMetadata = new RelationOperationMetadata(SelectorConstants.IN, lExpr.expressionText, selectorDefinition);
+	operationMetadata = new RelationOperationMetadata(SelectorConstants.IN, $lExpr.expressionText, selectorDefinition);
 } else {
-	String inExpressionText = StringFormater.format("({})", rExpr.expressionText);
-	operationMetadata = new RelationOperationMetadata(SelectorConstants.IN, lExpr.expressionText, inExpressionText);
+	String inExpressionText = StringFormater.format("({})", $rExpr.expressionText);
+	operationMetadata = new RelationOperationMetadata(SelectorConstants.IN, $lExpr.expressionText, inExpressionText);
 }
 if (not != null) {
 	operationMetadata = new LogicOperationMetadata(not.getText(), operationMetadata);
@@ -591,7 +595,7 @@ if (not != null) {
 
 likePredicate returns[OperationMetadata operationMetadata]
 @after {
-operationMetadata = new RelationOperationMetadata(SelectorConstants.LIKE, lExpr.expressionText, rExpr.expressionText);
+operationMetadata = new RelationOperationMetadata(SelectorConstants.LIKE, $lExpr.expressionText, $rExpr.expressionText);
 if (not != null) {
 	operationMetadata = new LogicOperationMetadata(not.getText(), operationMetadata);
 }
@@ -601,7 +605,7 @@ if (not != null) {
 	
 nullPredicate returns[OperationMetadata operationMetadata]
 @after {
-operationMetadata = new RelationOperationMetadata(SelectorConstants.IS, lExpr.expressionText, rExpr.getText());
+operationMetadata = new RelationOperationMetadata(SelectorConstants.IS, $lExpr.expressionText, rExpr.getText());
 if (not != null) {
 	operationMetadata = new LogicOperationMetadata(not.getText(), operationMetadata);
 }
@@ -667,7 +671,7 @@ function
 variable
 	: Identifier
 	;
-	
+
 constant
 	: IntegerLiteral
 	| FloatingPointLiteral

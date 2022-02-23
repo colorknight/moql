@@ -86,6 +86,22 @@ public class TestSelector extends TestCase {
     }
   }
 
+  public void testOneSingleDbTableSelector() {
+    List<BeanA> beanAList = BeanFactory.createBeanAList(0, 100);
+    DataSetMap dataSetMap = new DataSetMapImpl();
+    dataSetMap.putDataSet("db.BeanA", beanAList);
+    String sql = "select a.id, a.name, a.num%50 from db.BeanA a where a.num%500 > 10 order by 3";
+    try {
+      Selector selector = MoqlEngine.createSelector(sql);
+      selector.select(dataSetMap);
+      RecordSet recordSet = selector.getRecordSet();
+      outputRecordSet(recordSet);
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   public void testOneSingleTableWithUnderlineSelector() {
     List<BeanA> beanAList = BeanFactory.createBeanAList(0, 100);
     DataSetMap dataSetMap = new DataSetMapImpl();
