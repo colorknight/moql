@@ -874,8 +874,6 @@ select count(a.id), sum(a.num), a.num % 500 from BeanA a group by 3 having mod >
 
 ​	从上面演示代码输出的xml格式我们可以发现其格式比较复杂，可以包含不止一个selector标签（注：每个selector标签代表了一个sql语句）。这与MOQL最初的设计初衷有关，不影响使用，可以不必关心。另外，需要注意的就是，当sql语句中存在聚集运算时，如：union、intersect等时，其xml结构的标签就不是selector了，而是setlector了，setlector下会包含两个selector标签，表示两个集合进行聚集运算。
 
-​	注：开发时需在pom文件中将moql-translator和moql-querier升级到1.1.1版本。
-
 # 附录
 
 ## 函数
