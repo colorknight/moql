@@ -444,7 +444,7 @@ nonJoinTableReference returns[TableMetadata tableMetadata]
 	;
 
 tableName returns[String tableName]
-    : Identifier('.'Identifier)? {$tableName=$text;}
+    : Identifier('.'Identifier)* {$tableName=$text;}
     ;
 
 whereClause returns[ConditionMetadata whereMetadata]
