@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Tang Tadin
@@ -54,11 +55,18 @@ public class MemberVariableExpression extends AbstractExpression
 
   protected Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
 
+  protected Set<MemberVisitor> memberVisitors = null;
+
   {
     expressionType = ExpressionType.MEMBER;
   }
 
   public MemberVariableExpression(Operand target, Variable variable) {
+    this(target, variable, null);
+  }
+
+  public MemberVariableExpression(Operand target, Variable variable,
+      Set<MemberVisitor> memberVisitors) {
     Validate.notNull(target, "Parameter 'target' is null!");
     Validate.notNull(variable, "Parameter 'variable' is null!");
 
@@ -66,6 +74,7 @@ public class MemberVariableExpression extends AbstractExpression
     this.variable = variable;
 
     name = buildNameString();
+    this.memberVisitors = memberVisitors;
   }
 
   protected String buildNameString() {
@@ -125,6 +134,11 @@ public class MemberVariableExpression extends AbstractExpression
       if (o instanceof Element) {
         return operate((Element) o);
       }
+      MemberVisitor memberVisitor = getVisitor(o);
+      if (memberVisitor != null) {
+        String name = variable.getName();
+        return memberVisitor.operate(o, name);
+      }
       return operate(o);
     } else {
       OperandContextList ctxList = (OperandContextList) o;
@@ -157,6 +171,16 @@ public class MemberVariableExpression extends AbstractExpression
     if (list.size() > 1)
       return list;
     return list.get(0);
+  }
+
+  protected MemberVisitor getVisitor(Object o) {
+    if (memberVisitors == null)
+      return null;
+    for (MemberVisitor memberVisitor : memberVisitors) {
+      if (memberVisitor.isVisitable(o))
+        return memberVisitor;
+    }
+    return null;
   }
 
   protected Object operate(Object o) {

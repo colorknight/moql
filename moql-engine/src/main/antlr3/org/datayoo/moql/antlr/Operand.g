@@ -21,6 +21,8 @@ CIRCUMFLEX = '^';
 @header {
 package org.datayoo.moql.antlr;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.HashSet;
 import org.apache.commons.lang3.Validate;
 
 import org.datayoo.moql.*;
@@ -42,6 +44,7 @@ package org.datayoo.moql.antlr;
 
 @members {
 private FunctionFactory functionFactory;
+private Set<MemberVisitor> memberVisitors = new HashSet();
 
 public FunctionFactory getFunctionFactory() {
 	return functionFactory;
@@ -50,6 +53,14 @@ public FunctionFactory getFunctionFactory() {
 public void setFunctionFactory(FunctionFactory functionFactory) {
 	Validate.notNull(functionFactory, "Parameter 'functionFactory' is null!");
 	this.functionFactory = functionFactory;
+}
+
+public void setMemberVisitors(Set<MemberVisitor> memberVisitors) {
+    this.memberVisitors = memberVisitors;
+}
+
+public Set<MemberVisitor> getMemberVisitor() {
+    return memberVisitors;
 }
 }
 
@@ -133,7 +144,7 @@ operand = exp;
 member returns[Operand operand]
 	: exp = variable {operand = exp;}
 	('[' index = expression? {operand = new ArrayExpression(operand, index);}']')*
-	('.' (var = variable { operand = new MemberVariableExpression(operand, var);} 
+	('.' (var = variable { operand = new MemberVariableExpression(operand, var, memberVisitors);}
 	| func = function { operand = new MemberFunctionExpression(operand, func);}) 
 	('[' index = expression? {operand = new ArrayExpression(operand, index);}']')*)*
 	;

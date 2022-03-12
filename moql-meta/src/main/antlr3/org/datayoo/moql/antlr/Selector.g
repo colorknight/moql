@@ -14,7 +14,8 @@ package org.datayoo.moql.antlr;
 import java.util.LinkedList;
 import org.datayoo.moql.*;
 import org.datayoo.moql.metadata.*;
-import org.datayoo.moql.util.StringFormater;
+import org.datayoo.moql.util.*;
+
 }
 @lexer::header {
 package org.datayoo.moql.antlr;
@@ -409,11 +410,19 @@ String name = null;
 	  } else {
 	  	name = $expr.expressionText;
 	  }
+	  int index = name.lastIndexOf('.');
+	  if (index != -1) {
+	    name = name.substring(index+1);
+	  }
 	  column = new ColumnMetadata(name, $expr.expressionText);
 	}
-	| expr2 = Identifier'.*'
+	| (expr2 = Identifier '.')? '*'
 	{
-	  column = new ColumnMetadata(expr2.getText()+".*", expr2.getText()+".*");
+	    name = "*";
+	    if (expr2 != null) {
+            name = expr2.getText()+".*";
+	    }
+	  column = new ColumnMetadata(name, name);
 	}
 	| selectorDefinition = queryExpression AS? t = Identifier
 	{
@@ -439,7 +448,22 @@ tableReference returns[QueryableMetadata queryableMetadata]
 	;
 
 nonJoinTableReference returns[TableMetadata tableMetadata]
-	: value = tableName AS? name = Identifier {tableMetadata = new TableMetadata(name.getText(),$value.tableName);}
+	: value = tableName (AS? name = Identifier)?
+{
+    String tableName = $value.tableName;
+    if (name != null) {
+        tableName = name.getText();
+    } else {
+        if (TlcMoqlMode.isMoqlMode()) {
+            throw new IllegalStateException("Table clause in moql must has table alias!");
+        }
+    }
+    int index = tableName.lastIndexOf('.');
+    if (index != -1) {
+        tableName = tableName.substring(index+1);
+    }
+    tableMetadata = new TableMetadata(tableName,$value.tableName);
+}
 	| '(' queryMetadata = queryExpression ')' AS? name = Identifier {tableMetadata = new TableMetadata(name.getText(), queryMetadata);}
 	;
 

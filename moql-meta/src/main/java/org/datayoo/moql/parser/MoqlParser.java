@@ -13,6 +13,7 @@ import org.datayoo.moql.metadata.ConditionMetadata;
 import org.datayoo.moql.metadata.xml.FilterFormater;
 import org.datayoo.moql.metadata.xml.SelectorFormater;
 import org.datayoo.moql.util.StringFormater;
+import org.datayoo.moql.util.TlcMoqlMode;
 import org.datayoo.moql.xml.DefaultDocumentFormater;
 import org.datayoo.moql.xml.XmlAccessException;
 
@@ -23,23 +24,28 @@ import java.io.ByteArrayInputStream;
  */
 public abstract class MoqlParser {
   /**
-   *
    * @param moql
    * @return SelectorMetadata or SetlectorMetadata
    */
   public static SelectorDefinition parseMoql(String moql) throws MoqlException {
+    return parseMoql(moql, false);
+  }
+
+  public static SelectorDefinition parseMoql(String moql, boolean moqlMode)
+      throws MoqlException {
     Validate.notEmpty(moql, "Parameter 'moql' is empty!");
     try {
-      ANTLRInputStream is = new ANTLRInputStream(new ByteArrayInputStream(
-          moql.getBytes()));
+      TlcMoqlMode.setMoqlMode(moqlMode);
+      ANTLRInputStream is = new ANTLRInputStream(
+          new ByteArrayInputStream(moql.getBytes()));
       SelectorLexer lexer = new SelectorLexer(is);
       CommonTokenStream tokens = new CommonTokenStream(lexer);
       SelectorParser parser = new SelectorParser(tokens);
       return parser.selector();
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      throw new MoqlException(StringFormater.format("Parse moql '{}' failed!",
-          moql), e);
+      throw new MoqlException(
+          StringFormater.format("Parse moql '{}' failed!", moql), e);
     }
   }
 
@@ -47,16 +53,16 @@ public abstract class MoqlParser {
       throws MoqlException {
     Validate.notEmpty(condition, "Parameter 'condition' is empty!");
     try {
-      ANTLRInputStream is = new ANTLRInputStream(new ByteArrayInputStream(
-          condition.getBytes()));
+      ANTLRInputStream is = new ANTLRInputStream(
+          new ByteArrayInputStream(condition.getBytes()));
       FilterLexer lexer = new FilterLexer(is);
       CommonTokenStream tokens = new CommonTokenStream(lexer);
       FilterParser parser = new FilterParser(tokens);
       return new ConditionMetadata(parser.searchCondition());
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      throw new MoqlException(StringFormater.format(
-          "Parse condition '{}' failed!", condition), e);
+      throw new MoqlException(
+          StringFormater.format("Parse condition '{}' failed!", condition), e);
     }
   }
 
@@ -73,7 +79,6 @@ public abstract class MoqlParser {
     documentFormater.setFormater(selectorFormater);
     return documentFormater.exportObjectToString(definition);
   }
-
 
   public static SelectorDefinition translateXml2SelectorDefinition(
       String xmlData) throws MoqlException {

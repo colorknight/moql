@@ -26,11 +26,15 @@ import org.datayoo.moql.antlr.OperandLexer;
 import org.datayoo.moql.antlr.OperandParser;
 import org.datayoo.moql.operand.OperandFactory;
 import org.datayoo.moql.operand.PseudoOperand;
+import org.datayoo.moql.operand.expression.member.MemberVisitor;
+import org.datayoo.moql.operand.function.MemberFunction;
 import org.datayoo.moql.operand.function.factory.FunctionFactory;
 import org.datayoo.moql.operand.function.factory.FunctionFactoryImpl;
 import org.datayoo.moql.util.StringFormater;
 
 import java.io.ByteArrayInputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Tang Tadin
@@ -38,6 +42,8 @@ import java.io.ByteArrayInputStream;
 public class OperandFactoryImpl implements OperandFactory {
 
   protected FunctionFactory functionFactory = new FunctionFactoryImpl();
+
+  protected Set<MemberVisitor> memberVisitors = new HashSet<>();
 
   public OperandFactoryImpl() {
   }
@@ -56,6 +62,7 @@ public class OperandFactoryImpl implements OperandFactory {
       CommonTokenStream tokens = new CommonTokenStream(lexer);
       OperandParser parser = new OperandParser(tokens);
       parser.setFunctionFactory(functionFactory);
+      parser.setMemberVisitors(memberVisitors);
       return parser.operand();
     } catch (Exception e) {
       // TODO Auto-generated catch block
@@ -85,4 +92,13 @@ public class OperandFactoryImpl implements OperandFactory {
     return functionFactory.unregistFunction(name);
   }
 
+  @Override
+  public void addMemberVisitor(MemberVisitor memberVisitor) {
+    memberVisitors.add(memberVisitor);
+  }
+
+  @Override
+  public boolean removeMemberVisitor(MemberVisitor memberVisitor) {
+    return memberVisitors.remove(memberVisitor);
+  }
 }

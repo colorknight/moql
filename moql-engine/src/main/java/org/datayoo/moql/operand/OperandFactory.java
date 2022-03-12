@@ -20,6 +20,7 @@ package org.datayoo.moql.operand;
 
 import org.datayoo.moql.MoqlException;
 import org.datayoo.moql.Operand;
+import org.datayoo.moql.operand.expression.member.MemberVisitor;
 
 /**
  * @author Tang Tadin
@@ -35,5 +36,9 @@ public interface OperandFactory {
   String forceRegistFunction(String name, String className);
 
   String unregistFunction(String name);
+
+  void addMemberVisitor(MemberVisitor memberVisitor);
+
+  boolean removeMemberVisitor(MemberVisitor memberVisitor);
 
 }
