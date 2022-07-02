@@ -1,5 +1,7 @@
 package org.datayoo.moql.simulation;
 
+import org.datayoo.tripod.seg.ansj.AnsjSegmenter;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,11 +67,19 @@ public abstract class BeanFactory {
 
   public static List<Map<String, Object>> toMap(List<? extends Bean> beanList) {
     List<Map<String, Object>> mapList = new LinkedList<Map<String, Object>>();
+    AnsjSegmenter segmenter = new AnsjSegmenter();
+    int i = 0;
     for (Bean bean : beanList) {
       Map<String, Object> map = new HashMap<String, Object>();
       map.put("id", bean.getId());
       map.put("name", bean.getName());
       map.put("num", bean.getNum());
+      if (i++ % 2 == 0) {
+        map.put("cont", "这是中办发发布的关于人事任命的通知。杜绝形式主义，形而上学的言论。");
+        map.put("content",
+            segmenter.segment("这是中办发发布的关于人事任命的通知。杜绝形式主义，形而上学的言论。"));
+      }
+      mapList.add(map);
     }
     return mapList;
   }

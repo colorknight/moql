@@ -20,6 +20,7 @@ package org.datayoo.moql.engine;
 import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.*;
 import org.datayoo.moql.core.factory.MoqlFactoryImpl;
+import org.datayoo.moql.env.MoqlEnv;
 import org.datayoo.moql.metadata.ConditionMetadata;
 import org.datayoo.moql.parser.MoqlParser;
 import org.datayoo.moql.util.StringFormater;
@@ -31,10 +32,14 @@ public abstract class MoqlEngine {
 
   protected static MoqlFactoryImpl moqlFactory = new MoqlFactoryImpl();
 
+  static {
+    MoqlEnv.putEnvProp(MoqlEnv.ENV_OPERAND_FACTORY, moqlFactory.getOperandFactory());
+  }
+
   public static Selector createSelector(SelectorDefinition selectorDefinition)
       throws MoqlException {
-    Validate
-        .notNull(selectorDefinition, "Parameter 'selectorDefinition' is null!");
+    Validate.notNull(selectorDefinition,
+        "Parameter 'selectorDefinition' is null!");
     try {
       return moqlFactory.createSelector(selectorDefinition);
     } catch (Exception e) {
@@ -61,8 +66,9 @@ public abstract class MoqlEngine {
       return moqlFactory.createFilter(conditionMetadata);
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      throw new MoqlException(StringFormater
-          .format("Create filter by condition '{}' failed!", condition), e);
+      throw new MoqlException(
+          StringFormater.format("Create filter by condition '{}' failed!",
+              condition), e);
     }
   }
 

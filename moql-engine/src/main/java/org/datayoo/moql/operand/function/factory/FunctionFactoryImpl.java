@@ -38,6 +38,8 @@ public class FunctionFactoryImpl implements FunctionFactory {
   protected Map<String, FunctionBean> functionMap = new HashMap<String, FunctionBean>();
 
   {
+    functionMap.put(Lu.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Lu.FUNCTION_NAME, Lu.class.getName(), true));
     functionMap.put(Count.FUNCTION_NAME.toLowerCase(),
         new FunctionBean(Count.FUNCTION_NAME, Count.class.getName(), true));
     functionMap.put(Avg.FUNCTION_NAME.toLowerCase(),
@@ -264,9 +266,9 @@ public class FunctionFactoryImpl implements FunctionFactory {
           });
         } catch (Exception e) {
           // TODO Auto-generated catch block
-          throw new MoqlRuntimeException(StringFormater
-              .format("Load function '{}' class = '{}' failed!", name,
-                  className), e);
+          throw new MoqlRuntimeException(
+              StringFormater.format("Load function '{}' class = '{}' failed!",
+                  name, className), e);
         }
       }
       return cstr;

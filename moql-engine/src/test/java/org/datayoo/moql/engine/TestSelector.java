@@ -365,8 +365,7 @@ public class TestSelector extends TestCase {
   }
 
   protected void outputRecordSet(RecordSet recordSet) {
-    RecordSetDefinition recordSetDefinition = recordSet
-        .getRecordSetDefinition();
+    RecordSetDefinition recordSetDefinition = recordSet.getRecordSetDefinition();
     StringBuffer sbuf = new StringBuffer();
     for (ColumnDefinition column : recordSetDefinition.getColumns()) {
       sbuf.append(column.getName());
@@ -844,6 +843,23 @@ public class TestSelector extends TestCase {
     String sql = "Select a.name name, notNull(a.col1) col1, "
         + "notNull(a.col2) col2, notNull(a.col3, 3) col3 "
         + "FROM MapA a group by name";
+    try {
+      Selector selector = MoqlEngine.createSelector(sql);
+      selector.select(dataSetMap);
+      RecordSet recordSet = selector.getRecordSet();
+      outputRecordSet(recordSet);
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  public void testLuSelector() {
+    List<BeanA> beanAList = BeanFactory.createBeanAList(0, 100);
+    List<Map<String, Object>> mapList = BeanFactory.toMap(beanAList);
+    DataSetMap dataSetMap = new DataSetMapImpl();
+    dataSetMap.putDataSet("dbba", mapList);
+    String sql = "select a.id, a.name, a.num%50 from dbba a where lu('a.content:\"第5代 领导\" a.content:任命 a.content:形式主义')";
     try {
       Selector selector = MoqlEngine.createSelector(sql);
       selector.select(dataSetMap);
