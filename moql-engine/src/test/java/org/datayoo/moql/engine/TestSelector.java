@@ -859,7 +859,7 @@ public class TestSelector extends TestCase {
     List<Map<String, Object>> mapList = BeanFactory.toMap(beanAList);
     DataSetMap dataSetMap = new DataSetMapImpl();
     dataSetMap.putDataSet("dbba", mapList);
-    String sql = "select a.id, a.name, a.num%50 from dbba a where lu('a.content:\"第5代 领导\" a.content:任命 a.content:形式主义')";
+    String sql = "select a.id, a.name, a.num%50 from dbba a where lu('a.content:\"第5代 领导\" a.content:任命 a.content:形式主义') > 0";
     try {
       Selector selector = MoqlEngine.createSelector(sql);
       selector.select(dataSetMap);

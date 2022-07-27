@@ -22,12 +22,11 @@ import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.NumberConvertable;
 
 /**
- * Compare two objects for order. Returns a negative integer, zero, 
- * or a positive integer as this first object is less than, equal to, 
+ * Compare two objects for order. Returns a negative integer, zero,
+ * or a positive integer as this first object is less than, equal to,
  * or greater than the second object.
  *
  * @author Tang Tadin
- *
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public abstract class CompareHelper {
@@ -72,9 +71,13 @@ public abstract class CompareHelper {
     } else if (rOperand instanceof NumberConvertable) {
       rValue = ((NumberConvertable) rOperand).toNumber().doubleValue();
     } else {
-
     }
-    return (int) (lValue - rValue);
+    double d = lValue - rValue;
+    if (d > 0)
+      return 1;
+    else if (d == 0)
+      return 0;
+    return -1;
   }
 
   protected static int reverse(int result) {

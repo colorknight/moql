@@ -47,6 +47,7 @@ public class Lu extends AbstractFunction {
 
   public Lu(List<Operand> parameters) {
     super(FUNCTION_NAME, -1, parameters);
+    this.constantReturn = false;
     if (parameters.size() == 0 || parameters.size() > 3) {
       throw new IllegalArgumentException(
           "Invalid format! The format is 'lu(lucene [, idfCounterEnvName])'");
@@ -96,6 +97,8 @@ public class Lu extends AbstractFunction {
       }
       dataMap.put(field.toString(), (TermEntity[]) v);
     }
+    if (dataMap.size() == 0)
+      return 0;
     return tripod.match(dataMap);
   }
 
