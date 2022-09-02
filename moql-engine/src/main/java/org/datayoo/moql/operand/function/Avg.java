@@ -20,12 +20,11 @@ package org.datayoo.moql.operand.function;
 import org.datayoo.moql.EntityMap;
 import org.datayoo.moql.Operand;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
- *
  * @author Tang Tadin
- *
  */
 public class Avg extends AggregationFunction {
 
@@ -33,7 +32,7 @@ public class Avg extends AggregationFunction {
 
   protected Operand operand;
 
-  protected double sum = 0;
+  protected BigDecimal sum = new BigDecimal(0);
 
   protected long count = 0;
 
@@ -51,8 +50,8 @@ public class Avg extends AggregationFunction {
     if (obj == null) {
       return;
     }
-    Number num = toNumber(obj);
-    sum = sum + num.doubleValue();
+    BigDecimal num = toBigDecimal(obj);
+    sum = sum.add(num);
   }
 
   @Override
@@ -63,20 +62,19 @@ public class Avg extends AggregationFunction {
     if (obj == null) {
       return;
     }
-    Number num = toNumber(obj);
-    sum = sum + num.doubleValue();
+    BigDecimal num = toBigDecimal(obj);
+    sum = sum.add(num);
   }
 
   @Override
   public Object getValue() {
-    // TODO Auto-generated method stub
-    return new Double(sum / count);
+    return sum.divide(new BigDecimal(count)).doubleValue();
   }
 
   @Override
   public synchronized void clear() {
     // TODO Auto-generated method stub
-    sum = 0;
+    sum = new BigDecimal(0);
     count = 0;
   }
 

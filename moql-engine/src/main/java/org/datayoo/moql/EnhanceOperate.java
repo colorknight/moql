@@ -24,4 +24,10 @@ public interface EnhanceOperate {
    */
   Object operate(Object[] entityArray);
 
+  /**
+   * get or caculate the boolean value from the given entity map. The
+   * return is true if the value is not null, otherwise is false.
+   */
+  boolean booleanOperate(Object[] entityArray);
+
 }

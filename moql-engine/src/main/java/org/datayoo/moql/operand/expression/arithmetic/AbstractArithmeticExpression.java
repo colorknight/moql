@@ -26,6 +26,8 @@ import org.datayoo.moql.operand.expression.AbstractOperationExpression;
 import org.datayoo.moql.operand.expression.ExpressionType;
 import org.datayoo.moql.util.StringFormater;
 
+import java.math.BigDecimal;
+
 /**
  * @author Tang Tadin
  */
@@ -74,8 +76,9 @@ public abstract class AbstractArithmeticExpression
     if (obj instanceof NumberConvertable) {
       return ((NumberConvertable) obj).toNumber();
     }
-    throw new IllegalArgumentException(StringFormater
-        .format("Operand '{}' is not a number!", operand.toString()));
+    throw new IllegalArgumentException(
+        StringFormater.format("Operand '{}' is not a number!",
+            operand.toString()));
   }
 
   protected ConstantType getConstantType(Number number) {
@@ -120,11 +123,11 @@ public abstract class AbstractArithmeticExpression
   protected abstract Object calc(Number lNumber, Number rNumber,
       ConstantType returnType);
 
-  protected Object convertReturnValue(double ret, ConstantType returnType) {
+  protected Object convertReturnValue(Number ret, ConstantType returnType) {
     if (returnType == ConstantType.DOUBLE)
-      return ret;
+      return ret.doubleValue();
     else
-      return Double.valueOf(ret).longValue();
+      return ret.longValue();
   }
 
   @Override

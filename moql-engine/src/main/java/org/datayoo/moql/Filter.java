@@ -21,13 +21,28 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- *
  * @author Tang Tadin
- *
  */
 public interface Filter extends Serializable {
 
   boolean isMatch(EntityMap entityMap);
 
   List<EntityMap> match(List<EntityMap> entityMaps);
+
+  /**
+   * bind the index of entity
+   */
+  void bind(String[] entityNames);
+
+  /**
+   * whether the operand binded the index
+   */
+  boolean isBinded();
+
+  /**
+   * get or caculate the value from the given entity array. The entity array
+   * is an array of entities. The order of entity is samed as entityNames inputed
+   * in function bind.
+   */
+  List<Object[]> operate(List<Object[]> entityArrays);
 }

@@ -22,6 +22,7 @@ import org.datayoo.moql.NumberConvertable;
 import org.datayoo.moql.Operand;
 import org.datayoo.moql.util.StringFormater;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public abstract class AggregationFunction extends AbstractFunction {
@@ -60,9 +61,16 @@ public abstract class AggregationFunction extends AbstractFunction {
     if (obj instanceof NumberConvertable) {
       return ((NumberConvertable) obj).toNumber();
     }
-    throw new IllegalArgumentException(StringFormater
-        .format("Object '{}' of class '{}' can not cast to number!",
-            obj.toString(), obj.getClass().getName()));
+    throw new IllegalArgumentException(StringFormater.format(
+        "Object '{}' of class '{}' can not cast to number!", obj.toString(),
+        obj.getClass().getName()));
+  }
+
+  protected BigDecimal toBigDecimal(Object obj) {
+    if (obj instanceof BigDecimal)
+      return (BigDecimal) obj;
+    Number number = toNumber(obj);
+    return new BigDecimal(number.toString());
   }
 
   public abstract void increment(EntityMap entityMap);

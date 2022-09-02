@@ -20,6 +20,7 @@ package org.datayoo.moql.operand.function;
 import org.datayoo.moql.EntityMap;
 import org.datayoo.moql.Operand;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -58,6 +59,9 @@ public class Abs extends AbstractFunction {
       Number num = (Number) obj;
       long val = num.longValue();
       return Math.abs(val);
+    } else if (obj instanceof BigDecimal) {
+      BigDecimal bigDecimal = (BigDecimal) obj;
+      return bigDecimal.abs();
     } else {
       try {
         Long val = Long.valueOf(obj.toString());

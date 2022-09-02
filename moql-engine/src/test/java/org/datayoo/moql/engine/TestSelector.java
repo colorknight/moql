@@ -155,7 +155,7 @@ public class TestSelector extends TestCase {
     List<BeanA> beanAList = BeanFactory.createBeanAList(0, 100);
     DataSetMap dataSetMap = new DataSetMapImpl();
     dataSetMap.putDataSet("BeanA", beanAList);
-    String sql = "Select Count(a.id) cnt, Sum(a.num) sum, a.num%50 mod FROM BeanA a group by 3 having mod > 10 order by a.name desc";
+    String sql = "Select Count(a.id) cnt, Avg(a.num) avg, Sum(a.num) sum, a.num%50 mod FROM BeanA a group by 4 having mod > 10 order by a.name desc";
     try {
       Selector selector = MoqlEngine.createSelector(sql);
       selector.select(dataSetMap);

@@ -25,8 +25,7 @@ import org.datayoo.moql.OperandType;
 /**
  * @author Tang Tadin
  */
-public abstract class AbstractOperand
-    implements Operand, OperandSourceAware {
+public abstract class AbstractOperand implements Operand, OperandSourceAware {
 
   protected String name;
 
@@ -97,6 +96,11 @@ public abstract class AbstractOperand
   }
 
   @Override
+  public boolean booleanOperate(Object[] entityArray) {
+    return isTrue(operate(entityArray));
+  }
+
+  @Override
   public void increment(EntityMap entityMap) {
     // TODO Auto-generated method stub
     Validate.notNull(entityMap, "entityMap is null!");
@@ -128,6 +132,5 @@ public abstract class AbstractOperand
   public boolean isBinded() {
     return binded;
   }
-
 
 }

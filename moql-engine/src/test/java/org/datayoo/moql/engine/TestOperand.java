@@ -63,6 +63,12 @@ public class TestOperand extends TestCase {
       variable = MoqlEngine.createOperand("_data");
       System.out.println(variable.toString() + " " + variable.getOperandType());
       System.out.println(variable.operate(entityMap));
+      variable = MoqlEngine.createOperand("_data + num");
+      System.out.println(variable.toString() + " " + variable.getOperandType());
+      System.out.println(variable.operate(entityMap));
+      variable = MoqlEngine.createOperand("_data / num");
+      System.out.println(variable.toString() + " " + variable.getOperandType());
+      System.out.println(variable.operate(entityMap));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

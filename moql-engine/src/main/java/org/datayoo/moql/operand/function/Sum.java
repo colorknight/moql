@@ -21,6 +21,7 @@ import org.datayoo.moql.EntityMap;
 import org.datayoo.moql.Operand;
 import org.datayoo.moql.operand.constant.ConstantType;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -32,9 +33,9 @@ public class Sum extends AggregationFunction {
 
   protected Operand operand;
 
-  protected Number sum = new Long(0);
+  protected BigDecimal sum = new BigDecimal(0);
 
-  protected ConstantType sumType = ConstantType.LONG;
+  protected ConstantType sumType = null;
 
   public Sum(List<Operand> parameters) {
     super(FUNCTION_NAME, 1, parameters);
@@ -48,19 +49,11 @@ public class Sum extends AggregationFunction {
     Object obj = operand.operate(entityMap);
     if (obj == null)
       return;
-    Number num = toNumber(obj);
+    BigDecimal num = toBigDecimal(obj);
     ConstantType numType = getConstantType(num);
-    if (sum == null) {
-      sum = num;
+    if (numType == ConstantType.DOUBLE)
       sumType = numType;
-    } else {
-      if (sumType == ConstantType.DOUBLE || numType == ConstantType.DOUBLE) {
-        sum = new Double(sum.doubleValue() + num.doubleValue());
-        sumType = ConstantType.DOUBLE;
-      } else {
-        sum = new Long(sum.longValue() + num.longValue());
-      }
-    }
+    sum = sum.add(num);
   }
 
   @Override
@@ -69,25 +62,18 @@ public class Sum extends AggregationFunction {
     Object obj = operand.operate(entityArray);
     if (obj == null)
       return;
-    Number num = toNumber(obj);
+    BigDecimal num = toBigDecimal(obj);
     ConstantType numType = getConstantType(num);
-    if (sum == null) {
-      sum = num;
+    if (numType == ConstantType.DOUBLE)
       sumType = numType;
-    } else {
-      if (sumType == ConstantType.DOUBLE || numType == ConstantType.DOUBLE) {
-        sum = new Double(sum.doubleValue() + num.doubleValue());
-        sumType = ConstantType.DOUBLE;
-      } else {
-        sum = new Long(sum.longValue() + num.longValue());
-      }
-    }
+    sum = sum.add(num);
   }
 
   @Override
   public Object getValue() {
-    // TODO Auto-generated method stub
-    return sum;
+    if (sumType == ConstantType.DOUBLE)
+      return sum.doubleValue();
+    return sum.longValue();
   }
 
   protected ConstantType getConstantType(Number number) {
@@ -100,7 +86,7 @@ public class Sum extends AggregationFunction {
   @Override
   public synchronized void clear() {
     // TODO Auto-generated method stub
-    sum = new Long(0);
+    sum = new BigDecimal(0);
   }
 
 }

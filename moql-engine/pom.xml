@@ -10,7 +10,7 @@
 
     <groupId>org.datayoo.moql</groupId>
     <artifactId>moql-engine</artifactId>
-    <version>1.2.6</version>
+    <version>1.2.8</version>
     <packaging>jar</packaging>
 
     <name>moql-engine</name>
