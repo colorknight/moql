@@ -17,7 +17,10 @@
  */
 package org.datayoo.moql.operand.expression.member;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.EntityMap;
 import org.datayoo.moql.Operand;
@@ -161,7 +164,28 @@ public class MemberVariableExpression extends AbstractExpression
   // added 2017/02/05
   protected Object operate(JsonObject jsonObject) {
     String name = variable.getName();
-    return jsonObject.get(name);
+    JsonElement value = jsonObject.get(name);
+    if (value.isJsonNull())
+      return null;
+    if (value instanceof JsonPrimitive) {
+      JsonPrimitive jp = (JsonPrimitive) value;
+      if (jp.isString())
+        return jp.getAsString();
+      if (jp.isBoolean())
+        return jp.getAsBoolean();
+      if (jp.isNumber()) {
+        return getNumber(jp);
+      }
+    }
+    return value;
+  }
+
+  protected Object getNumber(JsonPrimitive value) {
+    String v = value.getAsString();
+    if (v.indexOf('.') == -1)
+      return value.getAsLong();
+    else
+      return value.getAsDouble();
   }
 
   // added 2017/02/05
@@ -189,9 +213,9 @@ public class MemberVariableExpression extends AbstractExpression
       return m.invoke(o);
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      throw new OperateException(StringFormater
-          .format("Invoke field '{}' in class '{}' failed!", variable.getName(),
-              o.getClass().getName()), e);
+      throw new OperateException(
+          StringFormater.format("Invoke field '{}' in class '{}' failed!",
+              variable.getName(), o.getClass().getName()), e);
     }
   }
 
@@ -203,8 +227,8 @@ public class MemberVariableExpression extends AbstractExpression
     Method m = methodCache.get(objClazz);
     if (m == null) {
       if (getter != null) {
-        throw new OperateException(StringFormater
-            .format("Get field '{}' from class '{}' failed!",
+        throw new OperateException(
+            StringFormater.format("Get field '{}' from class '{}' failed!",
                 variable.getName(), objClazz.getName()));
       }
       try {
@@ -216,8 +240,8 @@ public class MemberVariableExpression extends AbstractExpression
           m = objClazz.getMethod(getter, new Class[] {});
         } catch (Exception e1) {
           // TODO Auto-generated catch block
-          throw new OperateException(StringFormater
-              .format("Get field '{}' from class '{}' failed!",
+          throw new OperateException(
+              StringFormater.format("Get field '{}' from class '{}' failed!",
                   variable.getName(), objClazz.getName()), e1);
         }
         // TODO Auto-generated catch block
