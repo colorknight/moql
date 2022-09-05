@@ -18,6 +18,7 @@
 package org.datayoo.moql.operand.expression.member;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.commons.lang3.Validate;
@@ -34,6 +35,7 @@ import org.datayoo.moql.util.StringFormater;
 import org.dom4j.Element;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +44,7 @@ import java.util.Set;
 /**
  * @author Tang Tadin
  */
-public class MemberVariableExpression extends AbstractExpression
+public class MemberVariableExpression4M extends AbstractExpression
     implements MemberExpression {
 
   protected Variable variable;
@@ -51,9 +53,11 @@ public class MemberVariableExpression extends AbstractExpression
 
   protected Class<?> clazz;
 
-  protected Field field;
+  protected Method method;
 
-  protected Map<Class<?>, Field> fieldCache = new HashMap<Class<?>, Field>();
+  protected String getter;
+
+  protected Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
 
   protected Set<MemberVisitor> memberVisitors = null;
 
@@ -61,11 +65,11 @@ public class MemberVariableExpression extends AbstractExpression
     expressionType = ExpressionType.MEMBER;
   }
 
-  public MemberVariableExpression(Operand target, Variable variable) {
+  public MemberVariableExpression4M(Operand target, Variable variable) {
     this(target, variable, null);
   }
 
-  public MemberVariableExpression(Operand target, Variable variable,
+  public MemberVariableExpression4M(Operand target, Variable variable,
       Set<MemberVisitor> memberVisitors) {
     Validate.notNull(target, "Parameter 'target' is null!");
     Validate.notNull(variable, "Parameter 'variable' is null!");
@@ -83,6 +87,18 @@ public class MemberVariableExpression extends AbstractExpression
     sbuf.append(target.toString());
     sbuf.append(SelectorConstants.PERIOD);
     sbuf.append(variable.toString());
+    return sbuf.toString();
+  }
+
+  protected String buildVariableGetter(boolean booleanType) {
+    String name = variable.getName();
+    StringBuffer sbuf = new StringBuffer();
+    if (booleanType) {
+      sbuf.append("is");
+    } else
+      sbuf.append("get");
+    sbuf.append(Character.toUpperCase(name.charAt(0)));
+    sbuf.append(name.substring(1));
     return sbuf.toString();
   }
 
@@ -196,9 +212,9 @@ public class MemberVariableExpression extends AbstractExpression
     if (o instanceof Map) {
       return ((Map) o).get(variable.getName());
     }
-    Field f = getField(o);
+    Method m = getMethod(o);
     try {
-      return f.get(o);
+      return m.invoke(o);
     } catch (Exception e) {
       // TODO Auto-generated catch block
       throw new OperateException(
@@ -207,26 +223,38 @@ public class MemberVariableExpression extends AbstractExpression
     }
   }
 
-  protected Field getField(Object targetObject) {
+  protected Method getMethod(Object targetObject) {
     Class<?> objClazz = targetObject.getClass();
     if (clazz != null && objClazz.equals(clazz)) {
-      return field;
+      return method;
     }
-    Field f = fieldCache.get(objClazz);
-    if (f == null) {
-      try {
-        f = objClazz.getDeclaredField(variable.getName());
-        f.setAccessible(true);
-      } catch (Exception e) {
+    Method m = methodCache.get(objClazz);
+    if (m == null) {
+      if (getter != null) {
         throw new OperateException(
             StringFormater.format("Get field '{}' from class '{}' failed!",
-                variable.getName(), objClazz.getName()), e);
+                variable.getName(), objClazz.getName()));
       }
-      fieldCache.put(objClazz, f);
+      try {
+        getter = buildVariableGetter(false);
+        m = objClazz.getMethod(getter, new Class[] {});
+      } catch (Exception e) {
+        getter = buildVariableGetter(true);
+        try {
+          m = objClazz.getMethod(getter, new Class[] {});
+        } catch (Exception e1) {
+          // TODO Auto-generated catch block
+          throw new OperateException(
+              StringFormater.format("Get field '{}' from class '{}' failed!",
+                  variable.getName(), objClazz.getName()), e1);
+        }
+        // TODO Auto-generated catch block
+      }
+      methodCache.put(objClazz, m);
       clazz = objClazz;
-      field = f;
+      method = m;
     }
-    return f;
+    return m;
   }
 
   @Override

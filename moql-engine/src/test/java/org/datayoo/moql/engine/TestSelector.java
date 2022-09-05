@@ -21,7 +21,7 @@ public class TestSelector extends TestCase {
       selector.select(dataSetMap);
       RecordSet recordSet = selector.getRecordSet();
       outputRecordSet(recordSet);
-      Operand arrayOperand = MoqlEngine.createOperand("rs['a.name']");
+      Operand arrayOperand = MoqlEngine.createOperand("rs['name']");
       EntityMap entityMap = new EntityMapImpl();
       entityMap.putEntity("rs", recordSet);
       List data = (List) arrayOperand.operate(entityMap);
