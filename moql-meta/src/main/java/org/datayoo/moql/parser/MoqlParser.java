@@ -9,7 +9,7 @@ import org.datayoo.moql.antlr.FilterLexer;
 import org.datayoo.moql.antlr.FilterParser;
 import org.datayoo.moql.antlr.SelectorLexer;
 import org.datayoo.moql.antlr.SelectorParser;
-import org.datayoo.moql.metadata.ConditionMetadata;
+import org.datayoo.moql.metadata.*;
 import org.datayoo.moql.metadata.xml.FilterFormater;
 import org.datayoo.moql.metadata.xml.SelectorFormater;
 import org.datayoo.moql.util.StringFormater;
@@ -18,6 +18,8 @@ import org.datayoo.moql.xml.DefaultDocumentFormater;
 import org.datayoo.moql.xml.XmlAccessException;
 
 import java.io.ByteArrayInputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by tangtadin on 17/10/16.
@@ -113,4 +115,38 @@ public abstract class MoqlParser {
     return documentFormater.exportObjectToString(conditionMetadata);
   }
 
+  public static Set<String> getRelatedTables(
+      SelectorDefinition selectorDefinition) {
+    Set<String> relatedTables = new HashSet<>();
+    getRelatedTables(selectorDefinition, relatedTables);
+    return relatedTables;
+  }
+
+  protected static void getRelatedTables(SelectorDefinition selectorDefinition,
+      Set<String> relatedTables) {
+    if (selectorDefinition instanceof SetlectorMetadata) {
+      SetlectorMetadata setlectorMetadata = (SetlectorMetadata) selectorDefinition;
+      for (SelectorDefinition sd : setlectorMetadata.getSets()) {
+        getRelatedTables(sd, relatedTables);
+      }
+    } else {
+      SelectorMetadata selectorMetadata = (SelectorMetadata) selectorDefinition;
+      for (QueryableMetadata queryableMetadata : selectorMetadata.getTables()
+          .getTables()) {
+        getRelatedTables(queryableMetadata, relatedTables);
+      }
+    }
+  }
+
+  protected static void getRelatedTables(QueryableMetadata queryableMetadata,
+      Set<String> relatedTables) {
+    if (queryableMetadata instanceof JoinMetadata) {
+      JoinMetadata joinMetadata = (JoinMetadata) queryableMetadata;
+      getRelatedTables(joinMetadata.getLQueryable(), relatedTables);
+      getRelatedTables(joinMetadata.getRQueryable(), relatedTables);
+    } else {
+      TableMetadata tableMetadata = (TableMetadata) queryableMetadata;
+      relatedTables.add(tableMetadata.getValue());
+    }
+  }
 }

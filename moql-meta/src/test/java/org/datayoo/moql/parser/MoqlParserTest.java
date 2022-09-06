@@ -101,4 +101,17 @@ public class MoqlParserTest extends TestCase {
       e.printStackTrace();
     }
   }
+
+  public void testSelector5() {
+    try {
+      String sql = "select t.*, t1.* from t t, t1 tt";
+      SelectorDefinition selectorDefinition = MoqlParser.parseMoql(sql);
+      System.out.println(MoqlParser.getRelatedTables(selectorDefinition));
+      sql = "select t.*, t1.* from t t left join t1a t1 on t1.a = t.a";
+      selectorDefinition = MoqlParser.parseMoql(sql);
+      System.out.println(MoqlParser.getRelatedTables(selectorDefinition));
+    } catch (MoqlException e) {
+      e.printStackTrace();
+    }
+  }
 }
