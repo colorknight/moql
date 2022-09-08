@@ -150,7 +150,7 @@ public class MemberVariableExpression extends AbstractExpression
   protected Object operate(JsonObject jsonObject) {
     String name = variable.getName();
     JsonElement value = jsonObject.get(name);
-    if (value.isJsonNull())
+    if (value == null || value.isJsonNull())
       return null;
     if (value instanceof JsonPrimitive) {
       JsonPrimitive jp = (JsonPrimitive) value;
@@ -177,6 +177,8 @@ public class MemberVariableExpression extends AbstractExpression
   protected Object operate(Element element) {
     String name = variable.getName();
     List list = element.elements(name);
+    if (list == null)
+      return null;
     if (list.size() > 1)
       return list;
     return list.get(0);
