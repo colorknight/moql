@@ -30,9 +30,7 @@ import org.datayoo.moql.operand.function.Function;
 import org.datayoo.moql.util.StringFormater;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Tang Tadin
@@ -105,8 +103,8 @@ public class MemberFunctionExpression extends AbstractExpression
       return m.invoke(o, parameterObjects);
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      throw new OperateException(StringFormater
-          .format("Invoke method '{}' in class '{}' failed!",
+      throw new OperateException(
+          StringFormater.format("Invoke method '{}' in class '{}' failed!",
               function.getName(), o.getClass().getName()), e);
     }
   }
@@ -122,16 +120,69 @@ public class MemberFunctionExpression extends AbstractExpression
       try {
         m = objClazz.getMethod(function.getName(), parameterTypes);
       } catch (Exception e) {
-        // TODO Auto-generated catch block
-        throw new OperateException(StringFormater
-            .format("Get method '{}' from class '{}' failed!",
-                function.getName(), objClazz.getName()), e);
+        m = derivationMethod(objClazz, function.getName(), parameterTypes);
+        if (m == null) {
+          throw new OperateException(
+              StringFormater.format("Get method '{}' from class '{}' failed!",
+                  function.getName(), objClazz.getName()), e);
+        }
       }
       methodCache.put(objClazz, m);
       clazz = objClazz;
       method = m;
     }
     return m;
+  }
+
+  protected Method derivationMethod(Class<?> objClazz, String methodName,
+      Class<?>[] parameterTypes) {
+    List<Method> methods = getMethods(objClazz, methodName,
+        parameterTypes.length);
+    methods.sort(new Comparator<Method>() {
+      @Override
+      public int compare(Method o1, Method o2) {
+        Class[] o1ps = o1.getParameterTypes();
+        Class[] o2ps = o2.getParameterTypes();
+        for (int i = 0; i < o1ps.length; i++) {
+          if (o1ps[i].isAssignableFrom(o2ps[i])) {
+            return -1;
+          } else if (o2ps[i].isAssignableFrom(o1ps[i])) {
+            return 1;
+          }
+        }
+        return 0;
+      }
+    });
+    return getMethod(methods, parameterTypes);
+  }
+
+  protected Method getMethod(List<Method> methods, Class<?>[] parameterTypes) {
+    for (Method method : methods) {
+      Class[] pts = method.getParameterTypes();
+      boolean matched = true;
+      for (int i = 0; i < pts.length; i++) {
+        if (pts[i].isAssignableFrom(parameterTypes[i])) {
+          continue;
+        }
+        matched = false;
+        break;
+      }
+      if (matched)
+        return method;
+    }
+    return null;
+  }
+
+  protected List<Method> getMethods(Class<?> objClazz, String methodName,
+      int paramCount) {
+    List<Method> methods = new LinkedList<>();
+    for (Method method : objClazz.getMethods()) {
+      if (method.getName().equals(methodName)
+          && method.getParameters().length == paramCount) {
+        methods.add(method);
+      }
+    }
+    return methods;
   }
 
   protected Object[] getParameterObjects(EntityMap entityMap) {
