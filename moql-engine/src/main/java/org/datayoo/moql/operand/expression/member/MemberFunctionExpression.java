@@ -157,6 +157,8 @@ public class MemberFunctionExpression extends AbstractExpression
   }
 
   protected Method getMethod(List<Method> methods, Class<?>[] parameterTypes) {
+    if (methods.size() == 1)
+      return methods.get(0);
     for (Method method : methods) {
       Class[] pts = method.getParameterTypes();
       boolean matched = true;
@@ -199,7 +201,10 @@ public class MemberFunctionExpression extends AbstractExpression
   protected Class<?>[] getParameterTypes(Object[] parameterObjects) {
     Class<?>[] parameterTypes = new Class[parameterObjects.length];
     for (int i = 0; i < parameterObjects.length; i++) {
-      parameterTypes[i] = parameterObjects[i].getClass();
+      if (parameterObjects[i] != null)
+        parameterTypes[i] = parameterObjects[i].getClass();
+      else
+        parameterTypes[i] = Object.class;
       parameterTypes[i] = adjustPrimitiveType(parameterTypes[i]);
     }
     return parameterTypes;

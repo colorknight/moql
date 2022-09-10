@@ -14,7 +14,9 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import java.io.ByteArrayInputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TestOperand extends TestCase {
 
@@ -147,25 +149,25 @@ public class TestOperand extends TestCase {
     entityMap.putEntity("num1", 3);
     entityMap.putEntity("num2", 4);
     try {
-      Operand arithmetic = MoqlEngine
-          .createOperand("(num*num1) / num2 * 2.2 + 2 - 1");
-      Operand arithmetic2 = MoqlEngine
-          .createOperand("(经济|文化) + (十八大|中国) + 美国 - 病闹");
+      Operand arithmetic = MoqlEngine.createOperand(
+          "(num*num1) / num2 * 2.2 + 2 - 1");
+      Operand arithmetic2 = MoqlEngine.createOperand(
+          "(经济|文化) + (十八大|中国) + 美国 - 病闹");
       Operand arithmetic3 = MoqlEngine.createOperand("6+ 5*2");
       System.out.println(
           arithmetic3.toString() + " " + arithmetic3.operate(entityMap));
-      System.out
-          .println(arithmetic2.toString() + " " + arithmetic2.getOperandType());
-      System.out
-          .println(arithmetic.toString() + " " + arithmetic.getOperandType());
+      System.out.println(
+          arithmetic2.toString() + " " + arithmetic2.getOperandType());
+      System.out.println(
+          arithmetic.toString() + " " + arithmetic.getOperandType());
       System.out.println(arithmetic.operate(entityMap));
       arithmetic = MoqlEngine.createOperand("num + 21");
-      System.out
-          .println(arithmetic.toString() + " " + arithmetic.getOperandType());
+      System.out.println(
+          arithmetic.toString() + " " + arithmetic.getOperandType());
       System.out.println(arithmetic.operate(entityMap));
       arithmetic = MoqlEngine.createOperand("num + num1 + num2");
-      System.out
-          .println(arithmetic.toString() + " " + arithmetic.operate(entityMap));
+      System.out.println(
+          arithmetic.toString() + " " + arithmetic.operate(entityMap));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -176,21 +178,21 @@ public class TestOperand extends TestCase {
     String[] names = new String[] { "num", "num1", "num2" };
     Object[] data = new Object[] { 12, 3, 4 };
     try {
-      Operand arithmetic = MoqlEngine
-          .createOperand("(num*num1) / num2 * 2.2 + 2 - 1");
+      Operand arithmetic = MoqlEngine.createOperand(
+          "(num*num1) / num2 * 2.2 + 2 - 1");
       arithmetic.bind(names);
       System.out.println(arithmetic.operate(data));
 
       Operand arithmetic3 = MoqlEngine.createOperand("6+ 5*2");
-      System.out
-          .println(arithmetic3.toString() + " " + arithmetic3.operate(data));
+      System.out.println(
+          arithmetic3.toString() + " " + arithmetic3.operate(data));
       arithmetic = MoqlEngine.createOperand("num + 21");
       arithmetic.bind(names);
       System.out.println(arithmetic.operate(data));
       arithmetic = MoqlEngine.createOperand("num + num1 + num2");
       arithmetic.bind(names);
-      System.out
-          .println(arithmetic.toString() + " " + arithmetic.operate(data));
+      System.out.println(
+          arithmetic.toString() + " " + arithmetic.operate(data));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -224,16 +226,16 @@ public class TestOperand extends TestCase {
     try {
       Operand arithmetic = MoqlEngine.createOperand(" num << num1 + 1");
       arithmetic.bind(names);
-      System.out
-          .println(arithmetic.toString() + " = " + arithmetic.operate(data));
+      System.out.println(
+          arithmetic.toString() + " = " + arithmetic.operate(data));
       arithmetic = MoqlEngine.createOperand("num2 | num1 & num");
       arithmetic.bind(names);
-      System.out
-          .println(arithmetic.toString() + " = " + arithmetic.operate(data));
+      System.out.println(
+          arithmetic.toString() + " = " + arithmetic.operate(data));
       arithmetic = MoqlEngine.createOperand("~num2 ^ num2");
       arithmetic.bind(names);
-      System.out
-          .println(arithmetic.toString() + " = " + arithmetic.operate(data));
+      System.out.println(
+          arithmetic.toString() + " = " + arithmetic.operate(data));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -327,8 +329,8 @@ public class TestOperand extends TestCase {
     try {
       Operand operand = MoqlEngine.createOperand("(1, 2, 3)");
       System.out.println(operand.toString() + " " + operand.getOperandType());
-      List<Operand> operands = (List<Operand>) operand
-          .operate((EntityMap) null);
+      List<Operand> operands = (List<Operand>) operand.operate(
+          (EntityMap) null);
       System.out.println(operands.size());
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
@@ -358,8 +360,8 @@ public class TestOperand extends TestCase {
     try {
       Operand operand = MoqlEngine.createOperand("[1, 2}");
       System.out.println(operand.toString() + " " + operand.getOperandType());
-      List<Operand> operands = (List<Operand>) operand
-          .operate((EntityMap) null);
+      List<Operand> operands = (List<Operand>) operand.operate(
+          (EntityMap) null);
       System.out.println(operands.size());
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
@@ -392,6 +394,20 @@ public class TestOperand extends TestCase {
       e.printStackTrace();
     } catch (DocumentException e) {
       e.printStackTrace();
+    }
+  }
+
+  public void testDerivationMethod() {
+    EntityMap entityMap = new EntityMapImpl();
+    Map map = new HashMap<>();
+    map.put("a", "b");
+    entityMap.putEntity("e", map);
+    try {
+      Operand member = MoqlEngine.createOperand("e.put('c', 'd')");
+      member.operate(entityMap);
+      System.out.println(map);
+    } catch (MoqlException e) {
+      throw new RuntimeException(e);
     }
   }
 }
