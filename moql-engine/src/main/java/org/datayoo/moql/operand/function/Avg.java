@@ -68,7 +68,8 @@ public class Avg extends AggregationFunction {
 
   @Override
   public Object getValue() {
-    return sum.divide(new BigDecimal(count)).doubleValue();
+    return sum.divide(new BigDecimal(count), 6, BigDecimal.ROUND_HALF_UP)
+        .doubleValue();
   }
 
   @Override

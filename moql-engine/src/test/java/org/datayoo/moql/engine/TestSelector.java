@@ -543,6 +543,7 @@ public class TestSelector extends TestCase {
 
   public void testTwoUnionSelector() {
     List<BeanA> beanAList = BeanFactory.createBeanAList(0, 5);
+    beanAList.addAll(BeanFactory.createBeanAList(0, 3));
     List<BeanB> beanBList = BeanFactory.createBeanBList(1, 5);
     DataSetMap dataSetMap = new DataSetMapImpl();
     dataSetMap.putDataSet("BeanA", beanAList);

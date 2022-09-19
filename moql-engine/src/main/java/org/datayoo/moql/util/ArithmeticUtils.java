@@ -49,7 +49,7 @@ public abstract class ArithmeticUtils {
     if (needPreciseCalculation(v1, v2)) {
       BigDecimal n1 = toBigDecimal(v1);
       BigDecimal n2 = toBigDecimal(v2);
-      return n1.divide(n2);
+      return n1.divide(n2, 6, BigDecimal.ROUND_HALF_UP);
     } else {
       return v1.doubleValue() / v2.doubleValue();
     }
