@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import org.datayoo.moql.*;
 import org.datayoo.moql.simulation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -123,7 +124,7 @@ public class TestSelector extends TestCase {
     List<BeanA> beanAList = BeanFactory.createBeanAList(0, 100);
     DataSetMap dataSetMap = new DataSetMapImpl();
     dataSetMap.putDataSet("BeanA", beanAList);
-    String sql = "Select Joint(a.name,','), Count(a.id) cnt, Sum(a.num) sum FROM BeanA a";
+    String sql = "Select Joint(a.name,',') j, Count(a.id) cnt, Sum(a.num) sum FROM BeanA a";
     try {
       Selector selector = MoqlEngine.createSelector(sql);
       selector.select(dataSetMap);

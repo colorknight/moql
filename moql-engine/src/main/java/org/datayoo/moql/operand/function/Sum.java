@@ -50,9 +50,9 @@ public class Sum extends AggregationFunction {
     if (obj == null)
       return;
     BigDecimal num = toBigDecimal(obj);
-    ConstantType numType = getConstantType(num);
-    if (numType == ConstantType.DOUBLE)
-      sumType = numType;
+    if (num.scale() > 0) {
+      sumType = ConstantType.DOUBLE;
+    }
     sum = sum.add(num);
   }
 
@@ -63,9 +63,9 @@ public class Sum extends AggregationFunction {
     if (obj == null)
       return;
     BigDecimal num = toBigDecimal(obj);
-    ConstantType numType = getConstantType(num);
-    if (numType == ConstantType.DOUBLE)
-      sumType = numType;
+    if (num.scale() > 0) {
+      sumType = ConstantType.DOUBLE;
+    }
     sum = sum.add(num);
   }
 
@@ -74,13 +74,6 @@ public class Sum extends AggregationFunction {
     if (sumType == ConstantType.DOUBLE)
       return sum.doubleValue();
     return sum.longValue();
-  }
-
-  protected ConstantType getConstantType(Number number) {
-    if (number instanceof Float || number instanceof Double)
-      return ConstantType.DOUBLE;
-
-    return ConstantType.LONG;
   }
 
   @Override
