@@ -50,6 +50,10 @@ public class FunctionFactoryImpl implements FunctionFactory {
         new FunctionBean(Max.FUNCTION_NAME, Max.class.getName(), true));
     functionMap.put(Sum.FUNCTION_NAME.toLowerCase(),
         new FunctionBean(Sum.FUNCTION_NAME, Sum.class.getName(), true));
+    functionMap.put(First.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(First.FUNCTION_NAME, First.class.getName(), true));
+    functionMap.put(Last.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(Last.FUNCTION_NAME, Last.class.getName(), true));
     functionMap.put(Joint.FUNCTION_NAME.toLowerCase(),
         new FunctionBean(Joint.FUNCTION_NAME, Joint.class.getName(), true));
     functionMap.put(NotNull.FUNCTION_NAME.toLowerCase(),
