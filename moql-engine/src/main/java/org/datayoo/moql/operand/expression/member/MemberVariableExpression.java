@@ -33,6 +33,7 @@ import org.datayoo.moql.operand.variable.Variable;
 import org.datayoo.moql.util.StringFormater;
 import org.dom4j.Element;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -198,6 +199,9 @@ public class MemberVariableExpression extends AbstractExpression
     if (o instanceof Map) {
       return ((Map) o).get(variable.getName());
     }
+    if (o.getClass().isArray()) {
+      return operateArray(o);
+    }
     Field f = getField(o);
     try {
       return f.get(o);
@@ -207,6 +211,13 @@ public class MemberVariableExpression extends AbstractExpression
           StringFormater.format("Invoke field '{}' in class '{}' failed!",
               variable.getName(), o.getClass().getName()), e);
     }
+  }
+
+  protected Object operateArray(Object o) {
+    if (variable.getName().equals("length")) {
+      return Array.getLength(o);
+    }
+    throw new UnsupportedOperationException("");
   }
 
   protected Field getField(Object targetObject) {
