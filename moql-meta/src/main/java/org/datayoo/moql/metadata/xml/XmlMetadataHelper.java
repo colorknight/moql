@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@
  */
 package org.datayoo.moql.metadata.xml;
 
+import javafx.beans.binding.When;
 import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.SelectorDefinition;
 import org.datayoo.moql.metadata.*;
@@ -28,9 +29,7 @@ import org.dom4j.*;
 import java.util.*;
 
 /**
- * 
  * @author Tang Tadin
- * 
  */
 class XmlMetadataHelper {
 
@@ -47,6 +46,8 @@ class XmlMetadataHelper {
   public static final String COLUMNS_ELEMENT = "columns";
 
   public static final String COLUMN_ELEMENT = "column";
+  public static final String CASE_ELEMENT = "case";
+  public static final String WHEN_ELEMENT = "when";
 
   public static final String TABLES_ELEMENT = "tables";
 
@@ -67,6 +68,9 @@ class XmlMetadataHelper {
   public static final String HAVING_ELEMENT = "having";
 
   public static final String ORDERBY_ELEMENT = "orderby";
+
+  public static final String DECORATORS_ELEMENT = "decorators";
+  public static final String DECORATEBY_ELEMENT = "decorateby";
 
   public static final String ORDER_ELEMENT = "order";
 
@@ -106,19 +110,25 @@ class XmlMetadataHelper {
 
   public static final String COLUMN_ATTRIBUTE = "column";
 
+  public static final String ELSE_ATTRIBUTE = "else";
+
+  public static final String THEN_ATTRIBUTE = "then";
+
   public static final String MODE_ATTRIBUTE = "mode";
 
   public static final String OFFSET_ATTRIBUTE = "offset";
+
+  public static final String DECORATOR_ATTRIBUTE = "decorator";
 
   protected Map<String, XmlElementFormater<Object>> extendedElementFormaters = new HashMap<String, XmlElementFormater<Object>>();
 
   public SelectorDefinition readSelectorDefinition(Element element)
       throws XmlAccessException {
     Validate.notNull(element, "Parameter 'element' is null!");
-    if (!element.getName().equals(SELECTOR_ELEMENT)
-        && !element.getName().equals(SETLECTOR_ELEMENT)) {
-      throw new IllegalArgumentException(StringFormater.format(
-          "Invalid element '{}'!", element.getName()));
+    if (!element.getName().equals(SELECTOR_ELEMENT) && !element.getName()
+        .equals(SETLECTOR_ELEMENT)) {
+      throw new IllegalArgumentException(
+          StringFormater.format("Invalid element '{}'!", element.getName()));
     }
 
     if (element.getName().equals(SELECTOR_ELEMENT)) {
@@ -136,9 +146,9 @@ class XmlMetadataHelper {
     }
     if (option)
       return null;
-    throw new XmlAccessException(StringFormater.format(
-        "There is no attribute '{}' in element '{}'!", attribute,
-        element.getName()));
+    throw new XmlAccessException(
+        StringFormater.format("There is no attribute '{}' in element '{}'!",
+            attribute, element.getName()));
   }
 
   protected String getElementText(Element element, String textElement,
@@ -149,9 +159,9 @@ class XmlMetadataHelper {
     }
     if (option)
       return null;
-    throw new XmlAccessException(StringFormater.format(
-        "There is no element '{}' in element '{}'!", textElement,
-        element.getName()));
+    throw new XmlAccessException(
+        StringFormater.format("There is no element '{}' in element '{}'!",
+            textElement, element.getName()));
   }
 
   protected SelectorMetadata readSelectorMetadata(Element element)
@@ -161,13 +171,12 @@ class XmlMetadataHelper {
     return selector;
   }
 
-  @SuppressWarnings({
-    "rawtypes"
+  @SuppressWarnings({ "rawtypes"
   })
-  protected void readSelectorMetadata(Element element, SelectorMetadata selector)
-      throws XmlAccessException {
+  protected void readSelectorMetadata(Element element,
+      SelectorMetadata selector) throws XmlAccessException {
 
-    for (Iterator it = element.elementIterator(); it.hasNext();) {
+    for (Iterator it = element.elementIterator(); it.hasNext(); ) {
       Element el = (Element) it.next();
       if (el.getName().equals(CACHE_ELEMENT)) {
         CacheMetadata cache = readCacheMetadata(el);
@@ -193,6 +202,9 @@ class XmlMetadataHelper {
       } else if (el.getName().equals(LIMIT_ELEMENT)) {
         LimitMetadata limit = readLimitMetadata(el);
         selector.setLimit(limit);
+      } else if (el.getName().equals(DECORATORS_ELEMENT)) {
+        List<DecorateMetadata> decorateMetadatas = readDecorateMetadatas(el);
+        selector.setDecorateBy(decorateMetadatas);
       }
     }
   }
@@ -208,8 +220,7 @@ class XmlMetadataHelper {
     return cacheMetadata;
   }
 
-  @SuppressWarnings({
-    "rawtypes"
+  @SuppressWarnings({ "rawtypes"
   })
   protected ColumnsMetadata readColumnsMetadata(Element element)
       throws XmlAccessException {
@@ -219,7 +230,8 @@ class XmlMetadataHelper {
       columnsMetadata.setDistinct(Boolean.valueOf(value));
     }
     List<ColumnMetadata> columns = new LinkedList<ColumnMetadata>();
-    for (Iterator it = element.elementIterator(COLUMN_ELEMENT); it.hasNext();) {
+    for (Iterator it = element.elementIterator(
+        COLUMN_ELEMENT); it.hasNext(); ) {
       Element el = (Element) it.next();
       ColumnMetadata column = readColumnMetadata(el);
       columns.add(column);
@@ -234,26 +246,31 @@ class XmlMetadataHelper {
     String name = getAttribute(element, NAME_ATTRIBUTE, false);
     String value = getAttribute(element, VALUE_ATTRIBUTE, true);
     if (value == null) {
-      SelectorDefinition nestedSelector = readColumnSelectorMetadata(element);
-      column = new ColumnMetadata(name, nestedSelector);
+      Element el = element.element(SELECTOR_ELEMENT);
+      if (el != null) {
+        SelectorDefinition nestedSelector = readColumnSelectorMetadata(el);
+        column = new ColumnMetadata(name, nestedSelector);
+      } else {
+        el = element.element(CASE_ELEMENT);
+        if (el != null) {
+          CaseMetadata caseMetadata = readCaseMetadata(el);
+          column = new ColumnMetadata(name, caseMetadata);
+        } else {
+          throw new XmlAccessException(StringFormater.format(
+              "Invalid element '{}' has no selector, setlector or case element!",
+              element.getName()));
+        }
+      }
     } else {
       column = new ColumnMetadata(name, value);
     }
     return column;
   }
 
-  @SuppressWarnings({
-    "rawtypes"
+  @SuppressWarnings({ "rawtypes"
   })
-  protected SelectorDefinition readColumnSelectorMetadata(Element element)
+  protected SelectorDefinition readColumnSelectorMetadata(Element el)
       throws XmlAccessException {
-    List elements = element.elements();
-    if (elements == null || elements.size() == 0) {
-      throw new XmlAccessException(StringFormater.format(
-          "Invalid element '{}' has no selector or setlector element!",
-          element.getName()));
-    }
-    Element el = (Element) elements.get(0);
     if (el.getName().equals(SELECTOR_ELEMENT)) {
       SelectorMetadata columnSelector = new SelectorMetadata();
       readSelectorMetadata(el, columnSelector);
@@ -265,13 +282,32 @@ class XmlMetadataHelper {
     }
   }
 
-  @SuppressWarnings({
-    "rawtypes"
+  protected CaseMetadata readCaseMetadata(Element el)
+      throws XmlAccessException {
+    List<WhenMetadata> whenMetadatas = new LinkedList<>();
+    String elseText = null;
+    Attribute attr = el.attribute(ELSE_ATTRIBUTE);
+    elseText = attr.getValue();
+    for (Element e : el.elements()) {
+      WhenMetadata whenMetadata = readWhenMetadata(e);
+      whenMetadatas.add(whenMetadata);
+    }
+    return new CaseMetadata(whenMetadatas, elseText);
+  }
+
+  protected WhenMetadata readWhenMetadata(Element el)
+      throws XmlAccessException {
+    String then = el.attributeValue(THEN_ATTRIBUTE);
+    OperationMetadata when = readOperationMetadata(el);
+    return new WhenMetadata(when, then);
+  }
+
+  @SuppressWarnings({ "rawtypes"
   })
   protected TablesMetadata readTablesMetadata(Element element)
       throws XmlAccessException {
     List<QueryableMetadata> tables = new LinkedList<QueryableMetadata>();
-    for (Iterator it = element.elementIterator(); it.hasNext();) {
+    for (Iterator it = element.elementIterator(); it.hasNext(); ) {
       Element el = (Element) it.next();
       if (el.getName().equals(TABLE_ELEMENT)) {
         TableMetadata tableMetadata = readTableMetadata(el);
@@ -280,16 +316,15 @@ class XmlMetadataHelper {
         JoinMetadata joinMetadata = readJoinMetadata(el);
         tables.add(joinMetadata);
       } else {
-        throw new XmlAccessException(StringFormater.format(
-            "Invalid element '{}' in element '{}'!", element.getName(),
-            TABLES_ELEMENT));
+        throw new XmlAccessException(
+            StringFormater.format("Invalid element '{}' in element '{}'!",
+                element.getName(), TABLES_ELEMENT));
       }
     }
     return new TablesMetadata(tables);
   }
 
-  @SuppressWarnings({
-    "rawtypes"
+  @SuppressWarnings({ "rawtypes"
   })
   protected TableMetadata readTableMetadata(Element element)
       throws XmlAccessException {
@@ -299,11 +334,9 @@ class XmlMetadataHelper {
     if (value == null) {
       List elements = element.elements();
       if (elements == null || elements.size() == 0) {
-        throw new XmlAccessException(
-            StringFormater
-                .format(
-                    "Invalid element '{}' has no selector,setlector or reference element!",
-                    element.getName()));
+        throw new XmlAccessException(StringFormater.format(
+            "Invalid element '{}' has no selector,setlector or reference element!",
+            element.getName()));
       }
       Element el = (Element) elements.get(0);
       if (el.getName().equals(SELECTOR_ELEMENT)) {
@@ -321,8 +354,7 @@ class XmlMetadataHelper {
     return table;
   }
 
-  @SuppressWarnings({
-    "rawtypes"
+  @SuppressWarnings({ "rawtypes"
   })
   protected JoinMetadata readJoinMetadata(Element element)
       throws XmlAccessException {
@@ -332,7 +364,7 @@ class XmlMetadataHelper {
     QueryableMetadata rQueryable = null;
     ConditionMetadata condition = null;
 
-    for (Iterator it = element.elementIterator(); it.hasNext();) {
+    for (Iterator it = element.elementIterator(); it.hasNext(); ) {
       Element el = (Element) it.next();
       if (el.getName().equals(TABLE_ELEMENT)) {
         if (lQueryable == null)
@@ -347,9 +379,9 @@ class XmlMetadataHelper {
       } else if (el.getName().equals(ON_ELEMENT)) {
         condition = innerReadConditionMetadata(el);
       } else {
-        throw new XmlAccessException(StringFormater.format(
-            "Invalid element '{}' in element '{}'!", element.getName(),
-            TABLES_ELEMENT));
+        throw new XmlAccessException(
+            StringFormater.format("Invalid element '{}' in element '{}'!",
+                element.getName(), TABLES_ELEMENT));
       }
     }
     JoinMetadata join = new JoinMetadata(joinType, lQueryable, rQueryable);
@@ -364,12 +396,11 @@ class XmlMetadataHelper {
     return new ConditionMetadata(operation);
   }
 
-  @SuppressWarnings({
-    "rawtypes"
+  @SuppressWarnings({ "rawtypes"
   })
   protected OperationMetadata readOperationMetadata(Element element)
       throws XmlAccessException {
-    for (Iterator it = element.elementIterator(); it.hasNext();) {
+    for (Iterator it = element.elementIterator(); it.hasNext(); ) {
       Element el = (Element) it.next();
       if (el.getName().equals(AND_ELEMENT)) {
         return readLogicOperationMetadata(el);
@@ -389,19 +420,19 @@ class XmlMetadataHelper {
             el.getName(), element.getName()));
       }
     }
-    throw new XmlAccessException(StringFormater.format(
-        "Invalid condition element '{}' !", element.getName()));
+    throw new XmlAccessException(
+        StringFormater.format("Invalid condition element '{}' !",
+            element.getName()));
   }
 
-  @SuppressWarnings({
-    "rawtypes"
+  @SuppressWarnings({ "rawtypes"
   })
   protected LogicOperationMetadata readLogicOperationMetadata(Element element)
       throws XmlAccessException {
     int size = 1;
     String operator;
-    if (element.getName().equals(AND_ELEMENT)
-        || element.getName().equals(OR_ELEMENT)) {
+    if (element.getName().equals(AND_ELEMENT) || element.getName()
+        .equals(OR_ELEMENT)) {
       size = 2;
       operator = element.getName();
     } else {
@@ -409,7 +440,7 @@ class XmlMetadataHelper {
     }
     OperationMetadata[] operands = new OperationMetadata[size];
     int inx = 0;
-    for (Iterator it = element.elementIterator(); it.hasNext();) {
+    for (Iterator it = element.elementIterator(); it.hasNext(); ) {
       Element el = (Element) it.next();
       if (el.getName().equals(AND_ELEMENT)) {
         operands[inx] = readLogicOperationMetadata(el);
@@ -424,15 +455,17 @@ class XmlMetadataHelper {
       } else if (el.getName().equals(BINARY_ELEMENT)) {
         operands[inx] = readBinaryRelationOperationMetadata(el);
       } else {
-        throw new XmlAccessException(StringFormater.format(
-            "Invalid operation element '{}' !", el.getName()));
+        throw new XmlAccessException(
+            StringFormater.format("Invalid operation element '{}' !",
+                el.getName()));
       }
       if (++inx == size)
         break;
     }
     if (inx == 0) {
-      throw new XmlAccessException(StringFormater.format(
-          "Invalid operation element '{}' !", element.getName()));
+      throw new XmlAccessException(
+          StringFormater.format("Invalid operation element '{}' !",
+              element.getName()));
     }
     if (size == 1) {
       return new LogicOperationMetadata(operator, operands[0]);
@@ -478,13 +511,12 @@ class XmlMetadataHelper {
     return relation;
   }
 
-  @SuppressWarnings({
-    "rawtypes"
+  @SuppressWarnings({ "rawtypes"
   })
   protected List<GroupMetadata> readGroupBy(Element element)
       throws XmlAccessException {
     List<GroupMetadata> groups = new LinkedList<GroupMetadata>();
-    for (Iterator it = element.elementIterator(GROUP_ELEMENT); it.hasNext();) {
+    for (Iterator it = element.elementIterator(GROUP_ELEMENT); it.hasNext(); ) {
       Element el = (Element) it.next();
       String column = getAttribute(el, COLUMN_ATTRIBUTE, false);
       GroupMetadata group = new GroupMetadata(column);
@@ -493,13 +525,12 @@ class XmlMetadataHelper {
     return groups;
   }
 
-  @SuppressWarnings({
-    "rawtypes"
+  @SuppressWarnings({ "rawtypes"
   })
   protected List<OrderMetadata> readOrderBy(Element element)
       throws XmlAccessException {
     List<OrderMetadata> orders = new LinkedList<OrderMetadata>();
-    for (Iterator it = element.elementIterator(ORDER_ELEMENT); it.hasNext();) {
+    for (Iterator it = element.elementIterator(ORDER_ELEMENT); it.hasNext(); ) {
       Element el = (Element) it.next();
       OrderMetadata order = readOrderMetadata(el);
       orders.add(order);
@@ -536,6 +567,19 @@ class XmlMetadataHelper {
     return limitMetadata;
   }
 
+  protected List<DecorateMetadata> readDecorateMetadatas(Element element)
+      throws XmlAccessException {
+    List<DecorateMetadata> decorateMetadatas = new LinkedList<>();
+    for (Iterator it = element.elementIterator(
+        DECORATOR_ATTRIBUTE); it.hasNext(); ) {
+      Element el = (Element) it.next();
+      String value = getAttribute(el, DECORATOR_ATTRIBUTE, false);
+      DecorateMetadata decorateMetadata = new DecorateMetadata(value);
+      decorateMetadatas.add(decorateMetadata);
+    }
+    return decorateMetadatas;
+  }
+
   protected SetlectorMetadata readSetlectorMetadata(Element element)
       throws XmlAccessException {
     SetlectorMetadata setlector = new SetlectorMetadata();
@@ -543,15 +587,14 @@ class XmlMetadataHelper {
     return setlector;
   }
 
-  @SuppressWarnings({
-    "rawtypes"
+  @SuppressWarnings({ "rawtypes"
   })
   protected void readSetlectorMetadata(Element element,
       SetlectorMetadata setlector) throws XmlAccessException {
     String value = getAttribute(element, COMBINATION_ATTRIBUTE, true);
     if (value != null)
       setlector.setCombinationType(CombinationType.valueOf(value));
-    for (Iterator it = element.elementIterator(); it.hasNext();) {
+    for (Iterator it = element.elementIterator(); it.hasNext(); ) {
       Element el = (Element) it.next();
       if (el.getName().equals(COLUMNS_ELEMENT)) {
         ColumnsMetadata columns = readColumnsMetadata(el);
@@ -563,21 +606,20 @@ class XmlMetadataHelper {
         List<OrderMetadata> orders = readOrderBy(el);
         setlector.setOrderBy(orders);
       } else {
-        throw new XmlAccessException(StringFormater.format(
-            "Invalid element '{}' in element '{}'!", el.getName(),
-            element.getName()));
+        throw new XmlAccessException(
+            StringFormater.format("Invalid element '{}' in element '{}'!",
+                el.getName(), element.getName()));
       }
     }
   }
 
-  @SuppressWarnings({
-    "rawtypes"
+  @SuppressWarnings({ "rawtypes"
   })
   protected List<SelectorDefinition> readSets(Element element)
       throws XmlAccessException {
     List<SelectorDefinition> sets = new LinkedList<SelectorDefinition>();
     int i = 0;
-    for (Iterator it = element.elementIterator(); it.hasNext();) {
+    for (Iterator it = element.elementIterator(); it.hasNext(); ) {
       Element el = (Element) it.next();
       if (el.getName().equals(SELECTOR_ELEMENT)) {
         SelectorMetadata nestedSelector = new SelectorMetadata();
@@ -588,16 +630,16 @@ class XmlMetadataHelper {
         readSetlectorMetadata(el, nestedSetlector);
         sets.add(nestedSetlector);
       } else {
-        throw new XmlAccessException(StringFormater.format(
-            "Invalid element '{}' in element '{}'!", el.getName(),
-            element.getName()));
+        throw new XmlAccessException(
+            StringFormater.format("Invalid element '{}' in element '{}'!",
+                el.getName(), element.getName()));
       }
       if (++i == 2)
         break;
     }
     if (i != 2) {
-      throw new XmlAccessException(StringFormater.format(
-          "Invalid element '{}'!", element.getName()));
+      throw new XmlAccessException(
+          StringFormater.format("Invalid element '{}'!", element.getName()));
     }
     return sets;
   }
@@ -628,8 +670,8 @@ class XmlMetadataHelper {
     } else {
       Document doc = DocumentHelper.createDocument();
       elRoot = doc.addElement(rootName, "http://www.datayoo.org/schema/moql");
-      elRoot.add(new Namespace("xsi",
-          "http://www.w3.org/2001/XMLSchema-instance"));
+      elRoot.add(
+          new Namespace("xsi", "http://www.w3.org/2001/XMLSchema-instance"));
       elRoot.addAttribute("xsi:schemaLocation",
           "http://www.datayoo.org/schema/moql selector-base.xsd");
 
@@ -656,21 +698,27 @@ class XmlMetadataHelper {
       writeGroupBy(element, selector.getGroupBy());
     }
     if (selector.getHaving() != null) {
-      innerWriteConditionMetadata(element, HAVING_ELEMENT, selector.getHaving());
+      innerWriteConditionMetadata(element, HAVING_ELEMENT,
+          selector.getHaving());
     }
     if (selector.getOrderBy() != null) {
       writeOrderBy(element, selector.getOrderBy());
     }
     if (selector.getLimit() != null)
       writeLimitMetadata(element, selector.getLimit());
+
+    if (selector.getDecorateBy() != null
+        && selector.getDecorateBy().size() > 0) {
+      writeDecorateMetadatas(element, selector.getDecorateBy());
+    }
   }
 
   protected void writeCacheMetadata(Element element, CacheMetadata cache) {
     Element elCache = element.addElement(CACHE_ELEMENT);
     elCache.addAttribute(SIZE_ATTRIBUTE, String.valueOf(cache.getSize()));
     if (cache.getWashoutStrategy() != WashoutStrategy.FIFO) {
-      elCache
-          .addAttribute(WASHOUT_ATTRIBUTE, cache.getWashoutStrategy().name());
+      elCache.addAttribute(WASHOUT_ATTRIBUTE,
+          cache.getWashoutStrategy().name());
     }
   }
 
@@ -701,10 +749,23 @@ class XmlMetadataHelper {
         writeSetlectorMetadataWithoutId(elSelector,
             (SetlectorMetadata) selectorDefinition);
       }
+    } else if (column.getCaseMetadata() != null) {
+      writeCaseMetadata(elColumn, column.getCaseMetadata());
     } else {
       if (column.getValue() != null) {
         elColumn.addAttribute(VALUE_ATTRIBUTE, column.getValue());
       }
+    }
+  }
+
+  protected void writeCaseMetadata(Element element, CaseMetadata caseMetadata)
+      throws XmlAccessException {
+    Element caseElement = element.addElement(CASE_ELEMENT);
+    caseElement.addAttribute(ELSE_ATTRIBUTE, caseMetadata.getElseMetadata());
+    for (WhenMetadata whenMetadata : caseMetadata.getWhenMetadatas()) {
+      Element elWhen = caseElement.addElement(WHEN_ELEMENT);
+      elWhen.addAttribute(THEN_ATTRIBUTE, whenMetadata.getThenMetadata());
+      writeOperationMetadata(elWhen, whenMetadata.getWhenMetadata());
     }
   }
 
@@ -814,7 +875,8 @@ class XmlMetadataHelper {
         writeRelationOperationMetadata(elLogic,
             (RelationOperationMetadata) operation.getRightOperand());
       } else {
-        writeParenMetadata(elLogic, (ParenMetadata) operation.getRightOperand());
+        writeParenMetadata(elLogic,
+            (ParenMetadata) operation.getRightOperand());
       }
     }
     return elLogic;
@@ -893,6 +955,15 @@ class XmlMetadataHelper {
     elLimit.addAttribute(VALUE_ATTRIBUTE, value);
   }
 
+  protected void writeDecorateMetadatas(Element element,
+      List<DecorateMetadata> decorateMetadatas) {
+    Element elDecorators = element.addElement(DECORATORS_ELEMENT);
+    for (DecorateMetadata decorateMetadata : decorateMetadatas) {
+      Element el = elDecorators.addElement(DECORATEBY_ELEMENT);
+      el.addAttribute(DECORATOR_ATTRIBUTE, decorateMetadata.getDecorator());
+    }
+  }
+
   protected Element writeSetlectorMetadata(Element element,
       SetlectorMetadata setlector) throws XmlAccessException {
     Element elSetlector = createElement(element, SETLECTOR_ELEMENT);
@@ -903,8 +974,8 @@ class XmlMetadataHelper {
   protected void writeSetlectorMetadataWithoutId(Element element,
       SetlectorMetadata nestedSetlector) throws XmlAccessException {
     if (nestedSetlector.getCombinationType() != null)
-      element.addAttribute(COMBINATION_ATTRIBUTE, nestedSetlector
-          .getCombinationType().name());
+      element.addAttribute(COMBINATION_ATTRIBUTE,
+          nestedSetlector.getCombinationType().name());
 
     writeColumnsMetadata(element, nestedSetlector.getColumns());
     writeSets(element, nestedSetlector.getSets());

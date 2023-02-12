@@ -44,8 +44,6 @@ public class OtherCaculation extends DecorateFunction {
 
   protected OtherRecord[] otherRecords;
 
-  protected FunctionFactory functionFactory;
-
   protected boolean firstTime = true;
 
   public OtherCaculation(List<Operand> parameters) {
@@ -98,16 +96,14 @@ public class OtherCaculation extends DecorateFunction {
   }
 
   protected void initialize(RecordSet recordSet, Columns columns) {
-    RecordSetDefinition recordSetDefinition = recordSet
-        .getRecordSetDefinition();
+    RecordSetDefinition recordSetDefinition = recordSet.getRecordSetDefinition();
     initializeGroupIndexes(recordSetDefinition);
     initializeOtherRecords(recordSetDefinition, columns);
   }
 
   protected void initializeGroupIndexes(
       RecordSetDefinition recordSetDefinition) {
-    List<ColumnDefinition> columnDefinitions = recordSetDefinition
-        .getGroupColumns();
+    List<ColumnDefinition> columnDefinitions = recordSetDefinition.getGroupColumns();
     if (columnDefinitions.size() == 0 && otherAliases.length != 1) {
       throw new IllegalArgumentException(
           "The count of aliases should be one when the record set has no group!");

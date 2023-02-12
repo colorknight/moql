@@ -39,6 +39,8 @@ public class ColumnMetadata implements ColumnDefinition, Serializable {
 
   protected SelectorDefinition nestedSelector;
 
+  protected CaseMetadata caseMetadata;
+
   public ColumnMetadata(String name, String value) {
     Validate.notEmpty(name, "Parameter 'name' is empty!");
     Validate.notEmpty(value, "Parameter 'value' is empty!");
@@ -67,6 +69,13 @@ public class ColumnMetadata implements ColumnDefinition, Serializable {
     this.value = "";  //pending... nestedColumnSelector.toString();
   }
 
+  public ColumnMetadata(String name, CaseMetadata caseMetadata) {
+    Validate.notEmpty(name, "Parameter 'name' is empty!");
+    Validate.notNull(caseMetadata, "Parameter 'caseMetadata' is empty!");
+    this.name = name;
+    this.caseMetadata = caseMetadata;
+  }
+
   public boolean isHasAlias() {
     return !name.equals(value);
   }
@@ -92,4 +101,7 @@ public class ColumnMetadata implements ColumnDefinition, Serializable {
     return nestedSelector;
   }
 
+  public CaseMetadata getCaseMetadata() {
+    return caseMetadata;
+  }
 }

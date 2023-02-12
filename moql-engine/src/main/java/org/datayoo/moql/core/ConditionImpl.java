@@ -49,12 +49,29 @@ public class ConditionImpl implements Condition {
   }
 
   @Override
+  public boolean isMatch(Object[] entityArray) {
+    return operand.booleanOperate(entityArray);
+  }
+
+  @Override
   public List<EntityMap> match(List<EntityMap> entityMaps) {
     // TODO Auto-generated method stub
     List<EntityMap> matches = new LinkedList<EntityMap>();
     for (EntityMap entityMap : entityMaps) {
       if (operand.booleanOperate(entityMap)) {
         matches.add(entityMap);
+      }
+    }
+    return matches;
+  }
+
+  @Override
+  public List<Object[]> matchArray(List<Object[]> entityArrays) {
+    // TODO Auto-generated method stub
+    List<Object[]> matches = new LinkedList<Object[]>();
+    for (Object[] entityArray : entityArrays) {
+      if (operand.booleanOperate(entityArray)) {
+        matches.add(entityArray);
       }
     }
     return matches;

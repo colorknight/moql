@@ -114,4 +114,22 @@ public class MoqlParserTest extends TestCase {
       e.printStackTrace();
     }
   }
+
+  public void testSelector6() {
+    try {
+      String sql = "SELECT OrderID, Quantity,\n" + "CASE\n"
+          + "    WHEN Quantity > 30 THEN 'The quantity is greater than 30'\n"
+          + "    WHEN Quantity = 30 THEN 'The quantity is 30'\n"
+          + "    ELSE 'The quantity is under 30'\n" + "END AS QuantityText\n"
+          + "FROM OrderDetails;";
+      SelectorDefinition selectorDefinition = MoqlParser.parseMoql(sql);
+      String xml = MoqlParser.translateMetadata2Xml(selectorDefinition);
+      System.out.println(xml);
+      selectorDefinition = MoqlParser.translateXml2SelectorDefinition(xml);
+      System.out.println("----------------------------");
+      System.out.println(xml);
+    } catch (MoqlException e) {
+      e.printStackTrace();
+    }
+  }
 }

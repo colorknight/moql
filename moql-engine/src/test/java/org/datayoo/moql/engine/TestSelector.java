@@ -768,6 +768,22 @@ public class TestSelector extends TestCase {
     }
   }
 
+  public void testCase() {
+    List<BeanA> beanAList = BeanFactory.createBeanAList(0, 100);
+    DataSetMap dataSetMap = new DataSetMapImpl();
+    dataSetMap.putDataSet("BeanA", beanAList);
+    String sql = "Select a.num, case when a.num < 100 then 0 else 1 end as category FROM BeanA a";
+    try {
+      Selector selector = MoqlEngine.createSelector(sql);
+      selector.select(dataSetMap);
+      RecordSet recordSet = selector.getRecordSet();
+      outputRecordSet(recordSet);
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   public void testOtherCaculationDecorator() {
     List<BeanA> beanAList = BeanFactory.createBeanAList(0, 100);
     DataSetMap dataSetMap = new DataSetMapImpl();

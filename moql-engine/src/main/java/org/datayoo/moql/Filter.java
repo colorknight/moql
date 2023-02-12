@@ -27,7 +27,11 @@ public interface Filter extends Serializable {
 
   boolean isMatch(EntityMap entityMap);
 
+  boolean isMatch(Object[] entityArray);
+
   List<EntityMap> match(List<EntityMap> entityMaps);
+
+  List<Object[]> matchArray(List<Object[]> entityArrays);
 
   /**
    * bind the index of entity

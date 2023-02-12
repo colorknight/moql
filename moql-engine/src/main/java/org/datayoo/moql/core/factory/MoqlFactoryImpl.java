@@ -27,6 +27,8 @@ import org.datayoo.moql.core.table.CommonTable;
 import org.datayoo.moql.core.table.SelectorTable;
 import org.datayoo.moql.metadata.*;
 import org.datayoo.moql.operand.OperandFactory;
+import org.datayoo.moql.operand.cond.CaseOperand;
+import org.datayoo.moql.operand.cond.WhenOperand;
 import org.datayoo.moql.operand.expression.ParenExpression;
 import org.datayoo.moql.operand.expression.logic.LogicExpressionFactory;
 import org.datayoo.moql.operand.expression.relation.RelationExpressionFactory;
@@ -92,25 +94,23 @@ public class MoqlFactoryImpl implements MoqlFactory {
       throws MoqlException {
     Operand lOperand = null;
     if (!LogicExpressionFactory.isUnary(logicOperationMetadata.getOperator())) {
-      OperationMetadata lOperationMetadata = logicOperationMetadata
-          .getLeftOperand();
+      OperationMetadata lOperationMetadata = logicOperationMetadata.getLeftOperand();
       lOperand = createOperand(lOperationMetadata, selector);
     }
     Operand rOperand = createOperand(logicOperationMetadata.getRightOperand(),
         selector);
-    return LogicExpressionFactory
-        .createLogicExpression(logicOperationMetadata.getOperator(), lOperand,
-            rOperand);
+    return LogicExpressionFactory.createLogicExpression(
+        logicOperationMetadata.getOperator(), lOperand, rOperand);
   }
 
   protected Operand createRelationOperand(
       RelationOperationMetadata relationOperationMetadata,
       SelectorImpl selector) throws MoqlException {
     Operand lOperand = null;
-    if (!RelationExpressionFactory
-        .isUnary(relationOperationMetadata.getOperator())) {
-      lOperand = operandFactory
-          .createOperand(relationOperationMetadata.getLeftOperand());
+    if (!RelationExpressionFactory.isUnary(
+        relationOperationMetadata.getOperator())) {
+      lOperand = operandFactory.createOperand(
+          relationOperationMetadata.getLeftOperand());
     }
     Operand rOperand = null;
     if (relationOperationMetadata.getNestedSelector() != null) {
@@ -123,12 +123,11 @@ public class MoqlFactoryImpl implements MoqlFactory {
       selector.getNestedTableSelectors().add(nestedSelector);
       rOperand = new ColumnSelectorOperand(nestedSelector);
     } else {
-      rOperand = operandFactory
-          .createOperand(relationOperationMetadata.getRightOperand());
+      rOperand = operandFactory.createOperand(
+          relationOperationMetadata.getRightOperand());
     }
-    return RelationExpressionFactory
-        .createRelationExpression(relationOperationMetadata.getOperator(),
-            lOperand, rOperand);
+    return RelationExpressionFactory.createRelationExpression(
+        relationOperationMetadata.getOperator(), lOperand, rOperand);
   }
 
   /*
@@ -276,8 +275,8 @@ public class MoqlFactoryImpl implements MoqlFactory {
       }
       JoinMetadata joinMetadata = new JoinMetadata(JoinType.INNER,
           lQueryableMetadata, queryableMetadata);
-      lQueryable = JoinFactory
-          .createJoin(joinMetadata, lQueryable, rQueryable, null);
+      lQueryable = JoinFactory.createJoin(joinMetadata, lQueryable, rQueryable,
+          null);
       lQueryableMetadata = joinMetadata;
     }
     return (Join) lQueryable;
@@ -300,8 +299,9 @@ public class MoqlFactoryImpl implements MoqlFactory {
         try {
           int index = Integer.valueOf(column);
           if (index > columns.size() || index < 0) {
-            throw new MoqlException(StringFormater
-                .format("Order index {} is out of boundary!", index));
+            throw new MoqlException(
+                StringFormater.format("Order index {} is out of boundary!",
+                    index));
           }
           continue;
         } catch (Throwable t) {
@@ -315,8 +315,8 @@ public class MoqlFactoryImpl implements MoqlFactory {
           // "Order by column must appear in SELECT list when SELECT used GROUP BY or DISTINCT!");
           // }
           ColumnMetadata columnMetadata = new ColumnMetadata(column, column);
-          Operand operand = operandFactory
-              .createOperand(columnMetadata.getValue());
+          Operand operand = operandFactory.createOperand(
+              columnMetadata.getValue());
           columns.add(new ColumnImpl(columnMetadata, operand, true));
         }
       }
@@ -337,7 +337,11 @@ public class MoqlFactoryImpl implements MoqlFactory {
       List<Selector> nestedColumnSelectors) throws MoqlException {
     if (columnMetadata.getNestedSelector() == null) {
       Operand operand = null;
-      operand = operandFactory.createOperand(columnMetadata.getValue());
+      if (columnMetadata.getCaseMetadata() == null) {
+        operand = operandFactory.createOperand(columnMetadata.getValue());
+      } else {
+        operand = createCase(columnMetadata.getCaseMetadata());
+      }
       return new ColumnImpl(columnMetadata, operand);
     } else {
       Selector nestedSelector = createSelector(
@@ -349,12 +353,31 @@ public class MoqlFactoryImpl implements MoqlFactory {
     }
   }
 
+  protected CaseOperand createCase(CaseMetadata caseMetadata)
+      throws MoqlException {
+    List<WhenOperand> whenOperands = new LinkedList<>();
+    for (WhenMetadata whenMetadata : caseMetadata.getWhenMetadatas()) {
+      WhenOperand whenOperand = createWhenOperand(whenMetadata);
+      whenOperands.add(whenOperand);
+    }
+    Operand elseOperand = operandFactory.createOperand(
+        caseMetadata.getElseMetadata());
+    return new CaseOperand(whenOperands, elseOperand);
+  }
+
+  protected WhenOperand createWhenOperand(WhenMetadata whenMetadata)
+      throws MoqlException {
+    Operand condition = createOperand(whenMetadata.getWhenMetadata(), null);
+    Operand operand = operandFactory.createOperand(
+        whenMetadata.getThenMetadata());
+    return new WhenOperand(condition, operand);
+  }
+
   protected Selector baseCreateSetlector(SetlectorMetadata setlectorMetadata)
       throws MoqlException {
     SetlectorImpl setlector = new SetlectorImpl(setlectorMetadata);
-    RecordSetCombination combination = RecordSetCombinationFactory
-        .createRecordSetCombination(setlectorMetadata.getCombinationType(),
-            setlectorMetadata.getColumns());
+    RecordSetCombination combination = RecordSetCombinationFactory.createRecordSetCombination(
+        setlectorMetadata.getCombinationType(), setlectorMetadata.getColumns());
     setlector.setCombination(combination);
 
     for (SelectorDefinition selectorDefinition : setlectorMetadata.getSets()) {

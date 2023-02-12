@@ -29,10 +29,13 @@ ASCENDING	: A_ S_ C_;
 BETWEEN	:	B_ E_ T_ W_ E_ E_ N_;
 BY		:	B_ Y_;
 CACHE	:	C_ A_ C_ H_ E_;
+CASE	:	C_ A_ S_ E_;
 COMPLEMENTATION	:	C_ O_ M_ P_ L_ E_ M_ E_ N_ T_ A_ T_ I_ O_ N_;
 DECORATE	:	D_ E_ C_ O_ R_ A_ T_ E_;
 DESCENDING	: 	D_ E_ S_ C_;
 DISTINCT	:	D_ I_ S_ T_ I_ N_ C_ T_;
+ELSE		:	E_ L_ S_ E_;
+END		    :	E_ N_ D_;
 EXCEPT		:	E_ X_ C_ E_ P_ T_;
 EXISTS		:	E_ X_ I_ S_ T_ S_;
 FALSE		:	F_ A_ L_ S_ E_;
@@ -60,10 +63,12 @@ OUTER		:	O_ U_ T_ E_ R_;
 RIGHT		:	R_ I_ G_ H_ T_;
 SELECT		:	S_ E_ L_ E_ C_ T_;
 SYMEXCEPT	:	S_ Y_ M_ E_ X_ C_ E_ P_ T_;
+THEN        :   T_ H_ E_ N_;
 LIMIT		:	L_ I_ M_ I_ T_;
 TRUE		:	T_ R_ U_ E_;
 UNION		:	U_ N_ I_ O_ N_;
 WHERE		:	W_ H_ E_ R_ E_;
+WHEN		:	W_ H_ E_ N_;
 
 selector returns[SelectorDefinition selectorDefinition]
 	: queryMetadata = queryExpression {selectorDefinition = queryMetadata;}
@@ -428,7 +433,32 @@ String name = null;
 	{
 	  column = new ColumnMetadata(t.getText(), selectorDefinition);
 	}
+	| caseMetadata = caseClause AS? t = Identifier
+	{
+	  column = new ColumnMetadata(t.getText(), caseMetadata);
+	}
 	;
+
+caseClause returns[CaseMetadata caseMetadata]
+@init {
+List<WhenMetadata> whenMetadatas = new LinkedList<WhenMetadata>();
+}
+@after {
+if (whenMetadatas.size() > 0) {
+    caseMetadata = new CaseMetadata(whenMetadatas, $expr.expressionText);
+}
+}
+:
+    CASE whenMetadata = whenClause { whenMetadatas.add(whenMetadata);}
+    (whenMetadata = whenClause { whenMetadatas.add(whenMetadata);})*
+    ELSE expr = expression?
+    END
+;
+
+whenClause returns[WhenMetadata whenMetadata]
+:
+    WHEN conditionMetadata = searchCondition THEN expr = expression { whenMetadata = new WhenMetadata(conditionMetadata, $expr.expressionText);}
+;
   
 fromClause returns[TablesMetadata tablesMetadata]
 @init {
