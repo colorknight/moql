@@ -30,4 +30,6 @@ public interface EnhanceOperate {
    */
   boolean booleanOperate(Object[] entityArray);
 
+  Operand setValue(Object[] entityArray, Object value);
+
 }

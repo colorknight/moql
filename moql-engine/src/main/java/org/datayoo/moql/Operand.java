@@ -55,6 +55,8 @@ public interface Operand extends EnhanceOperate, Serializable {
    */
   Object getValue();
 
+  Operand setValue(EntityMap entityMap, Object value);
+
   /**
    * get the type of the operand
    */

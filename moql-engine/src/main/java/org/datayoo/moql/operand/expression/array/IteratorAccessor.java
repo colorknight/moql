@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,50 +25,55 @@ import org.datayoo.moql.util.StringFormater;
 import java.util.Iterator;
 
 /**
- * 
  * @author Tang Tadin
- *
  */
 @SuppressWarnings("unchecked")
 public class IteratorAccessor implements ArrayAccessor {
 
-	@Override
-	public Object getObject(Object array, Object index) {
-		// TODO Auto-generated method stub
-		Iterator<Object> it = ((Iterable<Object>)array).iterator();
-		if (index instanceof Number) {
-			return getObject(it, ((Number)index).intValue());
-		}
-//		if (index.getClass().equals(String.class)) {
-//			return getObject(it, Integer.valueOf((String)index));
-//		}
-		if (index instanceof NumberConvertable) {
-			Number inx = ((NumberConvertable)index).toNumber();
-			return getObject(it, inx.intValue());
-		}
-		throw new IllegalArgumentException(StringFormater
-        .format("Unsupport 'index' of class '{}'!", index.getClass().getName()));
-	}
-	
-	protected Object getObject(Iterator<Object> it, int index) {
-		int i = 0;
-		while(it.hasNext()) {
-			Object o = it.next();
-			if (i++ == index)
-				return o;
-		}
-		throw new IndexOutOfBoundsException();
-	}
+  @Override
+  public Object getObject(Object array, Object index) {
+    // TODO Auto-generated method stub
+    Iterator<Object> it = ((Iterable<Object>) array).iterator();
+    if (index instanceof Number) {
+      return getObject(it, ((Number) index).intValue());
+    }
+    //		if (index.getClass().equals(String.class)) {
+    //			return getObject(it, Integer.valueOf((String)index));
+    //		}
+    if (index instanceof NumberConvertable) {
+      Number inx = ((NumberConvertable) index).toNumber();
+      return getObject(it, inx.intValue());
+    }
+    throw new IllegalArgumentException(
+        StringFormater.format("Unsupport 'index' of class '{}'!",
+            index.getClass().getName()));
+  }
 
-	@Override
-	public OperandContextList toOperandContextList(Object array) {
-		// TODO Auto-generated method stub
-		Iterator<Object> it = ((Iterable<Object>)array).iterator();
-		OperandContextList ctxList = new OperandContextLinkedList();
-		while(it.hasNext()) {
-			ctxList.add(it.next());
-		}
-		return ctxList;
-	}
+  protected Object getObject(Iterator<Object> it, int index) {
+    int i = 0;
+    while (it.hasNext()) {
+      Object o = it.next();
+      if (i++ == index)
+        return o;
+    }
+    throw new IndexOutOfBoundsException();
+  }
+
+  @Override
+  public void setObject(Object array, Object index, Object value) {
+    throw new UnsupportedOperationException(
+        "The array of Iterator doesn't support set object!");
+  }
+
+  @Override
+  public OperandContextList toOperandContextList(Object array) {
+    // TODO Auto-generated method stub
+    Iterator<Object> it = ((Iterable<Object>) array).iterator();
+    OperandContextList ctxList = new OperandContextLinkedList();
+    while (it.hasNext()) {
+      ctxList.add(it.next());
+    }
+    return ctxList;
+  }
 
 }

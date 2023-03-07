@@ -100,4 +100,36 @@ public class ArrayExpression extends AbstractExpression {
   public Operand getIndex() {
     return index;
   }
+
+  @Override
+  public Operand setValue(Object[] entityArray, Object value) {
+    Object o = array.operate(entityArray);
+    if (o == null)
+      return null;
+    ArrayAccessor arrayAccessor = ArrayExpressionUtils.getArrayAccessor(o);
+    if (index != null) {
+      Object inx = index.operate(entityArray);
+      arrayAccessor.setObject(o, inx, value);
+    } else {
+      throw new UnsupportedOperationException(
+          "The operand unsupport set value!");
+    }
+    return this;
+  }
+
+  @Override
+  public Operand setValue(EntityMap entityMap, Object value) {
+    Object o = array.operate(entityMap);
+    if (o == null)
+      return null;
+    ArrayAccessor arrayAccessor = ArrayExpressionUtils.getArrayAccessor(o);
+    if (index != null) {
+      Object inx = index.operate(entityMap);
+      arrayAccessor.setObject(o, inx, value);
+    } else {
+      throw new UnsupportedOperationException(
+          "The operand unsupport set value!");
+    }
+    return this;
+  }
 }

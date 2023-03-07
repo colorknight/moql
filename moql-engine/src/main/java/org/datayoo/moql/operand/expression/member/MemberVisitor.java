@@ -13,4 +13,6 @@ public interface MemberVisitor extends Serializable {
   boolean isVisitable(Object object);
 
   Object operate(Object object, String varName);
+
+  Object setValue(Object object, String varName, Object value);
 }

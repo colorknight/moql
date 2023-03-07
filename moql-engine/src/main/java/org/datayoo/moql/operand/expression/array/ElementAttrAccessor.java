@@ -27,8 +27,32 @@ public class ElementAttrAccessor implements ArrayAccessor {
       Number inx = ((NumberConvertable) index).toNumber();
       return element.attribute(inx.intValue()).getValue();
     }
-    throw new IllegalArgumentException(StringFormater
-        .format("Unsupport 'index' of class '{}'!",
+    throw new IllegalArgumentException(
+        StringFormater.format("Unsupport 'index' of class '{}'!",
+            index.getClass().getName()));
+  }
+
+  @Override
+  public void setObject(Object array, Object index, Object value) {
+    if (value == null)
+      value = "";
+    Element element = (Element) array;
+    if (index instanceof Number) {
+      element.attribute((((Number) index).intValue()))
+          .setValue(value.toString());
+      return;
+    }
+    if (index instanceof String) {
+      element.attribute(index.toString()).setValue(value.toString());
+      return;
+    }
+    if (index instanceof NumberConvertable) {
+      Number inx = ((NumberConvertable) index).toNumber();
+      element.attribute(inx.intValue()).setValue(value.toString());
+      return;
+    }
+    throw new IllegalArgumentException(
+        StringFormater.format("Unsupport 'index' of class '{}'!",
             index.getClass().getName()));
   }
 

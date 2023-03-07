@@ -133,4 +133,13 @@ public abstract class AbstractOperand implements Operand, OperandSourceAware {
     return binded;
   }
 
+  @Override
+  public Operand setValue(Object[] entityArray, Object value) {
+    throw new UnsupportedOperationException("The operand unsupport set value!");
+  }
+
+  @Override
+  public Operand setValue(EntityMap entityMap, Object value) {
+    throw new UnsupportedOperationException("The operand unsupport set value!");
+  }
 }

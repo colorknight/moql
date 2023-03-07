@@ -19,6 +19,7 @@ package org.datayoo.moql.operand.variable;
 
 import org.apache.commons.lang3.Validate;
 import org.datayoo.moql.EntityMap;
+import org.datayoo.moql.Operand;
 import org.datayoo.moql.OperandType;
 import org.datayoo.moql.operand.AbstractOperand;
 
@@ -64,5 +65,17 @@ public class SingleVariable extends AbstractOperand implements Variable {
   @Override
   public Object operate(Object[] entityArray) {
     return entityArray[operandIndex];
+  }
+
+  @Override
+  public Operand setValue(Object[] entityArray, Object value) {
+    entityArray[operandIndex] = value;
+    return this;
+  }
+
+  @Override
+  public Operand setValue(EntityMap entityMap, Object value) {
+    entityMap.putEntity(name, value);
+    return this;
   }
 }

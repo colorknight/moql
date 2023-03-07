@@ -18,6 +18,7 @@
 package org.datayoo.moql.operand.expression.member;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.commons.lang3.Validate;
@@ -252,5 +253,102 @@ public class MemberVariableExpression extends AbstractExpression
   public Object operate(Object[] entityArray) {
     Object o = target.operate(entityArray);
     return operateProc(o);
+  }
+
+  @Override
+  public Operand setValue(Object[] entityArray, Object value) {
+    Object o = target.operate(entityArray);
+    setValueProc(o, value);
+    return this;
+  }
+
+  protected void setValueProc(Object o, Object value) {
+    if (o == null)
+      return;
+    if (!(o instanceof OperandContextList)) {
+      if (o instanceof Map) {
+        setValue((Map) o, value);
+        return;
+      }
+      if (o instanceof JsonObject) {  // modified 2017/02/05
+        setValue((JsonObject) o, value);
+        return;
+      }
+      if (o instanceof Element) {
+        setValue((Element) o, value);
+        return;
+      }
+      MemberVisitor memberVisitor = getVisitor(o);
+      if (memberVisitor != null) {
+        String name = variable.getName();
+        memberVisitor.setValue(o, name, value);
+        return;
+      }
+      setValue(o, value);
+    }
+  }
+
+  protected void setValue(Map map, Object value) {
+    String name = variable.getName();
+    map.put(name, value);
+  }
+
+  // added 2017/02/05
+  protected void setValue(JsonObject jsonObject, Object value) {
+    String name = variable.getName();
+    jsonObject.remove(name);
+    if (value == null) {
+      jsonObject.add(name, JsonNull.INSTANCE);
+      return;
+    }
+    if (value instanceof String)
+      jsonObject.addProperty(name, (String) value);
+    else if (value instanceof Number) {
+      jsonObject.addProperty(name, (Number) value);
+    } else if (value instanceof Boolean) {
+      jsonObject.addProperty(name, (Boolean) value);
+    } else {
+      jsonObject.addProperty(name, value.toString());
+    }
+  }
+
+  // added 2017/02/05
+  protected void setValue(Element element, Object value) {
+    if (value == null)
+      return;
+    String name = variable.getName();
+    List list = element.elements(name);
+    if (list == null)
+      return;
+    if (list.size() > 1) {
+      for (Object o : list) {
+        Element e = (Element) o;
+        ((Element) o).setText(value.toString());
+      }
+      return;
+    }
+    ((Element) list.get(0)).setText(value.toString());
+  }
+
+  protected void setValue(Object o, Object value) {
+    if (o instanceof Map) {
+      ((Map) o).put(variable.getName(), value);
+    }
+    Field f = getField(o);
+    try {
+      f.set(o, value);
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      throw new OperateException(
+          StringFormater.format("Invoke field '{}' in class '{}' failed!",
+              variable.getName(), o.getClass().getName()), e);
+    }
+  }
+
+  @Override
+  public Operand setValue(EntityMap entityMap, Object value) {
+    Object o = target.operate(entityMap);
+    setValueProc(o, value);
+    return this;
   }
 }

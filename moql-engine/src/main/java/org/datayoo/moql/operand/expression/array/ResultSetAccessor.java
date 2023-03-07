@@ -57,7 +57,13 @@ public class ResultSetAccessor implements ArrayAccessor {
         .format("Unsupport 'index' of class '{}'!", index.getClass().getName()));
 
 	}
-	
+
+	@Override
+	public void setObject(Object array, Object index, Object value) {
+		throw new UnsupportedOperationException(
+				"The array of ResultSet doesn't support set object!");
+	}
+
 	protected Object getObject(ResultSet rs, int index) {
 		int i = 0;
 		try {
