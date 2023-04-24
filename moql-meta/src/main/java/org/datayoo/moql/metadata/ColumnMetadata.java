@@ -41,6 +41,8 @@ public class ColumnMetadata implements ColumnDefinition, Serializable {
 
   protected CaseMetadata caseMetadata;
 
+  protected Object dataType;
+
   public ColumnMetadata(String name, String value) {
     Validate.notEmpty(name, "Parameter 'name' is empty!");
     Validate.notEmpty(value, "Parameter 'value' is empty!");
@@ -103,5 +105,13 @@ public class ColumnMetadata implements ColumnDefinition, Serializable {
 
   public CaseMetadata getCaseMetadata() {
     return caseMetadata;
+  }
+
+  public Object getDataType() {
+    return dataType;
+  }
+
+  public void setDataType(Object dataType) {
+    this.dataType = dataType;
   }
 }
