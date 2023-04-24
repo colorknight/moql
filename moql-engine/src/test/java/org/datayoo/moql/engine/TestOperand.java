@@ -204,6 +204,7 @@ public class TestOperand extends TestCase {
     entityMap.putEntity("num", 2);
     entityMap.putEntity("num1", 3);
     entityMap.putEntity("num2", 4);
+    entityMap.putEntity("num3", 402653194);
     try {
       Operand arithmetic = MoqlEngine.createOperand(" num << num1 + 1");
       System.out.println(
@@ -212,6 +213,9 @@ public class TestOperand extends TestCase {
       System.out.println(
           arithmetic.toString() + " = " + arithmetic.operate(entityMap));
       arithmetic = MoqlEngine.createOperand("~num2 ^ num2");
+      System.out.println(
+          arithmetic.toString() + " = " + arithmetic.operate(entityMap));
+      arithmetic = MoqlEngine.createOperand("num3 >> 26 & 0x03");
       System.out.println(
           arithmetic.toString() + " = " + arithmetic.operate(entityMap));
     } catch (MoqlException e) {
@@ -255,6 +259,8 @@ public class TestOperand extends TestCase {
       System.out.println(member.operate(entityMap));
       member = MoqlEngine.createOperand("bean.getNum().getX()");
       System.out.println(member.toString() + " " + member.getOperandType());
+      member = MoqlEngine.createOperand("ary.length");
+      System.out.println(member.operate(entityMap));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

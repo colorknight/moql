@@ -73,7 +73,7 @@ public class OperandFactoryImpl implements OperandFactory {
 
   protected static Operand createPseudoOperand(String operand) {
     //
-    if (operand.endsWith(".*")) { //a.*,b.*,etc
+    if (operand.endsWith(".*") || operand.equals("*")) { //a.*,b.*,etc
       return new PseudoOperand(operand);
     }
     return null;
