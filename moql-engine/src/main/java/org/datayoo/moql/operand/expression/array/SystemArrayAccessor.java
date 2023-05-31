@@ -23,6 +23,9 @@ import org.datayoo.moql.operand.OperandContextList;
 import org.datayoo.moql.util.StringFormater;
 
 import java.lang.reflect.Array;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Tang Tadin
@@ -65,8 +68,25 @@ public class SystemArrayAccessor implements ArrayAccessor {
   }
 
   @Override
+  public Object removeObject(Object array, Object value) {
+    List<Object> list = new LinkedList<>();
+    for (int i = 0; i < Array.getLength(array); i++) {
+      Object n = Array.get(array, i);
+      if (Objects.equals(n, value))
+        continue;
+      list.add(n);
+    }
+    Object ary = Array.newInstance(array.getClass().getComponentType(),
+        list.size());
+    int i = 0;
+    for (Object o : list) {
+      Array.set(ary, i++, o);
+    }
+    return ary;
+  }
+
+  @Override
   public OperandContextList toOperandContextList(Object array) {
-    // TODO Auto-generated method stub
     OperandContextList ctxList = new OperandContextArrayList(
         Array.getLength(array));
     for (int i = 0; i < Array.getLength(array); i++) {
@@ -75,4 +95,8 @@ public class SystemArrayAccessor implements ArrayAccessor {
     return ctxList;
   }
 
+  @Override
+  public int getSize(Object array) {
+    return Array.getLength(array);
+  }
 }

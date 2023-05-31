@@ -82,6 +82,10 @@ public class InExpression extends AbstractRelationExpression {
     if (lValue == null)
       return false;
     if (rValues != null) {
+      for (Object v : rValues) {
+        if (CompareHelper.compare(lValue, v) == 0)
+          return true;
+      }
       return rValues.contains(lValue);
     } else {
       for (Operand rOperand : rOperands) {

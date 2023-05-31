@@ -28,6 +28,10 @@ public interface ArrayAccessor {
 
   void setObject(Object array, Object index, Object value);
 
+  Object removeObject(Object array, Object value);
+
   OperandContextList toOperandContextList(Object array);
+
+  int getSize(Object array);
 
 }

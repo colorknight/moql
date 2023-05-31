@@ -17,16 +17,19 @@
  */
 package org.datayoo.moql.operand.expression.array;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import org.datayoo.moql.NumberConvertable;
 import org.datayoo.moql.RecordSet;
 import org.datayoo.moql.operand.OperandContextArrayList;
 import org.datayoo.moql.operand.OperandContextList;
 import org.datayoo.moql.util.StringFormater;
 
+import java.util.Iterator;
+import java.util.Objects;
+
 /**
- *
  * @author Tang Tadin
- *
  */
 public class RecordSetAccessor implements ArrayAccessor {
 
@@ -57,10 +60,27 @@ public class RecordSetAccessor implements ArrayAccessor {
   }
 
   @Override
+  public Object removeObject(Object array, Object value) {
+    RecordSet rs = (RecordSet) array;
+    Iterator<Object[]> it = rs.getRecords().iterator();
+    while (it.hasNext()) {
+      Object n = it.next();
+      if (Objects.equals(n, value))
+        it.remove();
+    }
+    return array;
+  }
+
+  @Override
   public OperandContextList toOperandContextList(Object array) {
     // TODO Auto-generated method stub
     RecordSet rs = (RecordSet) array;
     return new OperandContextArrayList(rs.getRecordsAsMaps());
   }
 
+  @Override
+  public int getSize(Object array) {
+    RecordSet rs = (RecordSet) array;
+    return rs.getRecordsCount();
+  }
 }

@@ -888,4 +888,19 @@ public class TestSelector extends TestCase {
       e.printStackTrace();
     }
   }
+
+  public void testElementMatchSelector() {
+    List<BeanE> beanEList = BeanFactory.createBeanEList();
+    DataSetMap dataSetMap = new DataSetMapImpl();
+    dataSetMap.putDataSet("dbba", beanEList);
+    String sql = "select a.src, a.dst, a.ary from dbba a where elementMatch(a.ary, 'e in (1, 0)')";
+    try {
+      Selector selector = MoqlEngine.createSelector(sql);
+      selector.select(dataSetMap);
+      RecordSet recordSet = selector.getRecordSet();
+      outputRecordSet(recordSet);
+    } catch (MoqlException e) {
+      e.printStackTrace();
+    }
+  }
 }

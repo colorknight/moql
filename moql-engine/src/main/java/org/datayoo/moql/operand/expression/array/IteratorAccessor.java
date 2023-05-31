@@ -76,4 +76,19 @@ public class IteratorAccessor implements ArrayAccessor {
     return ctxList;
   }
 
+  @Override
+  public Object removeObject(Object array, Object value) {
+    Iterator<Object> it = ((Iterable<Object>) array).iterator();
+    while (it.hasNext()) {
+      Object n = it.next();
+      if (n.equals(value))
+        it.remove();
+    }
+    return array;
+  }
+
+  @Override
+  public int getSize(Object array) {
+    return -1;
+  }
 }

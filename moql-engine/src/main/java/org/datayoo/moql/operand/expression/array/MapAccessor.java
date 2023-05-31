@@ -42,10 +42,22 @@ public class MapAccessor implements ArrayAccessor {
   }
 
   @Override
+  public Object removeObject(Object array, Object value) {
+    Map<Object, Object> map = (Map<Object, Object>) array;
+    map.remove(value);
+    return map;
+  }
+
+  @Override
   public OperandContextList toOperandContextList(Object array) {
     // TODO Auto-generated method stub
     Map<Object, Object> map = (Map<Object, Object>) array;
     return new OperandContextArrayList(map.values());
   }
 
+  @Override
+  public int getSize(Object array) {
+    Map<Object, Object> map = (Map<Object, Object>) array;
+    return map.size();
+  }
 }

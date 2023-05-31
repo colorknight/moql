@@ -114,6 +114,9 @@ public class FunctionFactoryImpl implements FunctionFactory {
         new FunctionBean(Sqrt.FUNCTION_NAME, Sqrt.class.getName(), true));
     functionMap.put(Tan.FUNCTION_NAME.toLowerCase(),
         new FunctionBean(Tan.FUNCTION_NAME, Tan.class.getName(), true));
+    functionMap.put(ElementMatch.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(ElementMatch.FUNCTION_NAME,
+            ElementMatch.class.getName(), true));
     functionMap.put(GroupOrdinal.FUNCTION_NAME.toLowerCase(),
         new FunctionBean(GroupOrdinal.FUNCTION_NAME,
             GroupOrdinal.class.getName(), true));

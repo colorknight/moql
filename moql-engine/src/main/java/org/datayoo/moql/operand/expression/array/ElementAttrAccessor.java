@@ -6,6 +6,8 @@ import org.datayoo.moql.operand.OperandContextArrayList;
 import org.datayoo.moql.operand.OperandContextList;
 import org.datayoo.moql.util.StringFormater;
 import org.dom4j.Element;
+import org.dom4j.QName;
+import org.dom4j.tree.DefaultAttribute;
 
 import java.lang.reflect.Array;
 
@@ -57,13 +59,26 @@ public class ElementAttrAccessor implements ArrayAccessor {
   }
 
   @Override
+  public Object removeObject(Object array, Object value) {
+    Element element = (Element) array;
+    element.remove(new DefaultAttribute(new QName(value.toString())));
+    return array;
+  }
+
+  @Override
   public OperandContextList toOperandContextList(Object array) {
     Element element = (Element) array;
     OperandContextList ctxList = new OperandContextArrayList(
-        Array.getLength(array));
+        element.attributeCount());
     for (int i = 0; i < element.attributeCount(); i++) {
       ctxList.add(element.attribute(i).getValue());
     }
     return ctxList;
+  }
+
+  @Override
+  public int getSize(Object array) {
+    Element element = (Element) array;
+    return element.attributeCount();
   }
 }

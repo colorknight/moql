@@ -10,6 +10,8 @@ import org.datayoo.moql.operand.OperandContextList;
 import org.datayoo.moql.util.StringFormater;
 
 import java.lang.reflect.Array;
+import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * Created by tangtadin on 17/2/5.
@@ -62,6 +64,18 @@ public class JsonArrayAccessor implements ArrayAccessor {
   }
 
   @Override
+  public Object removeObject(Object array, Object value) {
+    JsonArray jsonArray = (JsonArray) array;
+    Iterator<JsonElement> it = jsonArray.iterator();
+    while (it.hasNext()) {
+      Object n = it.next();
+      if (Objects.equals(n, value))
+        it.remove();
+    }
+    return array;
+  }
+
+  @Override
   public OperandContextList toOperandContextList(Object array) {
     JsonArray jsonArray = (JsonArray) array;
     OperandContextList ctxList = new OperandContextArrayList(
@@ -70,5 +84,11 @@ public class JsonArrayAccessor implements ArrayAccessor {
       ctxList.add(jsonArray.get(i));
     }
     return ctxList;
+  }
+
+  @Override
+  public int getSize(Object array) {
+    JsonArray jsonArray = (JsonArray) array;
+    return jsonArray.size();
   }
 }

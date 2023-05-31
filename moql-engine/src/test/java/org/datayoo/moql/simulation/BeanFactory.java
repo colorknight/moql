@@ -143,6 +143,8 @@ public abstract class BeanFactory {
       String src = "src" + i % 3;
       String dst = "dst" + i % 3;
       BeanE beanE = new BeanE(src, dst);
+      int[] ary = new int[] { i, i % 3 };
+      beanE.setAry(ary);
       beanList.add(beanE);
     }
     return beanList;
