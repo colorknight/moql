@@ -40,6 +40,8 @@ public class TestOperand extends TestCase {
       System.out.println(constant.toString() + " " + constant.getOperandType());
       constant = MoqlEngine.createOperand("-2.3");
       System.out.println(constant.toString() + " " + constant.getOperandType());
+      constant = MoqlEngine.createOperand("\"-2.3\"");
+      System.out.println(constant.toString() + " " + constant.getOperandType());
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

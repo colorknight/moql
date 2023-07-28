@@ -10,11 +10,10 @@
 
     <groupId>org.datayoo.moql</groupId>
     <artifactId>moql-engine</artifactId>
-    <version>1.4.2</version>
+    <version>1.4.3</version>
     <packaging>jar</packaging>
 
     <name>moql-engine</name>
-    <url>http://maven.apache.org</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
