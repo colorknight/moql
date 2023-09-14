@@ -22,6 +22,7 @@ import org.datayoo.moql.MoqlRuntimeException;
 import org.datayoo.moql.Operand;
 import org.datayoo.moql.operand.function.*;
 import org.datayoo.moql.operand.function.decorator.*;
+import org.datayoo.moql.operand.nativeFunc.NativeDynamicField;
 import org.datayoo.moql.util.StringFormater;
 
 import java.io.InputStream;
@@ -35,9 +36,13 @@ import java.util.Map;
  */
 public class FunctionFactoryImpl implements FunctionFactory {
 
+  protected Map<String, FunctionBean> nativeFunctionMap = new HashMap<String, FunctionBean>();
   protected Map<String, FunctionBean> functionMap = new HashMap<String, FunctionBean>();
 
   {
+    nativeFunctionMap.put(NativeDynamicField.FUNCTION_NAME.toLowerCase(),
+        new FunctionBean(NativeDynamicField.FUNCTION_NAME,
+            NativeDynamicField.class.getName(), true));
     functionMap.put(Lu.FUNCTION_NAME.toLowerCase(),
         new FunctionBean(Lu.FUNCTION_NAME, Lu.class.getName(), true));
     functionMap.put(Count.FUNCTION_NAME.toLowerCase(),
@@ -140,10 +145,13 @@ public class FunctionFactoryImpl implements FunctionFactory {
   @Override
   public Function createFunction(String name, List<Operand> parameters) {
     Validate.notEmpty(name, "Parameter name is empty!");
-    FunctionBean bean = functionMap.get(name.toLowerCase());
+    FunctionBean bean = nativeFunctionMap.get(name.toLowerCase());
     if (bean == null) {
-      //
-      return new MemberFunction(name, parameters);
+      bean = functionMap.get(name.toLowerCase());
+      if (bean == null) {
+        //
+        return new MemberFunction(name, parameters);
+      }
     }
     Function func;
     try {

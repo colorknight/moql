@@ -197,9 +197,6 @@ public class MemberVariableExpression extends AbstractExpression
   }
 
   protected Object operate(Object o) {
-    if (o instanceof Map) {
-      return ((Map) o).get(variable.getName());
-    }
     if (o.getClass().isArray()) {
       return operateArray(o);
     }

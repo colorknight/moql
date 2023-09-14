@@ -27,6 +27,7 @@ import org.datayoo.moql.operand.OperandContextList;
 import org.datayoo.moql.operand.expression.AbstractExpression;
 import org.datayoo.moql.operand.expression.ExpressionType;
 import org.datayoo.moql.operand.function.Function;
+import org.datayoo.moql.operand.nativeFunc.AbstractNativeFunction;
 import org.datayoo.moql.util.StringFormater;
 
 import java.lang.reflect.Method;
@@ -48,6 +49,8 @@ public class MemberFunctionExpression extends AbstractExpression
 
   protected Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
 
+  protected boolean nativeFunction = false;
+
   {
     expressionType = ExpressionType.MEMBER;
   }
@@ -59,7 +62,9 @@ public class MemberFunctionExpression extends AbstractExpression
 
     this.target = target;
     this.function = function;
-
+    if (function instanceof AbstractNativeFunction) {
+      nativeFunction = true;
+    }
     name = buildNameString();
   }
 
@@ -78,8 +83,14 @@ public class MemberFunctionExpression extends AbstractExpression
     Object o = target.operate(entityMap);
     if (o == null)
       return null;
-    Object[] parameterObjects = getParameterObjects(entityMap);
-    return operateProc(o, parameterObjects);
+    if (!nativeFunction) {
+      Object[] parameterObjects = getParameterObjects(entityMap);
+      return operateProc(o, parameterObjects);
+    } else {
+      AbstractNativeFunction anf = (AbstractNativeFunction) function;
+      anf.setTarget(o);
+      return anf.operate(entityMap);
+    }
   }
 
   protected Object operateProc(Object o, Object[] parameterObjects) {

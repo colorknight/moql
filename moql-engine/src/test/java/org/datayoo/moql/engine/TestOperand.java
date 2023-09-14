@@ -348,7 +348,7 @@ public class TestOperand extends TestCase {
 
   public void testJsonExpression() {
     EntityMap entityMap = new EntityMapImpl();
-    String json = "{\"obj\":{\"name\":\"test\";\"value\":[1,2,3]}}";
+    String json = "{\"obj\":{\"name\":\"test\";\"value\":[1,2,3];\"embed\":{\"test\":{\"a\":\"abc\"}}}}";
     JsonParser parser = new JsonParser();
     entityMap.putEntity("j", parser.parse(json));
     try {
@@ -357,6 +357,8 @@ public class TestOperand extends TestCase {
       System.out.println(member.operate(entityMap));
       member = MoqlEngine.createOperand("j.obj.value[2]");
       System.out.println(member.toString() + " " + member.getOperandType());
+      System.out.println(member.operate(entityMap));
+      member = MoqlEngine.createOperand("j.obj.embed._fe('j.obj.name').a");
       System.out.println(member.operate(entityMap));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
@@ -379,7 +381,7 @@ public class TestOperand extends TestCase {
 
   public void testElementExpression() {
     EntityMap entityMap = new EntityMapImpl();
-    String xml = "<e1><e10 a1=\"t1\" a2=\"t2\">test</e10><e11>ddd</e11><e11 a3=\"t3\">eee</e11><e11>fff</e11></e1>";
+    String xml = "<e1><e10 a1=\"t1\" a2=\"t2\">test</e10><e11>ddd</e11><e11 a3=\"t3\">eee</e11><e11>fff</e11><e12>e11</e12></e1>";
     ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes());
     SAXReader reader = new SAXReader();
     try {
@@ -396,6 +398,13 @@ public class TestOperand extends TestCase {
       System.out.println(member.operate(entityMap));
       member = MoqlEngine.createOperand("e.e11[1]['a3']");
       System.out.println(member.toString() + " " + member.getOperandType());
+      System.out.println(member.operate(entityMap));
+      member = MoqlEngine.createOperand("e._fe('e.e12.getText()')[1]['a3']");
+      System.out.println(member.operate(entityMap));
+      xml = "<e1><e10>test</e10><e10 a1=\"t1\" a3=\"t2\">test</e10><e11>ddd</e11><e11 a3=\"t3\">eee</e11><e11>fff</e11><e12>e10</e12></e1>";
+      bais = new ByteArrayInputStream(xml.getBytes());
+      document = reader.read(bais);
+      entityMap.putEntity("e", document.getRootElement());
       System.out.println(member.operate(entityMap));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
