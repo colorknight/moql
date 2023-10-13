@@ -182,7 +182,8 @@ public class FunctionFactoryImpl implements FunctionFactory {
     if (bean != null) {
       if (bean.isReadonly())
         throw new IllegalArgumentException(
-            String.format("Function %s is read only. Cann't be overwritten!"));
+            String.format("Function %s is read only. Cann't be overwritten!",
+                name));
       functionMap.put(name, new FunctionBean(name, className, false));
       return bean.getClassName();
     } else {
