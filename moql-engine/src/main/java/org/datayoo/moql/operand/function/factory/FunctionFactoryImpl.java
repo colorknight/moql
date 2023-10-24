@@ -175,6 +175,12 @@ public class FunctionFactoryImpl implements FunctionFactory {
 
   @Override
   public String registFunction(String name, String className) {
+    return registFunction(name, className, null);
+  }
+
+  @Override
+  public String registFunction(String name, String className,
+      ClassLoader classLoader) {
     Validate.notEmpty(name, "Parameter name is empty!");
     Validate.notEmpty(name, "Parameter className is empty!");
     name = name.toLowerCase();
@@ -184,27 +190,37 @@ public class FunctionFactoryImpl implements FunctionFactory {
         throw new IllegalArgumentException(
             String.format("Function %s is read only. Cann't be overwritten!",
                 name));
-      functionMap.put(name, new FunctionBean(name, className, false));
+      functionMap.put(name,
+          new FunctionBean(name, className, false, classLoader));
       return bean.getClassName();
     } else {
-      functionMap.put(name, new FunctionBean(name, className, false));
+      functionMap.put(name,
+          new FunctionBean(name, className, false, classLoader));
+      return className;
+    }
+  }
+
+  @Override
+  public String forceRegistFunction(String name, String className,
+      ClassLoader classLoader) {
+    Validate.notEmpty(name, "Parameter name is empty!");
+    Validate.notEmpty(name, "Parameter className is empty!");
+    name = name.toLowerCase();
+    FunctionBean bean = functionMap.get(name);
+    if (bean != null) {
+      functionMap.put(name,
+          new FunctionBean(name, className, false, classLoader));
+      return bean.getClassName();
+    } else {
+      functionMap.put(name,
+          new FunctionBean(name, className, false, classLoader));
       return className;
     }
   }
 
   @Override
   public String forceRegistFunction(String name, String className) {
-    Validate.notEmpty(name, "Parameter name is empty!");
-    Validate.notEmpty(name, "Parameter className is empty!");
-    name = name.toLowerCase();
-    FunctionBean bean = functionMap.get(name);
-    if (bean != null) {
-      functionMap.put(name, new FunctionBean(name, className, false));
-      return bean.getClassName();
-    } else {
-      functionMap.put(name, new FunctionBean(name, className, false));
-      return className;
-    }
+    return forceRegistFunction(name, className, null);
   }
 
   @Override
@@ -241,12 +257,23 @@ public class FunctionFactoryImpl implements FunctionFactory {
     private String name;
     private String className;
     private boolean readonly = false;
+
+    private ClassLoader classLoader;
+
     private Constructor<?> cstr;
 
     public FunctionBean(String name, String className, boolean readonly) {
       this.name = name;
       this.className = className;
       this.readonly = readonly;
+    }
+
+    public FunctionBean(String name, String className, boolean readonly,
+        ClassLoader classLoader) {
+      this.name = name;
+      this.className = className;
+      this.readonly = readonly;
+      this.classLoader = classLoader;
     }
 
     /**
@@ -276,8 +303,10 @@ public class FunctionFactoryImpl implements FunctionFactory {
     public synchronized Constructor<?> getCstr() {
       if (cstr == null) {
         try {
-          Class<?> clazz = (Class<?>) this.getClass().getClassLoader()
-              .loadClass(className);
+          ClassLoader classLoader = this.classLoader;
+          if (classLoader == null)
+            classLoader = this.getClass().getClassLoader();
+          Class<?> clazz = (Class<?>) classLoader.loadClass(className);
           cstr = clazz.getConstructor(new Class<?>[] { List.class
           });
         } catch (Exception e) {

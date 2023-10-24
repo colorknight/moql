@@ -33,6 +33,8 @@ public interface FunctionFactory {
 
   String registFunction(String name, String className);
 
+  String registFunction(String name, String className, ClassLoader classLoader);
+
   /**
    * force regist function, even read only function will be overwrittern
    *
@@ -41,6 +43,9 @@ public interface FunctionFactory {
    * @return
    */
   String forceRegistFunction(String name, String className);
+
+  String forceRegistFunction(String name, String className,
+      ClassLoader classLoader);
 
   String unregistFunction(String name);
 

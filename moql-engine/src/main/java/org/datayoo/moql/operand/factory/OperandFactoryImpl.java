@@ -27,7 +27,6 @@ import org.datayoo.moql.antlr.OperandParser;
 import org.datayoo.moql.operand.OperandFactory;
 import org.datayoo.moql.operand.PseudoOperand;
 import org.datayoo.moql.operand.expression.member.MemberVisitor;
-import org.datayoo.moql.operand.function.MemberFunction;
 import org.datayoo.moql.operand.function.factory.FunctionFactory;
 import org.datayoo.moql.operand.function.factory.FunctionFactoryImpl;
 import org.datayoo.moql.util.StringFormater;
@@ -86,6 +85,18 @@ public class OperandFactoryImpl implements OperandFactory {
   @Override
   public String forceRegistFunction(String name, String className) {
     return functionFactory.forceRegistFunction(name, className);
+  }
+
+  @Override
+  public String registFunction(String name, String className,
+      ClassLoader classLoader) {
+    return functionFactory.registFunction(name, className, classLoader);
+  }
+
+  @Override
+  public String forceRegistFunction(String name, String className,
+      ClassLoader classLoader) {
+    return functionFactory.forceRegistFunction(name, className, classLoader);
   }
 
   public String unregistFunction(String name) {

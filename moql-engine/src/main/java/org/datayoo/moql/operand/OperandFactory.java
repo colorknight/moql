@@ -33,7 +33,12 @@ public interface OperandFactory {
 
   String registFunction(String name, String className);
 
+  String registFunction(String name, String className, ClassLoader classLoader);
+
   String forceRegistFunction(String name, String className);
+
+  String forceRegistFunction(String name, String className,
+      ClassLoader classLoader);
 
   String unregistFunction(String name);
 
