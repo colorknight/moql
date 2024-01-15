@@ -142,4 +142,14 @@ public class MoqlParserTest extends TestCase {
       e.printStackTrace();
     }
   }
+
+  public void testSelector8() {
+    try {
+      String sql = "select `key`, count(src_cat) `cnt` from brk_source as a group by key";
+      SelectorDefinition selectorDefinition = MoqlParser.parseMoql(sql, false);
+      System.out.println(MoqlParser.translateMetadata2Xml(selectorDefinition));
+    } catch (MoqlException e) {
+      e.printStackTrace();
+    }
+  }
 }

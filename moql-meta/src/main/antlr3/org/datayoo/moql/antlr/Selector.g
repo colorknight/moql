@@ -774,7 +774,9 @@ fragment
 Escape	: '\'' '\'';
 
 Identifier
-	: Letter (Letter | Digital)*;
+	: Letter (Letter | Digital)*
+	| '`' Letter (Letter | Digital)* '`'
+	;
 	
 fragment
 Letter	:	
