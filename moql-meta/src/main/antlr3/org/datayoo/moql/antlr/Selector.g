@@ -719,7 +719,7 @@ member
 
 function
 	: Identifier '('expressionList?')'
-	| Identifier '(' expression 'as' expression ')'
+	| Identifier '(' expression AS expression ')'
 	;
 	
 variable

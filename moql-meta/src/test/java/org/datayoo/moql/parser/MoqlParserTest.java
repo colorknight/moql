@@ -135,7 +135,7 @@ public class MoqlParserTest extends TestCase {
 
   public void testSelector7() {
     try {
-      String sql = "select src_cat, count(src_cat) cnt from brk_source as a group by src_cat";
+      String sql = "select src_cat, count(src_cat) cnt from brk_source a group by src_cat";
       SelectorDefinition selectorDefinition = MoqlParser.parseMoql(sql, false);
       System.out.println(MoqlParser.translateMetadata2Xml(selectorDefinition));
     } catch (MoqlException e) {
@@ -145,8 +145,11 @@ public class MoqlParserTest extends TestCase {
 
   public void testSelector8() {
     try {
-      String sql = "select `key`, count(src_cat) `cnt` from brk_source as a group by key";
+      String sql = "select `key`, count(src_cat) `cnt` from brk_source as brk group by `key`";
       SelectorDefinition selectorDefinition = MoqlParser.parseMoql(sql, false);
+      System.out.println(MoqlParser.translateMetadata2Xml(selectorDefinition));
+      sql = "select `name`, `embedding` from `image`";
+      selectorDefinition = MoqlParser.parseMoql(sql, false);
       System.out.println(MoqlParser.translateMetadata2Xml(selectorDefinition));
     } catch (MoqlException e) {
       e.printStackTrace();
