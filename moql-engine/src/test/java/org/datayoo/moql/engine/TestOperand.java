@@ -435,8 +435,7 @@ public class TestOperand extends TestCase {
     entityMap.putEntity("e", map);
     try {
       Operand member = MoqlEngine.createOperand("e.`a-b`");
-      member.operate(entityMap);
-      System.out.println(map);
+      System.out.println(member.operate(entityMap));
     } catch (MoqlException e) {
       throw new RuntimeException(e);
     }
