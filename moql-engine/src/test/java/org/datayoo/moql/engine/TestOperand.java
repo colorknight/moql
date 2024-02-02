@@ -427,4 +427,18 @@ public class TestOperand extends TestCase {
       throw new RuntimeException(e);
     }
   }
+
+  public void testSpecialIdentity() {
+    EntityMap entityMap = new EntityMapImpl();
+    Map map = new HashMap<>();
+    map.put("a-b", "b");
+    entityMap.putEntity("e", map);
+    try {
+      Operand member = MoqlEngine.createOperand("e.`a-b`");
+      member.operate(entityMap);
+      System.out.println(map);
+    } catch (MoqlException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }

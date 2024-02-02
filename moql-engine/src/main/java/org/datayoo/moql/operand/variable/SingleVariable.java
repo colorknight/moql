@@ -34,6 +34,8 @@ public class SingleVariable extends AbstractOperand implements Variable {
 
   public SingleVariable(String name) {
     Validate.notEmpty(name, "name is empty!");
+    if (name.charAt(0) == '`')
+      name = name.substring(1, name.length() - 1);
     this.name = name;
   }
 
