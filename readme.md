@@ -1,5 +1,7 @@
 (注：moql-translator,moql-querier以转移到moql-transx工程)
 
+[English](https://github.com/colorknight/moql/blob/master/readme_en.md) | 中文
+
 # MOQL简介
 
 ​	MOQL(MemoryObject Query Language)是一款基于Java的面向内存对象过滤、查询及统计分析的开源工具。它能够对内存中存储的集合对象，集合中的对象可以是Bean对象，数组对象、Map对象等各种对象，完成类似于数据库提供的查询及统计分析功能。它的语法结构类似于SQL，支持distinct、where、group、having、order、limit、聚集运算(count、sum、avg、min、max)、多表查询、连接查询(left、right、inner、full)、嵌套查询、以及集合运算(union、intersect、except)等。如：

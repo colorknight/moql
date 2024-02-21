@@ -1,5 +1,7 @@
 (Note: moql-translator, moql-querier can be transferred to moql-transx project)
 
+English | [中文](https://github.com/colorknight/moql/blob/master/readme.md)
+
 # MOQL Introduction
 
 ​	MOQL (MemoryObject Query Language) is a Java-based open source tool for memory object filtering, query and statistical analysis. It can complete query and statistical analysis functions similar to those provided by the database for collection objects stored in memory. The objects in the collection can be Bean objects, array objects, Map objects and other objects. Its syntax structure is similar to SQL, supporting distinct, where, group, having, order, limit, aggregation operations (count, sum, avg, min, max), multi-table query, join query (left, right, inner, full) , nested queries, and set operations (union, intersect, except), etc. like:
