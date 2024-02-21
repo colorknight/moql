@@ -155,4 +155,14 @@ public class MoqlParserTest extends TestCase {
       e.printStackTrace();
     }
   }
+
+  public void testSelector9() {
+    try {
+      String sql = "select u.name as nm,u.age as ag from UserInfo u where u.age>10";
+      SelectorDefinition selectorDefinition = MoqlParser.parseMoql(sql, true);
+      System.out.println(MoqlParser.translateMetadata2Xml(selectorDefinition));
+    } catch (MoqlException e) {
+      e.printStackTrace();
+    }
+  }
 }
