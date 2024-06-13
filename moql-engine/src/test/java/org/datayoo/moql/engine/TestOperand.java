@@ -10,7 +10,6 @@ import org.datayoo.moql.simulation.BeanA;
 import org.datayoo.moql.simulation.BeanFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import java.io.ByteArrayInputStream;
@@ -414,6 +413,16 @@ public class TestOperand extends TestCase {
     }
   }
 
+  public void testFunctionExpression() {
+    try {
+      Operand operand = MoqlEngine.createOperand("now().getTime()");
+      System.out.println(operand.toString() + " " + operand.getOperandType());
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   public void testDerivationMethod() {
     EntityMap entityMap = new EntityMapImpl();
     Map map = new HashMap<>();
@@ -436,6 +445,15 @@ public class TestOperand extends TestCase {
     try {
       Operand member = MoqlEngine.createOperand("e.`a-b`");
       System.out.println(member.operate(entityMap));
+    } catch (MoqlException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void testNumberFirstString() {
+    try {
+      Operand operand = MoqlEngine.createOperand("12datayoo.pdf");
+      System.out.println(operand.toString());
     } catch (MoqlException e) {
       throw new RuntimeException(e);
     }

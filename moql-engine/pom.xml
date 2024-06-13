@@ -10,7 +10,7 @@
 
     <groupId>org.datayoo.moql</groupId>
     <artifactId>moql-engine</artifactId>
-    <version>1.4.8</version>
+    <version>1.4.9</version>
     <packaging>jar</packaging>
 
     <name>moql-engine</name>
@@ -79,7 +79,7 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr3-maven-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.5.2</version>
                 <configuration>
                     <debug>false</debug>
                     <report>false</report>

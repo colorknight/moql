@@ -903,4 +903,20 @@ public class TestSelector extends TestCase {
       e.printStackTrace();
     }
   }
+
+  public void testSelector() {
+    List<BeanA> beanAList = BeanFactory.createBeanAList(0, 100);
+    DataSetMap dataSetMap = new DataSetMapImpl();
+    dataSetMap.putDataSet("BeanA", beanAList);
+    String sql = "select u.name as nm,u.age as ag from UserInfo u where u.age>10";
+    try {
+      Selector selector = MoqlEngine.createSelector(sql);
+      selector.select(dataSetMap);
+      RecordSet recordSet = selector.getRecordSet();
+      outputRecordSet(recordSet);
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
 }

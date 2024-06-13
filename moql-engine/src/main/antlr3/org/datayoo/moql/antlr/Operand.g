@@ -136,13 +136,12 @@ primary returns[Operand operand]
 operand = exp;
 }
     	: exp = parExpression
-    	| exp = function
     	| exp = member
     	| exp = constant
     	;
     	
 member returns[Operand operand]
-	: exp = variable {operand = exp;}
+	: (exp = variable {operand = exp;} | func = function { operand = func;})
 	('[' index = expression? {operand = new ArrayExpression(operand, index);}']')*
 	('.' (var = variable { operand = new MemberVariableExpression(operand, var, memberVisitors);}
 	| func = function { operand = new MemberFunctionExpression(operand, func);}) 
