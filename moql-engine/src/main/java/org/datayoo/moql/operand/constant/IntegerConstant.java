@@ -24,15 +24,15 @@ import java.io.UnsupportedEncodingException;
 /**
  * @author Tang Tadin
  */
-public class LongConstant extends AbstractConstant {
+public class IntegerConstant extends AbstractConstant {
 
   {
-    constantType = ConstantType.LONG;
+    constantType = ConstantType.INTEGER;
   }
 
-  public static Long ZERO = new Long(0);
+  public static Integer ZERO = new Integer(0);
 
-  public LongConstant(String name) {
+  public IntegerConstant(String name) {
     Validate.notEmpty(name, "Parameter 'name' is empty!");
     try {
       this.name = new String(name.getBytes("utf-8"));
@@ -42,8 +42,20 @@ public class LongConstant extends AbstractConstant {
     if (name.charAt(0) == '+') {
       name = name.substring(1);
     }
-    name = name.substring(0, name.length() - 1);
-    this.data = Long.valueOf(name, radix);
+    if (name.length() > 1) {
+      if (name.charAt(0) == '0') {
+        if (name.length() > 2) {
+          if (name.charAt(1) == 'x' || name.charAt(1) == 'X') {
+            radix = 16;
+            name = name.substring(2);
+          }
+        } else {
+          radix = 8;
+          name = name.substring(1);
+        }
+      }
+    }
+    this.data = Integer.valueOf(name, radix);
   }
 
 }

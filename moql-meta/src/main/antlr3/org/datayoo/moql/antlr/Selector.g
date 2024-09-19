@@ -728,7 +728,9 @@ variable
 
 constant
 	: IntegerLiteral
+	| LongLiteral
 	| FloatingPointLiteral
+	| DoublePointLiteral
 	| StringLiteral
 	| NULL
 	| TRUE
@@ -737,9 +739,12 @@ constant
 
 //Lexer
 
+LongLiteral
+	: DecimalLiteral LongTypeSuffix;
+
 IntegerLiteral
-	: DecimalLiteral
-	| HexLiteral
+	: HexLiteral
+	| DecimalLiteral
 	| OctalLiteral;
 
 fragment
@@ -755,15 +760,26 @@ OctalLiteral : '0' ('0'..'7')+ ;
 fragment
 HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
 
+fragment
+LongTypeSuffix : ('l'|'L') ;
 
 FloatingPointLiteral
+    	:   ('+'|'-')? ('0'..'9')+ '.' ('0'..'9')* Exponent? FloatTypeSuffix
+    	|   '.' ('0'..'9')+ Exponent? FloatTypeSuffix
+    	|   ('+'|'-')? ('0'..'9')+ Exponent FloatTypeSuffix
+    	;
+
+DoublePointLiteral
     	:   ('+'|'-')? ('0'..'9')+ '.' ('0'..'9')* Exponent?
-    	|   '.' ('0'..'9')+ Exponent? 
+    	|   '.' ('0'..'9')+ Exponent?
     	|   ('+'|'-')? ('0'..'9')+ Exponent
     	;
 
 fragment
 Exponent : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
+
+fragment
+FloatTypeSuffix : ('f'|'F') ;
 
 StringLiteral
     :  '\'' ( ~'\'' | Escape)*  '\''

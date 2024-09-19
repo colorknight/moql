@@ -173,8 +173,10 @@ constant returns[Operand operand]
 @after {
 ((OperandSourceAware)operand).setSource(t);
 }
-	: t = IntegerLiteral {operand = new LongConstant(t.getText());}
-	| t = FloatingPointLiteral {operand = new DoubleConstant(t.getText());}
+	: t = IntegerLiteral {operand = new IntegerConstant(t.getText());}
+	| t = LongLiteral {operand = new LongConstant(t.getText());}
+	| t = FloatingPointLiteral {operand = new FloatConstant(t.getText());}
+	| t = DoublePointLiteral {operand = new DoubleConstant(t.getText());}
 	| t = StringLiteral {operand = new StringConstant(t.getText());}
 	| t = NULL {operand = new NullConstant();}
 	| t = TRUE {operand = new BooleanConstant(t.getText());}
@@ -182,6 +184,9 @@ constant returns[Operand operand]
 	;
 
 //Lexer
+
+LongLiteral
+	: DecimalLiteral LongTypeSuffix;
 
 IntegerLiteral
 	: HexLiteral
@@ -202,9 +207,15 @@ fragment
 HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
 
 fragment
-IntegerTypeSuffix : ('l'|'L') ;
+LongTypeSuffix : ('l'|'L') ;
 
 FloatingPointLiteral
+    	:   ('+'|'-')? ('0'..'9')+ '.' ('0'..'9')* Exponent? FloatTypeSuffix
+    	|   '.' ('0'..'9')+ Exponent? FloatTypeSuffix
+    	|   ('+'|'-')? ('0'..'9')+ Exponent FloatTypeSuffix
+    	;
+
+DoublePointLiteral
     	:   ('+'|'-')? ('0'..'9')+ '.' ('0'..'9')* Exponent?
     	|   '.' ('0'..'9')+ Exponent?
     	|   ('+'|'-')? ('0'..'9')+ Exponent
@@ -212,6 +223,9 @@ FloatingPointLiteral
 
 fragment
 Exponent : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
+
+fragment
+FloatTypeSuffix : ('f'|'F') ;
 
 StringLiteral
     :  '\'' ( ~'\'' | Escape)*  '\''

@@ -6,6 +6,7 @@ import org.datayoo.moql.EntityMap;
 import org.datayoo.moql.EntityMapImpl;
 import org.datayoo.moql.MoqlException;
 import org.datayoo.moql.Operand;
+import org.datayoo.moql.operand.constant.Constant;
 import org.datayoo.moql.simulation.BeanA;
 import org.datayoo.moql.simulation.BeanFactory;
 import org.dom4j.Document;
@@ -23,6 +24,7 @@ public class TestOperand extends TestCase {
     try {
       Operand constant = MoqlEngine.createOperand("1234");
       System.out.println(constant.toString() + " " + constant.getOperandType());
+      System.out.println(((Constant) constant).getConstantType());
       constant = MoqlEngine.createOperand("192.16");
       System.out.println(constant.toString() + " " + constant.getOperandType());
       constant = MoqlEngine.createOperand("'中国''china'");
@@ -39,8 +41,15 @@ public class TestOperand extends TestCase {
       System.out.println(constant.toString() + " " + constant.getOperandType());
       constant = MoqlEngine.createOperand("-2.3");
       System.out.println(constant.toString() + " " + constant.getOperandType());
+      System.out.println(((Constant) constant).getConstantType());
       constant = MoqlEngine.createOperand("\"-2.3\"");
       System.out.println(constant.toString() + " " + constant.getOperandType());
+      constant = MoqlEngine.createOperand("-2.3f");
+      System.out.println(constant.toString() + " " + constant.getOperandType());
+      System.out.println(((Constant) constant).getConstantType());
+      constant = MoqlEngine.createOperand("3l");
+      System.out.println(constant.toString() + " " + constant.getOperandType());
+      System.out.println(((Constant) constant).getConstantType());
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

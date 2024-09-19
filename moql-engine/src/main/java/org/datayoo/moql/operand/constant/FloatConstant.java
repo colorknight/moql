@@ -19,31 +19,20 @@ package org.datayoo.moql.operand.constant;
 
 import org.apache.commons.lang3.Validate;
 
-import java.io.UnsupportedEncodingException;
-
 /**
  * @author Tang Tadin
  */
-public class LongConstant extends AbstractConstant {
-
+public class FloatConstant extends AbstractConstant {
   {
-    constantType = ConstantType.LONG;
+    constantType = ConstantType.FLOAT;
   }
 
-  public static Long ZERO = new Long(0);
+  public static Float ZERO = new Float(0.0);
 
-  public LongConstant(String name) {
+  public FloatConstant(String name) {
     Validate.notEmpty(name, "Parameter 'name' is empty!");
-    try {
-      this.name = new String(name.getBytes("utf-8"));
-    } catch (UnsupportedEncodingException e) {
-    }
-    int radix = 10;
-    if (name.charAt(0) == '+') {
-      name = name.substring(1);
-    }
-    name = name.substring(0, name.length() - 1);
-    this.data = Long.valueOf(name, radix);
+    this.name = name;
+    this.data = Float.valueOf(name.substring(0, name.length() - 1));
   }
 
 }
