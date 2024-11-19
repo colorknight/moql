@@ -422,6 +422,31 @@ public class TestOperand extends TestCase {
     }
   }
 
+  public void testElementExpression2() {
+    EntityMap entityMap = new EntityMapImpl();
+    String xml = "<epp xmlns=\"urn:ietf:params:xml:ns:epp-1.0\">\n"
+        + "        <command>\n" + "                <check>\n"
+        + "                        <domain:check xmlns:domain=\"urn:ietf:params:xml:ns:domain-1.0\">\n"
+        + "                                <domain:name>golang.org</domain:name>\n"
+        + "                                <domain:name>go.dev</domain:name>\n"
+        + "                        </domain:check>\n"
+        + "                </check>\n" + "        </command>\n" + "</epp>";
+    ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes());
+    SAXReader reader = new SAXReader();
+    try {
+      Document document = reader.read(bais);
+      entityMap.putEntity("e", document.getRootElement());
+      Operand member = MoqlEngine.createOperand("e.command.check.check.name[0].getNamespacePrefix()");
+      System.out.println(member.toString() + " " + member.getOperandType());
+      System.out.println(member.operate(entityMap));
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (DocumentException e) {
+      e.printStackTrace();
+    }
+  }
+
   public void testFunctionExpression() {
     try {
       Operand operand = MoqlEngine.createOperand("now().getTime()");

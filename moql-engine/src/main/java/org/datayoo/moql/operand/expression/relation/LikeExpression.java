@@ -65,9 +65,11 @@ public class LikeExpression extends AbstractRelationExpression {
         } else if (ch == SelectorConstants.BACKSLASH) {
           sbuf.append("\\\\");
         } else {
-          throw new IllegalArgumentException(StringFormater
-              .format("Invalid escape char at {} of search pattern '{}'!", i,
-                  pattern));
+          //          throw new IllegalArgumentException(StringFormater
+          //              .format("Invalid escape char at {} of search pattern '{}'!", i,
+          //                  pattern));
+          sbuf.append("\\");
+          sbuf.append(ch);
         }
       } else {
         sbuf.append(ch);

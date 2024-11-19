@@ -18,6 +18,7 @@ public class TestFilter extends TestCase {
 		entityMap = new EntityMapImpl();
 		entityMap.putEntity("num", 123);
 		entityMap.putEntity("bean", new BeanA("bean", 100));
+		entityMap.putEntity("b", "{\"a\": 2}");
 	}
 
 	public void testCompareFilter() {
@@ -166,6 +167,16 @@ public class TestFilter extends TestCase {
 	public void testTypeConvertFilter() {
 		try {
 			Filter filter1 = MoqlEngine.createFilter("1 = '1'");
+			assertTrue(filter1.isMatch(entityMap));
+		} catch (MoqlException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void testSpecialLikeFilter() {
+		try {
+			Filter filter1 = MoqlEngine.createFilter("b like '\\{%'");
 			assertTrue(filter1.isMatch(entityMap));
 		} catch (MoqlException e) {
 			// TODO Auto-generated catch block
