@@ -203,6 +203,25 @@ public class TestSelector extends TestCase {
     }
   }
 
+  public void testTwoTablesSelector() {
+    List<BeanA> beanAList = BeanFactory.createBeanAList(0, 5);
+    List<BeanB> beanBList = BeanFactory.createBeanBList(0, 5);
+    DataSetMap dataSetMap = new DataSetMapImpl();
+    dataSetMap.putDataSet("BeanA", beanAList);
+    dataSetMap.putDataSet("BeanB", beanBList);
+    String sql = "select a.id, a.name, a.num%50, b.id, b.name, b.num%500 "
+        + "from BeanA a, (select b1.id, b1.name, 1000 from BeanB b1) b where a.num%50 > 10 or b.num%500 < 400 Order By 3 desc, 6 desc";
+    try {
+      Selector selector = MoqlEngine.createSelector(sql);
+      selector.select(dataSetMap);
+      RecordSet recordSet = selector.getRecordSet();
+      outputRecordSet(recordSet);
+    } catch (MoqlException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   public void testTwoLeftJoinTableSelector1() {
     List<BeanA> beanAList = BeanFactory.createBeanAList(0, 5);
     List<BeanB> beanBList = BeanFactory.createBeanBList(0, 10);

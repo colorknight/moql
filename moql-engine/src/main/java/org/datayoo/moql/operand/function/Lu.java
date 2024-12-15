@@ -62,7 +62,8 @@ public class Lu extends AbstractFunction {
     if (idfCounter == null)
       idfCounter = new IdfCounterImpl();
     Set<String> fieldSet = TripodExpressionParser.extractSegmentFields(lucene);
-    fieldSet.add("lu");
+    if (fieldSet.size() == 0)
+      throw new IllegalArgumentException("There is no default field!");
     OperandFactory operandFactory = (OperandFactory) MoqlEnv.getEnvProp(
         MoqlEnv.ENV_OPERAND_FACTORY);
     matchedFields = new Operand[fieldSet.size()];

@@ -492,4 +492,15 @@ public class TestOperand extends TestCase {
       throw new RuntimeException(e);
     }
   }
+
+  public void testRegex() {
+    EntityMap entityMap = new EntityMapImpl();
+    entityMap.putEntity("a", "12111111111");
+    try {
+      Operand operand = MoqlEngine.createOperand("regex(a, '^1\\d{10}$')");
+      System.out.println(operand.operate(entityMap));
+    } catch (MoqlException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }
