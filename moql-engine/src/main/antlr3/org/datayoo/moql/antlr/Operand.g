@@ -210,22 +210,22 @@ fragment
 LongTypeSuffix : ('l'|'L') ;
 
 FloatingPointLiteral
-    	:   ('+'|'-')? ('0'..'9')+ '.' ('0'..'9')* Exponent? FloatTypeSuffix
-    	|   '.' ('0'..'9')+ Exponent? FloatTypeSuffix
-    	|   ('+'|'-')? ('0'..'9')+ Exponent FloatTypeSuffix
-    	;
-
-DoublePointLiteral
     	:   ('+'|'-')? ('0'..'9')+ '.' ('0'..'9')* Exponent?
     	|   '.' ('0'..'9')+ Exponent?
     	|   ('+'|'-')? ('0'..'9')+ Exponent
+    	;
+
+DoublePointLiteral
+    	:   ('+'|'-')? ('0'..'9')+ '.' ('0'..'9')* Exponent? DoubleTypeSuffix
+    	|   '.' ('0'..'9')+ Exponent? DoubleTypeSuffix
+    	|   ('+'|'-')? ('0'..'9')+ Exponent DoubleTypeSuffix
     	;
 
 fragment
 Exponent : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
 
 fragment
-FloatTypeSuffix : ('f'|'F') ;
+DoubleTypeSuffix : ('d'|'D') ;
 
 StringLiteral
     :  '\'' ( ~'\'' | Escape)*  '\''

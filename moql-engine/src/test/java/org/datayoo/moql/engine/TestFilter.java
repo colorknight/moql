@@ -102,6 +102,8 @@ public class TestFilter extends TestCase {
       assertFalse(filter1.isMatch(entityMap));
       filter1 = MoqlEngine.createFilter("bean.name Is not null");
       assertTrue(filter1.isMatch(entityMap));
+      filter1 = MoqlEngine.createFilter("bean.name is not NULL");
+      assertTrue(filter1.isMatch(entityMap));
     } catch (MoqlException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

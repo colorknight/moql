@@ -32,7 +32,7 @@ public class FloatConstant extends AbstractConstant {
   public FloatConstant(String name) {
     Validate.notEmpty(name, "Parameter 'name' is empty!");
     this.name = name;
-    this.data = Float.valueOf(name.substring(0, name.length() - 1));
+    this.data = Float.valueOf(name);
   }
 
 }
